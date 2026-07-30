@@ -1,4 +1,5 @@
 import { Lightbulb } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface DeviceCardProps {
 	name: string;
@@ -35,32 +36,31 @@ export function MoistureCard({ name, gpio, color, active }: DeviceCardProps) {
 	const c = colors[color];
 
 	return (
-		<div
-			className={`flex w-full flex-col items-center gap-3 py-6 rounded-2xl p-4 shadow-sm transition-all duration-300 hover:shadow-md ${
+		<motion.div
+			whileHover={{ scale: 1.03 }}
+			whileTap={{ scale: 0.98 }}
+			className={`flex w-full flex-col items-center gap-2 py-4 rounded-2xl p-3 shadow-sm ${
 				active
 					? `${c.activeBg} shadow-md`
-					: "bg-white shadow-sm card r dark:shadow-slate-700"
+					: "bg-bg-card shadow-sm border border-border"
 			}`}>
 			{/* Icon */}
-			<div
-				className={`flex h-12 w-12 items-center justify-center rounded-xl sm:h-14 sm:w-14 md:h-16 md:w-16 ${active ? c.activeIconBg : c.bg}`}>
+			<motion.div
+				animate={active ? { scale: [1, 1.1, 1] } : { scale: 1 }}
+				transition={{ duration: 0.4, ease: "easeOut" }}
+				className={`flex h-10 w-10 items-center justify-center rounded-xl ${active ? c.activeIconBg : c.bg}`}>
 				<Lightbulb
-					className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 transition-colors duration-300 ${active ? "text-white" : c.text}`}
+					className={`h-5 w-5 transition-colors duration-300 ${active ? "text-white" : c.text}`}
 				/>
-			</div>
+			</motion.div>
 
 			{/* Label */}
 			<div className="text-center">
 				<h3
-					className={`text-sm font-semibold leading-tight sm:text-base md:text-lg transition-colors duration-300 ${active ? "text-white" : ""}`}>
+					className={`text-xs font-semibold leading-tight transition-colors duration-300 ${active ? "text-white" : ""}`}>
 					{name}
 				</h3>
-
-				<p
-					className={`mt-1 text-xs sm:text-sm transition-colors duration-300 ${active ? "text-white/80" : "text-muted-foreground"}`}>
-					GPIO {gpio}
-				</p>
 			</div>
-		</div>
+		</motion.div>
 	);
 }

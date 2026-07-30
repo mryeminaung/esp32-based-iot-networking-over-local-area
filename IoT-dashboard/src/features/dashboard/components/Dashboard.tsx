@@ -1,34 +1,91 @@
-import { useTheme } from "@/hooks/useTheme";
+import Footer from "@/components/Footer";
+import { motion } from "framer-motion";
 import ActivityLog from "./ActivityLog";
 import CardContainer from "./CardContainer";
-import Footer from "./Footer";
-import Header from "./Header";
+import FarmOverview from "./FarmOverview";
 import QuickControls from "./QuickControls";
+
 import SensorCard from "./SensorCard";
+import SystemDecision from "./SystemDecision";
 import SystemInfo from "./SystemInfo";
 
+const section = {
+	hidden: { opacity: 0, y: 30 },
+	show: {
+		opacity: 1,
+		y: 0,
+		transition: { type: "spring", stiffness: 260, damping: 20 },
+	},
+};
+
 export default function Dashboard() {
-	// Keeps <html data-theme> in sync
-	useTheme();
-
 	return (
-		<div className="max-w-[1100px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
-			<Header />
+		<div className="flex-1 max-w-[1100px] mx-auto w-full px-4 sm:px-6 py-6 sm:py-6 space-y-5">
+			{/* Technical Info */}
+			<motion.div
+				variants={section}
+				initial="hidden"
+				animate="show">
+				<SystemInfo />
+			</motion.div>
 
-			{/* Two-column grid — stacks at 900px.
-          Right column is minmax(0, 380px) so it never overflows on tiny screens. */}
-			<div className="grid gap-5 lg:grid-cols-[400px_1fr]">
-				<aside className="space-y-5">
-					<QuickControls />
-					<SystemInfo />
-				</aside>
-
-				<main className="space-y-5">
-					<CardContainer />
+			{/* Soil Moisture Gauge + LED Status Indicators */}
+			<div className="grid gap-4 sm:gap-5 grid-cols-1 md:grid-cols-3">
+				<motion.div
+					variants={section}
+					initial="hidden"
+					animate="show"
+					transition={{ delay: 0.1 }}
+					className="md:col-span-2">
 					<SensorCard />
-					<ActivityLog />
-				</main>
+				</motion.div>
+				<motion.div
+					variants={section}
+					initial="hidden"
+					animate="show"
+					transition={{ delay: 0.2 }}
+					className="md:col-span-1">
+					<CardContainer />
+				</motion.div>
 			</div>
+
+			{/* System Decision Banner */}
+			<motion.div
+				variants={section}
+				initial="hidden"
+				animate="show"
+				transition={{ delay: 0.3 }}>
+				<SystemDecision />
+			</motion.div>
+
+			{/* Irrigation Controls + Farm Overview */}
+			<div className="grid gap-4 sm:gap-5 grid-cols-1 md:grid-cols-3">
+				<motion.div
+					variants={section}
+					initial="hidden"
+					animate="show"
+					transition={{ delay: 0.4 }}
+					className="md:col-span-2">
+					<QuickControls />
+				</motion.div>
+				<motion.div
+					variants={section}
+					initial="hidden"
+					animate="show"
+					transition={{ delay: 0.5 }}
+					className="md:col-span-1">
+					<FarmOverview />
+				</motion.div>
+			</div>
+
+			{/* Farm Activity - Full Width */}
+			<motion.div
+				variants={section}
+				initial="hidden"
+				animate="show"
+				transition={{ delay: 0.6 }}>
+				<ActivityLog />
+			</motion.div>
 
 			<Footer />
 		</div>

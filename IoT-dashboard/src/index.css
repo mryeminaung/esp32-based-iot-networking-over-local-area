@@ -9,16 +9,102 @@
   font-display: swap;
 }
 
+/* ── Design Tokens ── */
+:root {
+  /* Surface */
+  --bg-page: #E8F0E4;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F0F5ED;
+  --bg-muted: #DDE8D8;
+
+  /* Borders */
+  --border: #D5DDD7;
+  --border-strong: #B0BFB3;
+
+  /* Text */
+  --text-primary: #17231B;
+  --text-secondary: #3D4F44;
+  --text-muted: #647067;
+
+  /* Primary Green */
+  --green-50: #F0FDF4;
+  --green-100: #DCFCE7;
+  --green-500: #22C55E;
+  --green-600: #166534;
+  --green-700: #15803D;
+
+  /* Water Blue */
+  --blue-50: #F0F9FF;
+  --blue-100: #E0F2FE;
+  --blue-500: #0EA5E9;
+  --blue-600: #0284C7;
+  --blue-700: #0369A1;
+
+  /* Semantic - Agriculture */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+
+  /* Toggle */
+  --toggle-off: #B0BFB3;
+}
+
+[data-theme="dark"] {
+  --bg-page: #0F172A;
+  --bg-card: #1E293B;
+  --bg-card-hover: #253449;
+  --bg-muted: #1E293B;
+
+  --border: #334155;
+  --border-strong: #475569;
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  --green-50: #143323;
+  --green-100: #1A4430;
+  --green-500: #22C55E;
+  --green-600: #4ADE80;
+  --green-700: #86EFAC;
+
+  --blue-50: #0C2D44;
+  --blue-100: #0E3A56;
+  --blue-500: #38BDF8;
+  --blue-600: #0EA5E9;
+  --blue-700: #7DD3FC;
+
+  --toggle-off: #475569;
+}
+
 @theme {
   --font-sans: "Space Grotesk", system-ui, sans-serif;
+
+  /* Semantic color tokens */
+  --color-bg-page: var(--bg-page);
+  --color-bg-card: var(--bg-card);
+  --color-bg-muted: var(--bg-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--green-600);
+  --color-accent-light: var(--green-50);
+  --color-accent-hover: var(--green-700);
+  --color-water: var(--blue-600);
+  --color-water-light: var(--blue-50);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
 }
 
 /* ── Base ── */
 html,
 body {
   font-family: "Space Grotesk", system-ui, sans-serif;
-  background: #f1f5f9;
-  color: #0f172a;
+  background: var(--bg-page);
+  color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -30,25 +116,14 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-/* Dark theme body */
-[data-theme="dark"] body,
-[data-theme="dark"] html {
-  background: #0f172a;
-  color: #f1f5f9;
-}
-
 /* ── Shared card style ── */
 .card {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 20px;
   padding: 28px;
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.04),
     0 4px 12px rgba(0, 0, 0, 0.03);
-}
-
-[data-theme="dark"] .card {
-  background: #060c1c;
 }
 
 /* ── Toggle switch ── */
@@ -74,7 +149,7 @@ body::-webkit-scrollbar {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #cbd5e1;
+  background-color: var(--toggle-off);
   transition: all 0.3s;
   border-radius: 30px;
 }
@@ -96,28 +171,34 @@ input:checked + .toggle-slider::before {
   transform: translateX(26px);
 }
 
-/* Smaller toggle on very small screens */
+/* Responsive toggle sizes */
+@media (max-width: 640px) {
+  .toggle-switch { width: 50px; height: 26px; }
+  .toggle-slider::before { width: 20px; height: 20px; }
+  input:checked + .toggle-slider::before { transform: translateX(24px); }
+}
+
 @media (max-width: 380px) {
-  .toggle-switch { width: 46px !important; height: 24px !important; }
-  .toggle-slider::before { width: 18px !important; height: 18px !important; }
-  input:checked + .toggle-slider::before { transform: translateX(22px) !important; }
+  .toggle-switch { width: 44px; height: 22px; }
+  .toggle-slider::before { width: 16px; height: 16px; }
+  input:checked + .toggle-slider::before { transform: translateX(22px); }
 }
 
 /* Per-color checked states */
 .toggle-switch.red input:checked + .toggle-slider {
-  background-color: #ef4444;
+  background-color: var(--color-danger);
 }
 .toggle-switch.blue input:checked + .toggle-slider {
-  background-color: #3b82f6;
+  background-color: var(--green-600);
 }
 .toggle-switch.yellow input:checked + .toggle-slider {
-  background-color: #f59e0b;
+  background-color: var(--color-warning);
 }
 .toggle-switch.green input:checked + .toggle-slider {
-  background-color: #22c55e;
+  background-color: var(--color-success);
 }
 .toggle-switch.gray input:checked + .toggle-slider {
-  background-color: #94a3b8;
+  background-color: var(--text-muted);
 }
 .toggle-switch.purple input:checked + .toggle-slider {
   background-color: #a855f7;
@@ -126,17 +207,13 @@ input:checked + .toggle-slider::before {
   background-color: #0d9488;
 }
 
-[data-theme="dark"] .toggle-slider {
-  background-color: #475569;
-}
-
 /* ── Range slider ── */
 .device-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 130px;
   height: 8px;
-  background: linear-gradient(to right, #3b82f6 0%, #3b82f6 0%, #e2e8f0 0%, #e2e8f0 100%);
+  background: linear-gradient(to right, var(--green-600) 0%, var(--green-600) 0%, var(--border) 0%, var(--border) 100%);
   border-radius: 4px;
   outline: none;
   cursor: pointer;
@@ -147,25 +224,21 @@ input:checked + .toggle-slider::before {
   appearance: none;
   width: 20px;
   height: 20px;
-  background: #3b82f6;
+  background: var(--green-600);
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
-  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(22, 101, 52, 0.35);
+  border: 3px solid var(--bg-card);
 }
 
 .device-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
-  background: #3b82f6;
+  background: var(--green-600);
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
-  border: 3px solid white;
-}
-
-[data-theme="dark"] .device-slider {
-  background: linear-gradient(to right, #3b82f6 0%, #3b82f6 0%, #475569 0%, #475569 100%) !important;
+  box-shadow: 0 2px 8px rgba(22, 101, 52, 0.35);
+  border: 3px solid var(--bg-card);
 }
 
 @keyframes pulse {
@@ -181,7 +254,7 @@ input:checked + .toggle-slider::before {
 
 @keyframes splash-pulse {
   0%, 100% { transform: scale(1); opacity: 0.9; }
-  50%      { transform: scale(1.05); opacity: 1; box-shadow: 0 0 20px rgba(59,130,246,0.2); }
+  50%      { transform: scale(1.05); opacity: 1; box-shadow: 0 0 20px rgba(22,101,52,0.2); }
 }
 
 @keyframes splash-dot {

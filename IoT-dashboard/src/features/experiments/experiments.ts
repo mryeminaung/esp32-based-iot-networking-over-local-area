@@ -30,18 +30,18 @@ export type Experiment = {
 export const statusConfig: Record<Status, { label: string; dot: string; badge: string }> = {
 	completed: {
 		label: "Completed",
-		dot: "bg-green-500",
-		badge: "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-700/30",
+		dot: "bg-success",
+		badge: "bg-success/10 text-success border-success/20",
 	},
 	"in-progress": {
 		label: "In Progress",
-		dot: "bg-yellow-500",
-		badge: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-700/30",
+		dot: "bg-warning",
+		badge: "bg-warning/10 text-warning border-warning/20",
 	},
 	planned: {
 		label: "Planned",
-		dot: "bg-slate-300",
-		badge: "bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-600",
+		dot: "bg-border-strong",
+		badge: "bg-bg-muted text-text-muted border-border",
 	},
 }
 
@@ -52,7 +52,7 @@ export const experiments: Experiment[] = [
 		description: "Configure ESP32 as a local WiFi network",
 		icon: Wifi,
 		iconColor: "text-blue-600",
-		iconBg: "bg-blue-100 dark:bg-blue-900/30",
+		iconBg: "bg-accent-light",
 		tags: ["ESP32 WiFi", "Access Point"],
 		status: "completed",
 		detail: {
@@ -82,7 +82,7 @@ export const experiments: Experiment[] = [
 		description: "Control GPIO through HTTP requests",
 		icon: Lightbulb,
 		iconColor: "text-amber-600",
-		iconBg: "bg-amber-100 dark:bg-amber-900/30",
+		iconBg: "bg-warning/10",
 		tags: ["HTTP", "GPIO", "Web Server"],
 		status: "completed",
 		detail: {
@@ -118,7 +118,7 @@ export const experiments: Experiment[] = [
 		description: "Control motor speed using PWM signals",
 		icon: Zap,
 		iconColor: "text-purple-600",
-		iconBg: "bg-purple-100 dark:bg-purple-900/30",
+		iconBg: "bg-purple-100",
 		tags: ["PWM", "L298N", "Motor Driver"],
 		status: "completed",
 		detail: {
@@ -150,7 +150,7 @@ export const experiments: Experiment[] = [
 		description: "Remote ESP32 control over internet",
 		icon: Globe,
 		iconColor: "text-teal-600",
-		iconBg: "bg-teal-100 dark:bg-teal-900/30",
+		iconBg: "bg-teal-100",
 		tags: ["IoT Cloud", "Communication"],
 		status: "completed",
 		detail: {
@@ -181,7 +181,7 @@ export const experiments: Experiment[] = [
 		description: "Monitor soil moisture and automatically control water pump",
 		icon: Sprout,
 		iconColor: "text-green-600",
-		iconBg: "bg-green-100 dark:bg-green-900/30",
+		iconBg: "bg-success/10",
 		tags: ["Soil Sensor", "Relay", "Water Pump"],
 		status: "in-progress",
 		featured: true,

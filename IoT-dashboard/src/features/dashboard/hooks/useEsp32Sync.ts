@@ -8,10 +8,10 @@ const deviceLabels: Record<DeviceKey, string> = {
   red_light: "Red Light",
   yellow_light: "Yellow Light",
   green_light: "Green Light",
-  white_light: "White Light",
+  white_light: "Grow Light",
   relay: "Relay",
-  fan: "Fan",
-  water_pump: "Water Pump",
+  fan: "Ventilation Fan",
+  water_pump: "Irrigation Pump",
 }
 
 let previousConnected = false
@@ -34,9 +34,12 @@ export function sendCommand(key: DeviceKey, state: boolean | number, value?: num
       const now = new Date().toLocaleTimeString()
       const label = deviceLabels[key]
       if (typeof state === "boolean") {
+        const action = key === "water_pump"
+          ? (state ? "started" : "stopped")
+          : (state ? "turned on" : "turned off")
         store.addLog({
           time: now,
-          message: `${label} turned ${state ? "on" : "off"}`,
+          message: `${label} ${action}`,
           type: state ? "on" : "off",
         })
       } else {
@@ -108,12 +111,12 @@ export default function useEsp32Sync() {
         // Log moisture changes
         if (previousMoisture !== -1 && data.soilMoisture !== previousMoisture) {
           const now = new Date().toLocaleTimeString()
-          const label =
-            data.soilMoisture <= 30 ? "Dry" :
-            data.soilMoisture < 50 ? "Moist" : "Wet"
+          const condition =
+            data.soilMoisture <= 30 ? "DRY" :
+            data.soilMoisture < 50 ? "MOIST" : "OPTIMAL"
           addLog({
             time: now,
-            message: `Soil ${label} (${data.soilMoisture}%)`,
+            message: `Soil moisture changed to ${data.soilMoisture}% — ${condition}`,
             type: "info",
           })
         }

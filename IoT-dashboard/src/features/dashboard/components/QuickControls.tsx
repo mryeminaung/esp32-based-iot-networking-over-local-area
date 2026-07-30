@@ -1,6 +1,6 @@
 import { sendCommand } from "@/features/dashboard/hooks/useEsp32Sync";
 import { useDashboardStore, type DeviceKey } from "@/store/dashboard";
-import { Droplets, Fan, Lightbulb, Square } from "lucide-react";
+import { Droplets, Fan, Lightbulb, Square, Power, Zap } from "lucide-react";
 import ControlItem from "./ControlItem";
 
 const allDevices: {
@@ -13,16 +13,16 @@ const allDevices: {
 	disabled?: boolean;
 }[] = [
 	{
-		key: "white_light",
-		icon: Lightbulb,
-		label: "White Light",
-		gpio: "GPIO 18",
-		color: "gray",
+		key: "water_pump",
+		icon: Droplets,
+		label: "Irrigation Pump",
+		gpio: "GPIO 22",
+		color: "blue",
 		type: "toggle",
 	},
 	{
 		key: "relay",
-		icon: Square,
+		icon: Zap,
 		label: "Relay",
 		gpio: "GPIO 21",
 		color: "teal",
@@ -31,23 +31,32 @@ const allDevices: {
 	{
 		key: "fan",
 		icon: Fan,
-		label: "Fan",
+		label: "Ventilation Fan",
 		gpio: "GPIO 19",
-		color: "blue",
+		color: "gray",
 		type: "slider",
 	},
 	{
-		key: "water_pump",
-		icon: Droplets,
-		label: "Water Pump",
-		gpio: "GPIO 22",
+		key: "white_light",
+		icon: Lightbulb,
+		label: "Grow Light",
+		gpio: "GPIO 18",
 		color: "purple",
 		type: "toggle",
 	},
 ];
 
+function getMoistureCondition(value: number) {
+	if (value <= 30) return { label: "DRY", color: "text-danger" };
+	if (value < 50) return { label: "MOIST", color: "text-warning" };
+	return { label: "OPTIMAL", color: "text-success" };
+}
+
 export default function QuickControls() {
 	const devicesState = useDashboardStore((s) => s.devices);
+	const moisture = useDashboardStore((s) => s.moisture);
+	const pumpRunning = devicesState.water_pump;
+	const condition = getMoistureCondition(moisture);
 
 	const handleToggle = (key: DeviceKey) => {
 		const current = useDashboardStore.getState().devices[key];
@@ -59,11 +68,34 @@ export default function QuickControls() {
 	};
 
 	return (
-		<section className="card">
-			<h2 className="text-[1.1rem] font-bold mb-5 max-sm:text-[1rem] max-sm:mb-[14px]">
-				Quick Controls
-			</h2>
+		<section className="bg-bg-card rounded-2xl p-4 sm:p-5 md:p-6 border border-border w-full h-full">
+			{/* Header with pump status */}
+			<div className="flex items-center justify-between mb-3 sm:mb-4">
+				<h2 className="text-[0.9375rem] sm:text-[1.05rem] md:text-[1.1rem] font-bold text-text-primary">
+					Irrigation Control
+				</h2>
+				<div className="flex items-center gap-1.5 sm:gap-2">
+					<Power size={12} className={`sm:size-[14px] ${pumpRunning ? "text-success" : "text-text-muted"}`} />
+					<span className={`text-[0.6875rem] sm:text-[0.75rem] font-semibold ${pumpRunning ? "text-success" : "text-text-muted"}`}>
+						{pumpRunning ? "RUNNING" : "IDLE"}
+					</span>
+				</div>
+			</div>
 
+			{/* Mode indicator */}
+			<div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-xl bg-bg-muted border border-border">
+				<div className="flex items-center gap-1.5 sm:gap-2">
+					<span className="text-[0.625rem] sm:text-[0.7rem] text-text-muted font-medium uppercase tracking-wider">Mode</span>
+					<span className="text-[0.6875rem] sm:text-[0.75rem] font-bold text-text-primary">MANUAL</span>
+				</div>
+				<div className="w-px h-3 sm:h-4 bg-border hidden sm:block" />
+				<div className="flex items-center gap-1.5 sm:gap-2">
+					<span className="text-[0.625rem] sm:text-[0.7rem] text-text-muted font-medium uppercase tracking-wider">Soil</span>
+					<span className={`text-[0.6875rem] sm:text-[0.75rem] font-bold ${condition.color}`}>{condition.label}</span>
+				</div>
+			</div>
+
+			{/* Device controls */}
 			{allDevices.map((dev, i) => {
 				const isLast = i === allDevices.length - 1;
 				const val = devicesState[dev.key];
@@ -78,6 +110,7 @@ export default function QuickControls() {
 						sliderValue={val as number}
 						onSliderChange={(v) => handleSlider(dev.key, v)}
 						last={isLast}
+						hideGpio
 					/>
 				) : (
 					<ControlItem
@@ -90,6 +123,7 @@ export default function QuickControls() {
 						onToggle={() => handleToggle(dev.key)}
 						disabled={dev.disabled}
 						last={isLast}
+						hideGpio
 					/>
 				);
 			})}

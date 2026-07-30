@@ -22,7 +22,7 @@ export default function ExperimentCard({ experiment, onClick }: ExperimentCardPr
 
 			{/* Title + description */}
 			<h3 className="text-[1.05rem] font-bold mb-1.5">{experiment.title}</h3>
-			<p className="text-[0.85rem] text-slate-500 dark:text-slate-400 leading-relaxed mb-4 flex-1">
+			<p className="text-[0.85rem] text-text-secondary leading-relaxed mb-4 flex-1">
 				{experiment.description}
 			</p>
 
@@ -32,7 +32,7 @@ export default function ExperimentCard({ experiment, onClick }: ExperimentCardPr
 					{experiment.tags.map((tag) => (
 						<span
 							key={tag}
-							className="text-[0.7rem] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+							className="text-[0.7rem] font-semibold px-2.5 py-1 rounded-full bg-bg-muted text-text-muted">
 							{tag}
 						</span>
 					))}
