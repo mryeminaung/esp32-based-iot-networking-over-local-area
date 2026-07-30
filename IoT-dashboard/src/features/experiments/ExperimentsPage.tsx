@@ -1,15 +1,11 @@
-import { ArrowLeft, Beaker } from "lucide-react"
+import { Beaker } from "lucide-react"
 import { useState } from "react"
-import { Link } from "react-router"
-import { useTheme } from "@/hooks/useTheme"
 import { experiments } from "./experiments"
 import type { Experiment } from "./experiments"
 import ExperimentCard from "./ExperimentCard"
 import ExperimentDetail from "./ExperimentDetail"
 
 export default function ExperimentsPage() {
-	useTheme()
-
 	const [selected, setSelected] = useState<Experiment | null>(null)
 
 	const regular = experiments.filter((e) => !e.featured)
@@ -19,26 +15,18 @@ export default function ExperimentsPage() {
 	const progress = total > 0 ? Math.round((completed / total) * 100) : 0
 
 	return (
-		<div className="max-w-[1100px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
-			{/* Back link */}
-			<Link
-				to="/"
-				className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors mb-6">
-				<ArrowLeft size={16} />
-				Back to Dashboard
-			</Link>
-
+		<div className="flex-1 max-w-[1100px] mx-auto w-full px-4 sm:px-6 py-6 sm:py-6">
 			{/* Header */}
 			<div className="card mb-6">
 				<div className="flex items-center gap-4 mb-3">
-					<div className="w-11 h-11 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center shrink-0">
+					<div className="w-11 h-11 rounded-xl bg-accent-light text-accent flex items-center justify-center shrink-0">
 						<Beaker size={22} />
 					</div>
 					<div>
 						<h1 className="text-[1.3rem] sm:text-[1.5rem] font-bold">
 							ESP32 Experiments
 						</h1>
-						<p className="text-[0.8125rem] text-slate-400 dark:text-slate-500 mt-0.5">
+						<p className="text-[0.8125rem] text-text-muted mt-0.5">
 							Track IoT networking experiments and implementation status
 						</p>
 					</div>
@@ -47,14 +35,14 @@ export default function ExperimentsPage() {
 				{/* Progress bar */}
 				<div className="mt-4">
 					<div className="flex items-center justify-between text-sm mb-2">
-						<span className="text-slate-500 dark:text-slate-400 font-medium">
+						<span className="text-text-secondary font-medium">
 							Progress
 						</span>
-						<span className="text-slate-500 dark:text-slate-400 font-medium">
+						<span className="text-text-secondary font-medium">
 							{completed}/{total} Completed
 						</span>
 					</div>
-					<div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+					<div className="w-full h-2 rounded-full bg-bg-muted overflow-hidden">
 						<div
 							className="h-full rounded-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-700 ease-out"
 							style={{ width: `${progress}%` }}
@@ -90,10 +78,10 @@ export default function ExperimentsPage() {
 							<span
 								className={`shrink-0 text-[0.7rem] font-semibold px-2.5 py-1 rounded-full border flex items-center gap-1.5 ${
 									featured.status === "completed"
-										? "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-700/30"
+										? "bg-success/10 text-success border-success/20"
 										: featured.status === "in-progress"
-											? "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-700/30"
-											: "bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-600"
+											? "bg-warning/10 text-warning border-warning/20"
+											: "bg-bg-muted text-text-muted border-border"
 								}`}>
 								<span
 									className={`w-1.5 h-1.5 rounded-full ${
@@ -101,7 +89,7 @@ export default function ExperimentsPage() {
 											? "bg-green-500"
 											: featured.status === "in-progress"
 												? "bg-yellow-500"
-												: "bg-slate-300"
+												: "bg-border-strong"
 									}`}
 								/>
 								{featured.status === "completed"
@@ -112,7 +100,7 @@ export default function ExperimentsPage() {
 							</span>
 						</div>
 
-						<p className="text-[0.85rem] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
+						<p className="text-[0.85rem] text-text-secondary leading-relaxed mb-3">
 							{featured.description}
 						</p>
 
@@ -121,13 +109,13 @@ export default function ExperimentsPage() {
 								{featured.tags.map((tag) => (
 									<span
 										key={tag}
-										className="text-[0.7rem] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+										className="text-[0.7rem] font-semibold px-2.5 py-1 rounded-full bg-bg-muted text-text-muted">
 										{tag}
 									</span>
 								))}
 							</div>
 
-							<span className="shrink-0 text-[0.8rem] font-semibold text-blue-500 flex items-center gap-1">
+							<span className="shrink-0 text-[0.8rem] font-semibold text-accent flex items-center gap-1">
 								View Details
 								<span className="text-[0.85rem]">&rarr;</span>
 							</span>
