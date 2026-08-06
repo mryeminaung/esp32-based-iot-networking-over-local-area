@@ -1,8 +1,15 @@
+import DeviceQRCode from "@/features/dashboard/components/DeviceQRCode";
 import { useDashboardStore } from "@/store/dashboard";
-import { Sprout, FlaskConical, LayoutDashboard, Moon, QrCode, Sun } from "lucide-react";
+import {
+	FlaskConical,
+	LayoutDashboard,
+	Moon,
+	QrCode,
+	Sprout,
+	Sun,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
-import DeviceQRCode from "@/features/dashboard/components/DeviceQRCode";
 
 export default function Header() {
 	const connected = useDashboardStore((s) => s.connected);
