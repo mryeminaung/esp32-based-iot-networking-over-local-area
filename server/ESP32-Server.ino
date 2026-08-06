@@ -19,8 +19,8 @@
 #include <ESPmDNS.h>
 
 // WiFi Configuration
-const char *ssid = "LOL";
-const char *password = "hello124";
+const char *ssid = "MIIT-WIFI";
+const char *password = "Thanks123";
 const char *hostName = "esp32-server";
 
 // Global Variables
@@ -35,6 +35,8 @@ WebServer server(80);
 #define RELAY_PIN 21
 #define PUMP_PIN 22
 #define SOIL_MOISTURE_PIN 34
+
+
 
 // PWM Configuration
 #define PWM_FREQUENCY 1000
@@ -219,10 +221,61 @@ void handleCORSPreflight()
   server.send(204);
 }
 
-// Root endpoint
+// Root endpoint - API documentation landing page
 void handleRoot()
 {
-  server.send(200, "text/plain", "ESP32 IoT Dashboard API");
+  String ip = WiFi.localIP().toString();
+  String wifi = WiFi.SSID();
+
+  String html = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\">";
+  html += "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">";
+  html += "<title>ESP32 - Smart Agriculture API</title><style>";
+  html += "*{margin:0;padding:0;box-sizing:border-box}";
+  html += "body{font-family:system-ui,-apple-system,sans-serif;background:#F8FAFC;color:#1E293B;min-height:100vh;padding:24px 16px}";
+  html += ".container{max-width:600px;margin:0 auto}";
+  html += ".header{text-align:center;margin-bottom:32px}";
+  html += ".header h1{font-size:1.5rem;font-weight:700;color:#166534;margin-bottom:4px}";
+  html += ".header p{color:#64748B;font-size:0.875rem}";
+  html += ".card{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;padding:20px;margin-bottom:16px}";
+  html += ".card h2{font-size:1rem;font-weight:600;color:#166534;margin-bottom:12px;display:flex;align-items:center;gap:8px}";
+  html += ".info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F1F5F9}";
+  html += ".info-row:last-child{border-bottom:none}";
+  html += ".info-label{color:#64748B;font-size:0.8125rem}";
+  html += ".info-value{color:#1E293B;font-size:0.8125rem;font-weight:500;font-family:monospace}";
+  html += ".endpoint{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #F1F5F9}";
+  html += ".endpoint:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}";
+  html += ".method{display:inline-block;padding:2px 8px;border-radius:6px;font-size:0.7rem;font-weight:700;font-family:monospace;margin-right:6px}";
+  html += ".method-get{background:#DCFCE7;color:#166534}";
+  html += ".method-post{background:#FEF3C7;color:#92400E}";
+  html += ".path{font-family:monospace;font-size:0.875rem;color:#1E293B}";
+  html += ".endpoint p{color:#64748B;font-size:0.8125rem;margin-top:6px;line-height:1.5}";
+  html += ".code-block{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px;margin-top:8px;font-family:monospace;font-size:0.75rem;color:#475569;line-height:1.6;white-space:pre;overflow-x:auto}";
+  html += ".footer{text-align:center;color:#94A3B8;font-size:0.75rem;margin-top:24px}";
+  html += "</style></head><body><div class=\"container\">";
+  html += "<div class=\"header\"><h1>&#127793; Smart Agriculture Dashboard API</h1>";
+  html += "<p>Smart Agriculture Device</p></div>";
+  html += "<div class=\"card\"><h2>Device Info</h2>";
+  html += "<div class=\"info-row\"><span class=\"info-label\">Device</span><span class=\"info-value\">ESP32 DevKit V1</span></div>";
+  html += "<div class=\"info-row\"><span class=\"info-label\">IP Address</span><span class=\"info-value\">" + ip + "</span></div>";
+  html += "<div class=\"info-row\"><span class=\"info-label\">mDNS</span><span class=\"info-value\">esp32-server.local</span></div>";
+  html += "<div class=\"info-row\"><span class=\"info-label\">Mode</span><span class=\"info-value\">Station (STA)</span></div>";
+  html += "<div class=\"info-row\"><span class=\"info-label\">WiFi</span><span class=\"info-value\">" + wifi + "</span></div>";
+  html += "</div>";
+  html += "<div class=\"card\"><h2>API Endpoints</h2>";
+  html += "<div class=\"endpoint\"><span class=\"method method-get\">GET</span><span class=\"path\">/all</span>";
+  html += "<p>Combined system info + sensor data in a single request.</p></div>";
+  html += "<div class=\"endpoint\"><span class=\"method method-get\">GET</span><span class=\"path\">/system</span>";
+  html += "<p>System info: device name, IP, MAC, uptime, free heap, WiFi SSID.</p></div>";
+  html += "<div class=\"endpoint\"><span class=\"method method-get\">GET</span><span class=\"path\">/sensors</span>";
+  html += "<p>Sensor readings and device states: soil moisture, lights, fan, relay, pump.</p></div>";
+  html += "<div class=\"endpoint\"><span class=\"method method-post\">POST</span><span class=\"path\">/control</span>";
+  html += "<p>Control devices. Send JSON body with device name, state, and optional value.</p>";
+  html += "<div class=\"code-block\">{\n  \"device\": \"red_light\",\n  \"state\": 1,\n  \"value\": 0\n}</div>";
+  html += "<p style=\"margin-top:6px\">Devices: red_light, yellow_light, green_light, white_light, fan, relay, water_pump</p></div>";
+  html += "</div>";
+  html += "<div class=\"footer\">IoT Monitoring & Irrigation System</div></div></body></html>";
+
+  server.send(200, "text/html", html);
 }
 
 // Unified control endpoint
@@ -245,19 +298,19 @@ void handleControl()
       {
         redLightState = state;
         setLight(RED_LIGHT_PIN, state);
-        lastSensorRead = millis();  // defer auto-cycle so manual state persists
+        lastSensorRead = millis(); // defer auto-cycle so manual state persists
       }
       else if (deviceStr == "yellow_light")
       {
         yellowLightState = state;
         setLight(YELLOW_LIGHT_PIN, state);
-        lastSensorRead = millis();  // defer auto-cycle so manual state persists
+        lastSensorRead = millis(); // defer auto-cycle so manual state persists
       }
       else if (deviceStr == "green_light")
       {
         greenLightState = state;
         setLight(GREEN_LIGHT_PIN, state);
-        lastSensorRead = millis();  // defer auto-cycle so manual state persists
+        lastSensorRead = millis(); // defer auto-cycle so manual state persists
       }
       else if (deviceStr == "white_light")
       {
@@ -415,7 +468,7 @@ void setPWMDevice(int pin, bool state, int value)
 int readSoilMoisture()
 {
   int rawValue = analogRead(SOIL_MOISTURE_PIN);
-  int moisturePercent = map(rawValue, 0, 4095, 100, 0);  // inverted sensor: dry=high, wet=low
+  int moisturePercent = map(rawValue, 0, 4095, 100, 0); // inverted sensor: dry=high, wet=low
   moisturePercent = constrain(moisturePercent, 0, 100);
   return moisturePercent;
 }
