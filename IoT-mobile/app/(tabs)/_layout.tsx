@@ -1,10 +1,15 @@
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { useResolvedTheme } from "@/hooks/useResolvedTheme";
+import CustomTabBar from "@/features/navigation/CustomTabBar";
+import { usePathname } from "expo-router";
+import type { ComponentProps } from "react";
+
+type IoniconsName = ComponentProps<typeof Ionicons>["name"];
 
 function HeaderTitle({ title, subtitle }: { title: string; subtitle: string }) {
   const resolvedTheme = useResolvedTheme();
@@ -18,28 +23,43 @@ function HeaderTitle({ title, subtitle }: { title: string; subtitle: string }) {
   );
 }
 
-export default function TabLayout() {
+const TABS: { key: string; label: string; icon: IoniconsName; iconFocused: IoniconsName }[] = [
+  { key: "index", label: "Home", icon: "leaf-outline", iconFocused: "leaf" },
+  { key: "sensors", label: "Sensors", icon: "analytics-outline", iconFocused: "analytics" },
+  { key: "devices", label: "Devices", icon: "hardware-chip-outline", iconFocused: "hardware-chip" },
+  { key: "settings", label: "Settings", icon: "settings-outline", iconFocused: "settings" },
+];
+
+function CustomTabBarWrapper() {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Determine active tab from pathname
+  const activeTab = TABS.find((t) => {
+    if (t.key === "index") return pathname === "/";
+    return pathname.startsWith(`/${t.key}`);
+  })?.key || "index";
+
+  const handleTabPress = (key: string) => {
+    if (key === "index") {
+      router.push("/");
+    } else {
+      router.push(`/${key}` as any);
+    }
+  };
+
+  return <CustomTabBar tabs={TABS} activeTab={activeTab} onTabPress={handleTabPress} />;
+}
+
+export default function RootLayout() {
   const resolvedTheme = useResolvedTheme();
   const colors = Colors[resolvedTheme];
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bgPage }]} edges={["top"]}>
       <Tabs
+        tabBar={() => <CustomTabBarWrapper />}
         screenOptions={{
-          tabBarActiveTintColor: colors.accent,
-          tabBarInactiveTintColor: colors.textMuted,
-          tabBarStyle: {
-            backgroundColor: colors.bgCard,
-            borderTopColor: colors.border,
-            borderTopWidth: 1,
-            height: 60,
-            paddingBottom: 8,
-            paddingTop: 8,
-          },
-          tabBarLabelStyle: {
-            fontSize: 11,
-            fontWeight: "600",
-          },
           headerStyle: {
             backgroundColor: colors.bgPage,
             shadowColor: "transparent",
@@ -47,9 +67,6 @@ export default function TabLayout() {
           },
           headerTintColor: colors.textPrimary,
           headerShown: true,
-          contentStyle: {
-            backgroundColor: colors.bgPage,
-          },
         }}
       >
         <Tabs.Screen
@@ -59,8 +76,14 @@ export default function TabLayout() {
             header: () => (
               <HeaderTitle title="Smart Agriculture" subtitle="IoT Monitoring System" />
             ),
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="leaf" size={22} color={color} />
+          }}
+        />
+        <Tabs.Screen
+          name="sensors"
+          options={{
+            title: "Sensors",
+            header: () => (
+              <HeaderTitle title="Sensor Readings" subtitle="Real-time Data" />
             ),
           }}
         />
@@ -71,9 +94,6 @@ export default function TabLayout() {
             header: () => (
               <HeaderTitle title="Device Controls" subtitle="Irrigation & Lighting" />
             ),
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="hardware-chip" size={22} color={color} />
-            ),
           }}
         />
         <Tabs.Screen
@@ -82,9 +102,6 @@ export default function TabLayout() {
             title: "Settings",
             header: () => (
               <HeaderTitle title="Settings" subtitle="Configuration" />
-            ),
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="settings" size={22} color={color} />
             ),
           }}
         />

@@ -12,6 +12,12 @@ export type DashboardState = {
   devices: DeviceStates;
   sysInfo: SysInfo;
   moisture: number;
+  // New sensor values
+  temperature: number;
+  humidity: number;
+  lightIntensity: number;
+  waterLevel: number;
+  airQuality: number;
   logs: LogEntry[];
   themeMode: ThemeMode;
   resolvedTheme: Theme;
@@ -26,10 +32,17 @@ export type DashboardActions = {
   setSlider: (key: DeviceKey, val: number) => void;
   setSysInfo: (info: Partial<SysInfo>) => void;
   setMoisture: (val: number) => void;
+  // New sensor actions
+  setTemperature: (val: number) => void;
+  setHumidity: (val: number) => void;
+  setLightIntensity: (val: number) => void;
+  setWaterLevel: (val: number) => void;
+  setAirQuality: (val: number) => void;
   syncFromESP32: (
     sysInfo: Partial<SysInfo>,
     moisture: number,
     devices?: Partial<DeviceStates>,
+    sensors?: Partial<Pick<DashboardState, 'temperature' | 'humidity' | 'lightIntensity' | 'waterLevel' | 'airQuality'>>,
   ) => void;
   setDisconnected: () => void;
   addLog: (entry: Omit<LogEntry, "id">) => void;
@@ -90,6 +103,12 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
     },
     sysInfo: initialSysInfo,
     moisture: 0,
+    // New sensor initial values
+    temperature: 0,
+    humidity: 0,
+    lightIntensity: 0,
+    waterLevel: 0,
+    airQuality: 0,
     logs: [],
     themeMode: "system",
     resolvedTheme: "light",
@@ -117,11 +136,19 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 
     setMoisture: (moisture) => set({ moisture }),
 
-    syncFromESP32: (sysInfo, moisture, devices) =>
+    // New sensor setters
+    setTemperature: (temperature) => set({ temperature }),
+    setHumidity: (humidity) => set({ humidity }),
+    setLightIntensity: (lightIntensity) => set({ lightIntensity }),
+    setWaterLevel: (waterLevel) => set({ waterLevel }),
+    setAirQuality: (airQuality) => set({ airQuality }),
+
+    syncFromESP32: (sysInfo, moisture, devices, sensors) =>
       set((s) => ({
         sysInfo: { ...s.sysInfo, ...sysInfo },
         moisture,
         devices: devices ? { ...s.devices, ...devices } : s.devices,
+        ...(sensors || {}),
         connected: true,
         connecting: false,
       })),

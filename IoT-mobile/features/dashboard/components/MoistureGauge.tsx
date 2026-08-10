@@ -130,7 +130,7 @@ export default function MoistureGauge({
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    gap: 16,
+    gap: 12,
   },
   gaugeContainer: {
     justifyContent: "center",
@@ -148,6 +148,18 @@ const styles = StyleSheet.create({
   percent: {
     fontSize: 14,
     marginLeft: 2,
+  },
+  percentageSection: {
+    alignItems: "center",
+    gap: 4,
+  },
+  percentageValue: {
+    fontSize: 32,
+    fontWeight: "700",
+  },
+  percentageLabel: {
+    fontSize: 13,
+    fontWeight: "500",
   },
   badge: {
     paddingHorizontal: 16,

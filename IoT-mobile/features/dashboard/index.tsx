@@ -1,5 +1,6 @@
 import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useDashboardStore } from "@/store/dashboard";
 import useEsp32Sync from "./hooks/useEsp32Sync";
 import MoistureGauge from "./components/MoistureGauge";
@@ -31,6 +32,15 @@ export default function DashboardScreen() {
     >
       {/* Soil Moisture Card */}
       <View style={[styles.card, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+        {/* Card Header */}
+        <View style={styles.cardHeader}>
+          <View style={[styles.iconContainer, { backgroundColor: colors.accentLight }]}>
+            <Ionicons name="water" size={20} color={colors.accent} />
+          </View>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
+            Soil Moisture
+          </Text>
+        </View>
         <MoistureGauge value={moisture} size={200} strokeWidth={10} />
       </View>
 
@@ -57,13 +67,31 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     gap: 16,
-    paddingBottom: 32,
+    paddingBottom: 100,
   },
   card: {
     borderRadius: 16,
     borderWidth: 1,
     padding: 24,
     alignItems: "center",
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 16,
+    alignSelf: "flex-start",
+  },
+  iconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "700",
   },
   indicators: {
     flexDirection: "row",

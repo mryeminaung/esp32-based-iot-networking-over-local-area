@@ -31,6 +31,12 @@ export type Sensors = {
   fanValue: number;
   relay: boolean;
   water_pump: boolean;
+  // New sensors (UI-only for now)
+  temperature: number;    // DHT22 °C
+  humidity: number;       // DHT22 %
+  lightIntensity: number; // BH1750 lux
+  waterLevel: number;     // Water tank %
+  airQuality: number;     // MQ-135 raw value (0-1024)
 };
 
 // Combined /all endpoint response
@@ -83,4 +89,35 @@ export function getMoistureCondition(
   if (value <= thresholds.dryBelow) return "DRY";
   if (value < thresholds.moistBelow) return "MOIST";
   return "OPTIMAL";
+}
+
+// ── New sensor condition types ──
+
+export type TemperatureStatus = "Cold" | "Normal" | "Hot";
+export type LightStatus = "Low Light" | "Optimal" | "Bright";
+export type WaterStatus = "Full" | "Medium" | "Low";
+export type AirQualityStatus = "Good" | "Moderate" | "Poor";
+
+export function getTemperatureStatus(temp: number): TemperatureStatus {
+  if (temp < 18) return "Cold";
+  if (temp <= 30) return "Normal";
+  return "Hot";
+}
+
+export function getLightStatus(lux: number): LightStatus {
+  if (lux < 200) return "Low Light";
+  if (lux <= 800) return "Optimal";
+  return "Bright";
+}
+
+export function getWaterStatus(level: number): WaterStatus {
+  if (level >= 60) return "Full";
+  if (level >= 25) return "Medium";
+  return "Low";
+}
+
+export function getAirQualityStatus(aqi: number): AirQualityStatus {
+  if (aqi < 300) return "Good";
+  if (aqi < 600) return "Moderate";
+  return "Poor";
 }
