@@ -110,6 +110,14 @@ export default function useEsp32Sync() {
           },
           data.soilMoisture,
           devices,
+          // New sensors (mock values for now - firmware doesn't have these yet)
+          {
+            temperature: (data as any).temperature ?? 25,
+            humidity: (data as any).humidity ?? 60,
+            lightIntensity: (data as any).lightIntensity ?? 450,
+            waterLevel: (data as any).waterLevel ?? 70,
+            airQuality: (data as any).airQuality ?? 200,
+          },
         );
 
         // Log moisture changes using thresholds

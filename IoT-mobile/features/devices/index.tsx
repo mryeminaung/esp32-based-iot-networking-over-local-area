@@ -1,5 +1,6 @@
 import React from "react";
-import { ScrollView, StyleSheet, View, Text } from "react-native";
+import { ScrollView, StyleSheet, View, Text, Pressable } from "react-native";
+import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { useDashboardStore } from "@/store/dashboard";
 import { sendCommand } from "@/features/dashboard/hooks/useEsp32Sync";
@@ -19,11 +20,37 @@ type DeviceConfig = {
   type: "toggle" | "slider";
 };
 
-const DEVICE_CONFIG: DeviceConfig[] = [
-  { key: "water_pump", label: "Irrigation Pump", icon: "water", type: "toggle" },
-  { key: "relay", label: "Relay", icon: "flash", type: "toggle" },
-  { key: "fan", label: "Ventilation Fan", icon: "airplane", type: "slider" },
-  { key: "white_light", label: "Grow Light", icon: "bulb", type: "toggle" },
+// Device groups
+const DEVICE_GROUPS = [
+  {
+    title: "Irrigation",
+    icon: "water" as const,
+    devices: [
+      { key: "water_pump" as DeviceKey, label: "Water Pump", icon: "water" as IoniconsName, type: "toggle" as const },
+    ],
+  },
+  {
+    title: "Lighting",
+    icon: "bulb" as const,
+    devices: [
+      { key: "white_light" as DeviceKey, label: "Grow Light", icon: "bulb" as IoniconsName, type: "toggle" as const },
+    ],
+  },
+  {
+    title: "Ventilation",
+    icon: "airplane" as const,
+    devices: [
+      { key: "fan" as DeviceKey, label: "Fan Speed", icon: "airplane" as IoniconsName, type: "slider" as const },
+      { key: "relay" as DeviceKey, label: "Relay", icon: "flash" as IoniconsName, type: "toggle" as const },
+    ],
+  },
+];
+
+// Quick actions
+const QUICK_ACTIONS = [
+  { label: "Water All", icon: "water", action: "water_all" },
+  { label: "Lights Off", icon: "bulb-outline", action: "lights_off" },
+  { label: "Full Speed", icon: "speedometer", action: "full_speed" },
 ];
 
 export default function DevicesScreen() {
@@ -32,6 +59,36 @@ export default function DevicesScreen() {
   const devices = useDashboardStore((s) => s.devices);
   const connected = useDashboardStore((s) => s.connected);
   const moisture = useDashboardStore((s) => s.moisture);
+
+  const handleQuickAction = (action: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    switch (action) {
+      case "water_all":
+        sendCommand("water_pump", true);
+        break;
+      case "lights_off":
+        sendCommand("white_light", false);
+        break;
+      case "full_speed":
+        sendCommand("fan", 100, 100);
+        break;
+    }
+  };
+
+  const handleToggle = (key: DeviceKey, value: boolean) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    sendCommand(key, value);
+  };
+
+  const handleSlider = (key: DeviceKey, value: number) => {
+    useDashboardStore.getState().setSlider(key, value);
+  };
+
+  const handleSliderComplete = (key: DeviceKey, value: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    sendCommand(key, value, value);
+  };
 
   return (
     <ScrollView
@@ -44,7 +101,7 @@ export default function DevicesScreen() {
         <View style={styles.headerRow}>
           <Ionicons name="power" size={18} color={colors.textMuted} />
           <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
-            Irrigation Control
+            Device Controls
           </Text>
         </View>
         <View style={[styles.modeBar, { backgroundColor: colors.bgMuted, borderColor: colors.border }]}>
@@ -72,34 +129,55 @@ export default function DevicesScreen() {
         </View>
       )}
 
-      {/* Device Controls */}
-      <View style={[styles.controlsCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
-        {DEVICE_CONFIG.map((device, index) =>
-          device.type === "slider" ? (
-            <FanSlider
-              key={device.key}
-              value={devices[device.key] as number}
-              onValueChange={(val) => {
-                useDashboardStore.getState().setSlider(device.key, val);
-              }}
-              onSlidingComplete={(val) => {
-                sendCommand(device.key, val, val);
-              }}
-              disabled={!connected}
-            />
-          ) : (
-            <DeviceCard
-              key={device.key}
-              device={device.key}
-              label={device.label}
-              icon={device.icon}
-              value={devices[device.key] as boolean}
-              onToggle={(val) => sendCommand(device.key, val)}
-              disabled={!connected}
-            />
-          )
-        )}
+      {/* Quick Actions */}
+      <View style={styles.quickActionsContainer}>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Quick Actions</Text>
+        <View style={styles.quickActionsRow}>
+          {QUICK_ACTIONS.map((action) => (
+            <Pressable
+              key={action.action}
+              style={[styles.quickAction, { backgroundColor: colors.bgCard, borderColor: colors.border }]}
+              onPress={() => handleQuickAction(action.action)}
+            >
+              <Ionicons name={action.icon as IoniconsName} size={20} color={colors.accent} />
+              <Text style={[styles.quickActionLabel, { color: colors.textPrimary }]}>{action.label}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
+
+      {/* Device Groups */}
+      {DEVICE_GROUPS.map((group) => (
+        <View key={group.title} style={styles.groupContainer}>
+          <View style={styles.groupHeader}>
+            <Ionicons name={group.icon} size={18} color={colors.accent} />
+            <Text style={[styles.groupTitle, { color: colors.textPrimary }]}>{group.title}</Text>
+          </View>
+          <View style={[styles.groupCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+            {group.devices.map((device, index) =>
+              device.type === "slider" ? (
+                <FanSlider
+                  key={device.key}
+                  value={devices[device.key] as number}
+                  onValueChange={(val) => handleSlider(device.key, val)}
+                  onSlidingComplete={(val) => handleSliderComplete(device.key, val)}
+                  disabled={!connected}
+                />
+              ) : (
+                <DeviceCard
+                  key={device.key}
+                  device={device.key}
+                  label={device.label}
+                  icon={device.icon}
+                  value={devices[device.key] as boolean}
+                  onToggle={(val) => handleToggle(device.key, val)}
+                  disabled={!connected}
+                />
+              )
+            )}
+          </View>
+        </View>
+      ))}
     </ScrollView>
   );
 }
@@ -111,7 +189,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     gap: 16,
-    paddingBottom: 32,
+    paddingBottom: 100,
   },
   headerCard: {
     borderRadius: 16,
@@ -169,10 +247,49 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     flex: 1,
   },
-  controlsCard: {
+  // Quick Actions
+  quickActionsContainer: {
+    gap: 10,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  quickActionsRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  quickAction: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 6,
+  },
+  quickActionLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  // Device Groups
+  groupContainer: {
+    gap: 10,
+  },
+  groupHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  groupTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  groupCard: {
     borderRadius: 16,
     borderWidth: 1,
-    padding: 16,
-    gap: 12,
+    padding: 12,
+    gap: 10,
   },
 });

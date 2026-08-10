@@ -135,3 +135,32 @@ export const FeatureIcons = {
   moon: "moon" as const,
   sun: "sunny" as const,
 };
+
+// Sensor color mappings
+export const SensorColors = {
+  temperature: {
+    bg: "#FEF2F2",
+    text: "#EF4444",
+    accent: "#DC2626",
+  },
+  humidity: {
+    bg: "#EFF6FF",
+    text: "#3B82F6",
+    accent: "#2563EB",
+  },
+  light: {
+    bg: "#FFFBEB",
+    text: "#F59E0B",
+    accent: "#D97706",
+  },
+  water: {
+    bg: "#F0F9FF",
+    text: "#0284C7",
+    accent: "#0284C7",
+  },
+  airQuality: {
+    bg: "#F0FDF4",
+    text: "#22C55E",
+    accent: "#16A34A",
+  },
+};
