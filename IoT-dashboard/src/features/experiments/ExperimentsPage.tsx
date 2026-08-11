@@ -15,9 +15,9 @@ export default function ExperimentsPage() {
 	const progress = total > 0 ? Math.round((completed / total) * 100) : 0
 
 	return (
-		<div className="flex-1 max-w-[1100px] mx-auto w-full px-4 sm:px-6 py-6 sm:py-6">
+		<div className="max-w-[1100px] mx-auto space-y-5 py-8 px-4 sm:px-6">
 			{/* Header */}
-			<div className="card mb-6">
+			<div className="card">
 				<div className="flex items-center gap-4 mb-3">
 					<div className="w-11 h-11 rounded-xl bg-accent-light text-accent flex items-center justify-center shrink-0">
 						<Beaker size={22} />

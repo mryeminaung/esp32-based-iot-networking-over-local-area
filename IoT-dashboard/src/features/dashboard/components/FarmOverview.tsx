@@ -1,12 +1,7 @@
 import { useDashboardStore } from "@/store/dashboard";
+import { getMoistureCondition } from "@/lib/moistureUtils";
 import { Droplets, Wifi, Cpu, Sprout } from "lucide-react";
 import { motion } from "framer-motion";
-
-function getMoistureCondition(value: number) {
-	if (value <= 30) return { label: "DRY", color: "text-danger" };
-	if (value < 50) return { label: "MOIST", color: "text-warning" };
-	return { label: "OPTIMAL", color: "text-success" };
-}
 
 const container = {
 	hidden: { opacity: 0 },
