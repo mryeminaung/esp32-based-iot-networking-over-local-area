@@ -1,13 +1,15 @@
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 import ActivityLog from "./ActivityLog";
-import CardContainer from "./CardContainer";
+import CardContainer from "@/features/sensors/components/CardContainer";
 import FarmOverview from "./FarmOverview";
-import QuickControls from "./QuickControls";
+import QuickControls from "@/features/actuators/components/QuickControls";
 
-import SensorCard from "./SensorCard";
+import SensorCard from "@/features/sensors/components/SensorCard";
 import SystemDecision from "./SystemDecision";
 import SystemInfo from "./SystemInfo";
+import { useAuthStore } from "@/store/auth";
+import { ROLES } from "@/config/roles";
 
 const section = {
 	hidden: { opacity: 0, y: 30 },
@@ -19,6 +21,9 @@ const section = {
 };
 
 export default function Dashboard() {
+	const user = useAuthStore((s) => s.user);
+	const isManager = user?.role === ROLES.FARM_MANAGER;
+
 	return (
 		<div className="flex-1 max-w-[1100px] mx-auto w-full px-4 sm:px-6 py-6 sm:py-6 space-y-5">
 			{/* Technical Info */}
@@ -78,14 +83,16 @@ export default function Dashboard() {
 				</motion.div>
 			</div>
 
-			{/* Farm Activity - Full Width */}
-			<motion.div
-				variants={section}
-				initial="hidden"
-				animate="show"
-				transition={{ delay: 0.6 }}>
-				<ActivityLog />
-			</motion.div>
+			{/* Farm Activity - Manager Only */}
+			{isManager && (
+				<motion.div
+					variants={section}
+					initial="hidden"
+					animate="show"
+					transition={{ delay: 0.6 }}>
+					<ActivityLog />
+				</motion.div>
+			)}
 
 			<Footer />
 		</div>
