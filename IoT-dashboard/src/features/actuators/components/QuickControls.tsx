@@ -1,5 +1,5 @@
 import { sendCommand } from "@/features/dashboard/hooks/useEsp32Sync";
-import { useDashboardStore, type DeviceKey } from "@/store/dashboard";
+import { useDashboardStore, type DeviceKey } from "@/store/use-dashboard-store";
 import { getMoistureCondition } from "@/lib/moistureUtils";
 import { Droplets, Fan, Lightbulb, Square, Power, Zap } from "lucide-react";
 import ControlItem from "./ControlItem";

@@ -1,4 +1,4 @@
-import { useDashboardStore } from "@/store/dashboard";
+import { useDashboardStore } from "@/store/use-dashboard-store";
 import { getMoistureCondition } from "@/lib/moistureUtils";
 import { Droplets, Wifi, Cpu, Sprout } from "lucide-react";
 import { motion } from "framer-motion";

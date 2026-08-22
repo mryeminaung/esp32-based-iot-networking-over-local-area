@@ -1,4 +1,4 @@
-import { useDashboardStore } from "@/store/dashboard";
+import { useDashboardStore } from "@/store/use-dashboard-store";
 import { Activity, Clock, Globe, Monitor, Network } from "lucide-react";
 import InfoRow from "./InfoRow";
 

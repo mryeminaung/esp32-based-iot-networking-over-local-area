@@ -1,4 +1,4 @@
-import { useDashboardStore } from "@/store/dashboard";
+import { useDashboardStore } from "@/store/use-dashboard-store";
 import { MoistureCard } from "./MoistureCard";
 
 export default function CardContainer() {
@@ -14,7 +14,7 @@ export default function CardContainer() {
 			<h2 className="text-[1.1rem] font-bold mb-5 max-sm:text-[1rem] max-sm:mb-[14px]">
 				Moisture Status Indicators
 			</h2>
-			<div className="flex flex-row md:flex-col-reverse items-center justify-between gap-4 sm:gap-6">
+			<div className="flex flex-wrap md:flex-col-reverse items-center justify-between gap-3 sm:gap-4 md:gap-6">
 				<MoistureCard
 					name="Dry"
 					gpio={2}

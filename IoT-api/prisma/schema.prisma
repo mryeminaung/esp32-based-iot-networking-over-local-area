@@ -20,6 +20,7 @@ model User {
   password      String
   role          String         @default("farm_worker")
   refreshTokens RefreshToken[]
+  activityLogs  ActivityLog[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now())
 }
@@ -34,4 +35,34 @@ model RefreshToken {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device    String
+  action    String
+  value     Int?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+model SensorReading {
+  id           Int      @id @default(autoincrement())
+  deviceId     Int      @default(1) @map("device_id")
+  temperature  Float?
+  humidity     Float?
+  soilMoisture Float?   @map("soil_moisture")
+  light        Float?
+  airQuality   Float?   @map("air_quality")
+  waterLevel   Float?   @map("water_level")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([deviceId])
+  @@index([createdAt])
+  @@map("sensor_readings")
 }

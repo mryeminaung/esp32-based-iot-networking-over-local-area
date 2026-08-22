@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { getAll, controlDevice } from "@/api/esp32"
-import { useDashboardStore, type DeviceKey } from "@/store/dashboard"
+import { createActivityLog } from "@/api/activity"
+import { useDashboardStore, type DeviceKey } from "@/store/use-dashboard-store"
 
 const sliderKeys = new Set<DeviceKey>(["fan"])
 
@@ -42,12 +43,23 @@ export function sendCommand(key: DeviceKey, state: boolean | number, value?: num
           message: `${label} ${action}`,
           type: state ? "on" : "off",
         })
+        // Persist to backend
+        createActivityLog({
+          device: key,
+          action: state ? "ON" : "OFF",
+        }).catch(() => {})
       } else {
         store.addLog({
           time: now,
           message: `${label} set to ${state}%`,
           type: "adjust",
         })
+        // Persist to backend
+        createActivityLog({
+          device: key,
+          action: "ADJUST",
+          value: state,
+        }).catch(() => {})
       }
     })
     .catch(() => {

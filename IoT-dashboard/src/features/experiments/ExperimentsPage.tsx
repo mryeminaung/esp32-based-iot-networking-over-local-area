@@ -1,11 +1,13 @@
 import { Beaker } from "lucide-react"
 import { useState } from "react"
+import { useHeader } from "@/hooks/useHeader"
 import { experiments } from "./experiments"
 import type { Experiment } from "./experiments"
-import ExperimentCard from "./ExperimentCard"
-import ExperimentDetail from "./ExperimentDetail"
+import ExperimentCard from "./components/ExperimentCard"
+import ExperimentDetail from "./components/ExperimentDetail"
 
 export default function ExperimentsPage() {
+	useHeader("Experiments")
 	const [selected, setSelected] = useState<Experiment | null>(null)
 
 	const regular = experiments.filter((e) => !e.featured)

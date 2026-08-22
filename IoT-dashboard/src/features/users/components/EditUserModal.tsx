@@ -1,9 +1,9 @@
 import { backendClient } from "@/api/auth";
 import { Eye, EyeOff, Loader2, RefreshCw, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { User } from "./types";
-import { ROLES } from "./types";
-import { generatePassword } from "./userUtils";
+import type { User } from "../types";
+import { ROLES } from "../types";
+import { generatePassword } from "../utils";
 
 interface EditUserModalProps {
 	open: boolean;

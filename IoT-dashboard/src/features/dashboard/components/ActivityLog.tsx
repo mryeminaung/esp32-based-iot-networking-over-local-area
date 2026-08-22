@@ -1,4 +1,4 @@
-import { useDashboardStore } from "@/store/dashboard";
+import { useDashboardStore } from "@/store/use-dashboard-store";
 import { History } from "lucide-react";
 
 /* Dot color per log type */
