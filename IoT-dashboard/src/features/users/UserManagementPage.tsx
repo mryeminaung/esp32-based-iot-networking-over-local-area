@@ -1,14 +1,17 @@
 import { backendClient } from "@/api/auth";
 import { Loader2, Plus, Search, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useHeader } from "@/hooks/useHeader";
+import PageHeader from "@/components/PageHeader";
 import CreateUserModal from "./components/CreateUserModal";
 import DeleteUserDialog from "./components/DeleteUserDialog";
 import EditUserModal from "./components/EditUserModal";
-import type { User } from "./components/types";
-import UserTable from "./components/UserTable";
+import type { User } from "./types";
+import UserTable, { type ViewMode } from "./components/UserTable";
 import UserToolbar from "./components/UserToolbar";
 
 export default function UserManagementPage() {
+	useHeader("User Management");
 	const [users, setUsers] = useState<User[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -17,6 +20,14 @@ export default function UserManagementPage() {
 	// Filter/search
 	const [search, setSearch] = useState("");
 	const [roleFilter, setRoleFilter] = useState<string | null>(null);
+	const [viewMode, setViewMode] = useState<ViewMode>(
+		() => (localStorage.getItem("users-view") as ViewMode) ?? "grid"
+	);
+
+	const handleViewChange = (v: ViewMode) => {
+		setViewMode(v);
+		localStorage.setItem("users-view", v);
+	};
 
 	// Modals
 	const [showCreateModal, setShowCreateModal] = useState(false);
@@ -93,31 +104,21 @@ export default function UserManagementPage() {
 	return (
 		<div className="max-w-[1100px] mx-auto space-y-5">
 			{/* Header */}
-			<div className="card flex items-center justify-between">
-				<div className="flex items-center gap-3">
-					<div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-						<Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-					</div>
-					<div>
-						<h1 className="text-xl font-bold text-gray-900 dark:text-white">
-							User Management
-						</h1>
-						<p className="text-sm text-gray-500 dark:text-gray-400">
-							Manage farm users and roles
-						</p>
-					</div>
-				</div>
+			<PageHeader
+				title="User Management"
+				description="Manage farm users and roles"
+			>
 				<button
 					onClick={() => setShowCreateModal(true)}
-					className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer">
+					className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors cursor-pointer">
 					<Plus size={16} />
 					Add User
 				</button>
-			</div>
+			</PageHeader>
 
 			{/* Success */}
 			{success && (
-				<div className="card bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 text-sm">
+				<div className="card bg-success/10 border border-success/30 text-success text-sm">
 					{success}
 				</div>
 			)}
@@ -128,37 +129,40 @@ export default function UserManagementPage() {
 					<Loader2 className="w-6 h-6 animate-spin text-green-600" />
 				</div>
 			) : error ? (
-				<div className="card bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
+				<div className="card bg-danger/10 border border-danger/30 text-danger text-sm">
 					{error}
 				</div>
 			) : users.length === 0 ? (
 				<div className="card text-center py-12">
-					<Users className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-					<p className="text-gray-500 dark:text-gray-400">No users found</p>
+					<Users className="w-12 h-12 text-border mx-auto mb-3" />
+					<p className="text-text-muted">No users found</p>
 				</div>
 			) : (
-				<div className="card p-0 overflow-hidden">
+				<div className="border border-border rounded-xl bg-bg-card overflow-hidden">
 					<UserToolbar
 						search={search}
 						onSearchChange={setSearch}
 						roleFilter={roleFilter}
 						onRoleFilterChange={setRoleFilter}
+						view={viewMode}
+						onViewChange={handleViewChange}
 					/>
 
-					{filteredUsers.length === 0 ? (
-						<div className="text-center py-12">
-							<Search className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-							<p className="text-gray-500 dark:text-gray-400">
-								No users match your search
-							</p>
-						</div>
-					) : (
-						<UserTable
-							users={filteredUsers}
-							onEdit={setEditingUser}
-							onDelete={setDeletingUser}
-						/>
-					)}
+					<div className="p-0">
+						{filteredUsers.length === 0 ? (
+							<div className="text-center py-12">
+								<Search className="w-10 h-10 text-border mx-auto mb-3" />
+								<p className="text-text-muted">No users match your search</p>
+							</div>
+						) : (
+							<UserTable
+								users={filteredUsers}
+								view={viewMode}
+								onEdit={setEditingUser}
+								onDelete={setDeletingUser}
+							/>
+						)}
+					</div>
 				</div>
 			)}
 

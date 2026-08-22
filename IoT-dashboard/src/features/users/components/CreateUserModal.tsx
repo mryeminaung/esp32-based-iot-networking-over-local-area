@@ -1,8 +1,8 @@
 import { Loader2, X, RefreshCw, Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 import { backendClient } from "@/api/auth"
-import { ROLES } from "./types"
-import { generatePassword } from "./userUtils"
+import { ROLES } from "../types"
+import { generatePassword } from "../utils"
 
 interface CreateUserModalProps {
   open: boolean

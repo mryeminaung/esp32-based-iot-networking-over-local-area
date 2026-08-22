@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useAuthStore } from "@/store/auth"
+import { useAuthStore } from "@/store/use-auth-store"
 import { Loader2 } from "lucide-react"
 
 export default function AuthInitializer({

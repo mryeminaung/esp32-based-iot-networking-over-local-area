@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useDashboardStore } from "@/store/dashboard";
+import { useDashboardStore } from "@/store/use-dashboard-store";
 
 export default function ScrollToTop() {
 	const [show, setShow] = useState(false);

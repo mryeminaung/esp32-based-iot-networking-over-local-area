@@ -1,20 +1,11 @@
-import { useDashboardStore } from "@/store/dashboard"
-import { useAuthStore } from "@/store/auth"
-import { Moon, Sun, QrCode, PanelLeftClose, PanelLeft, ChevronDown, Settings, LogOut } from "lucide-react"
-import { useLocation, useNavigate } from "react-router"
-import { useState, useRef, useEffect } from "react"
+import { memo, useState, useRef, useEffect } from "react"
+import { useDashboardStore } from "@/store/use-dashboard-store"
+import { useAuthStore } from "@/store/use-auth-store"
+import { useHeaderStore } from "@/store/use-header-store"
+import { Moon, Sun, QrCode, PanelLeftClose, PanelLeft, ChevronDown, Settings, LogOut, Mail, Menu } from "lucide-react"
+import { useNavigate, useLocation } from "react-router"
 import DeviceQRCode from "@/features/dashboard/components/DeviceQRCode"
 import UserAvatar from "@/features/users/components/UserAvatar"
-
-const pageTitles: Record<string, string> = {
-  "/": "Dashboard",
-  "/experiments": "Experiments",
-  "/sensors": "Sensors",
-  "/activity": "Activity Logs",
-  "/users": "User Management",
-  "/devices": "Device Info",
-  "/settings": "Settings",
-}
 
 const roleLabels: Record<string, string> = {
   farm_manager: "Farm Manager",
@@ -25,19 +16,27 @@ const roleLabels: Record<string, string> = {
 type TopBarProps = {
   collapsed: boolean
   onToggle: () => void
+  onMobileToggle: () => void
 }
 
-export default function TopBar({ collapsed, onToggle }: TopBarProps) {
-  const location = useLocation()
+export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: TopBarProps) {
   const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
+  const location = useLocation()
+  const user = useAuthStore((s) => s.user)
+  const logout = useAuthStore((s) => s.logout)
   const connected = useDashboardStore((s) => s.connected)
   const connecting = useDashboardStore((s) => s.connecting)
   const theme = useDashboardStore((s) => s.theme)
   const toggleTheme = useDashboardStore((s) => s.toggleTheme)
+  const pageTitle = useHeaderStore((s) => s.title)
   const [showQR, setShowQR] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setShowMenu(false)
+  }, [location.pathname])
 
   // Close menu on outside click
   useEffect(() => {
@@ -50,32 +49,37 @@ export default function TopBar({ collapsed, onToggle }: TopBarProps) {
     return () => document.removeEventListener("mousedown", handleClick)
   }, [showMenu])
 
-  const pageTitle =
-    pageTitles[location.pathname] ||
-    (location.pathname.startsWith("/experiments") ? "Experiments" : "Dashboard")
-
   return (
     <>
-      <header className="h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-800/60 flex items-center justify-between px-6 shrink-0 sticky top-0 z-30">
+      <header className="h-14 sm:h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-800/60 flex items-center justify-between px-3 sm:px-6 shrink-0 sticky top-0 z-30">
         {/* Left: toggle + page title */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {/* Mobile hamburger */}
+          <button
+            onClick={onMobileToggle}
+            className="md:hidden w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer shrink-0"
+            title="Open menu"
+          >
+            <Menu size={18} />
+          </button>
+          {/* Desktop sidebar toggle */}
           <button
             onClick={onToggle}
-            className="w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            className="hidden md:flex w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer shrink-0"
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
           </button>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate min-w-0">
             {pageTitle}
           </h2>
         </div>
 
         {/* Right: actions + user menu */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Connection status */}
           <div
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+            className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
               connected
                 ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
                 : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
@@ -88,11 +92,18 @@ export default function TopBar({ collapsed, onToggle }: TopBarProps) {
             />
             {connecting ? "Connecting..." : connected ? "Online" : "Offline"}
           </div>
+          {/* Mobile: dot only */}
+          <div
+            className={`sm:hidden w-2.5 h-2.5 rounded-full ${
+              connected ? "bg-green-500" : "bg-red-500 animate-pulse"
+            }`}
+            title={connected ? "Online" : "Offline"}
+          />
 
           {/* QR code */}
           <button
             onClick={() => setShowQR(true)}
-            className="w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             title="Show QR code"
           >
             <QrCode size={16} />
@@ -101,7 +112,7 @@ export default function TopBar({ collapsed, onToggle }: TopBarProps) {
           {/* Theme toggle */}
           <button
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             title="Toggle dark mode"
           >
             {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
@@ -111,7 +122,7 @@ export default function TopBar({ collapsed, onToggle }: TopBarProps) {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             >
               <UserAvatar
                 name={user?.name || null}
@@ -132,7 +143,7 @@ export default function TopBar({ collapsed, onToggle }: TopBarProps) {
 
             {/* Dropdown */}
             {showMenu && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg py-1 z-50">
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg py-1 z-[60]">
                 {/* User info */}
                 <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
@@ -147,19 +158,30 @@ export default function TopBar({ collapsed, onToggle }: TopBarProps) {
                 <button
                   onClick={() => {
                     setShowMenu(false)
+                    navigate("/settings/account")
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                >
+                  <Mail size={16} />
+                  Account
+                </button>
+                <button
+                  onClick={() => {
+                    setShowMenu(false)
                     navigate("/settings")
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                 >
                   <Settings size={16} />
                   Settings
                 </button>
+                <div className="border-t border-gray-100 dark:border-gray-800 my-1" />
                 <button
                   onClick={() => {
                     setShowMenu(false)
                     logout()
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
                 >
                   <LogOut size={16} />
                   Logout
@@ -191,4 +213,4 @@ export default function TopBar({ collapsed, onToggle }: TopBarProps) {
       )}
     </>
   )
-}
+})

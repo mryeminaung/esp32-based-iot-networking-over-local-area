@@ -8,7 +8,7 @@ import QuickControls from "@/features/actuators/components/QuickControls";
 import SensorCard from "@/features/sensors/components/SensorCard";
 import SystemDecision from "./SystemDecision";
 import SystemInfo from "./SystemInfo";
-import { useAuthStore } from "@/store/auth";
+import { useAuthStore } from "@/store/use-auth-store";
 import { ROLES } from "@/config/roles";
 
 const section = {

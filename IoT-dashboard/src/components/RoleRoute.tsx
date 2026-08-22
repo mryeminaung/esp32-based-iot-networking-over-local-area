@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router"
-import { useAuthStore } from "@/store/auth"
+import { useAuthStore } from "@/store/use-auth-store"
 import type { Role } from "@/config/roles"
 
 type RoleRouteProps = {

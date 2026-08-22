@@ -1,4 +1,4 @@
-import { useDashboardStore } from "@/store/dashboard";
+import { useDashboardStore } from "@/store/use-dashboard-store";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, CheckCircle, Info } from "lucide-react";
 

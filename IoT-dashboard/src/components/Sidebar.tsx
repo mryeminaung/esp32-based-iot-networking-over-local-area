@@ -1,4 +1,5 @@
-import { useAuthStore } from "@/store/auth"
+import { memo } from "react"
+import { useAuthStore } from "@/store/use-auth-store"
 import { getNavItems } from "@/config/navigation"
 import { NavLink, useLocation } from "react-router"
 
@@ -7,15 +8,15 @@ type SidebarProps = {
   onToggle: () => void
 }
 
-export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
-  const { user } = useAuthStore()
+export default memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
+  const user = useAuthStore((s) => s.user)
   const location = useLocation()
   const navItems = getNavItems(user?.role)
 
   return (
     <aside
       className={`fixed left-0 top-0 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-40 flex flex-col transition-[width] duration-300 ${
-        collapsed ? "w-[72px]" : "w-64"
+        collapsed ? "w-[72px]" : "w-56"
       }`}
     >
       {/* Brand */}
@@ -49,9 +50,9 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <NavLink
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-semibold border-l-3 border-green-600 dark:border-green-400"
+                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-semibold border-l-3 border-green-600 dark:border-green-400 shadow-sm -translate-x-0.5"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
               }`}
               title={collapsed ? item.label : undefined}
@@ -64,4 +65,4 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </nav>
     </aside>
   )
-}
+})

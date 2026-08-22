@@ -1,7 +1,10 @@
-import { useDashboardStore } from "@/store/dashboard"
-import { Activity, Clock, Globe, Monitor, Network, HardDrive, Wifi, Cpu } from "lucide-react"
+import { useDashboardStore } from "@/store/use-dashboard-store"
+import { useHeader } from "@/hooks/useHeader"
+import PageHeader from "@/components/PageHeader"
+import { Activity, Clock, Globe, Monitor, Network, HardDrive, Wifi } from "lucide-react"
 
 export default function DeviceInfoPage() {
+  useHeader("Device Info")
   const sysInfo = useDashboardStore((s) => s.sysInfo)
   const connected = useDashboardStore((s) => s.connected)
 
@@ -18,19 +21,10 @@ export default function DeviceInfoPage() {
   return (
     <div className="max-w-[1100px] mx-auto space-y-5">
       {/* Header card */}
-      <div className="card flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-          <Cpu className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            Device Info
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            ESP32 device and network information
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Device Info"
+        description="ESP32 device and network information"
+      />
 
       {/* Info grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

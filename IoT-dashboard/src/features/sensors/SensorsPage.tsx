@@ -1,7 +1,9 @@
 import CardContainer from "./components/CardContainer";
 import SensorCard from "./components/SensorCard";
-import { useDashboardStore } from "@/store/dashboard";
-import { Power, Thermometer, WifiOff, Droplets, Waves } from "lucide-react";
+import { useDashboardStore } from "@/store/use-dashboard-store";
+import { useHeader } from "@/hooks/useHeader";
+import PageHeader from "@/components/PageHeader";
+import { Power, WifiOff, Droplets, Waves, Thermometer } from "lucide-react";
 
 const deviceList = [
 	{
@@ -63,25 +65,17 @@ const deviceList = [
 ];
 
 export default function SensorsPage() {
+	useHeader("Sensors");
 	const devices = useDashboardStore((s) => s.devices);
 	const connected = useDashboardStore((s) => s.connected);
 
 	return (
 		<div className="max-w-[1100px] mx-auto space-y-5">
 			{/* Header */}
-			<div className="card flex items-center gap-3">
-				<div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
-					<Thermometer className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
-				</div>
-				<div>
-					<h1 className="text-xl font-bold text-gray-900 dark:text-white">
-						Sensors & Devices
-					</h1>
-					<p className="text-sm text-gray-500 dark:text-gray-400">
-						Monitor sensor readings and control devices
-					</p>
-				</div>
-			</div>
+			<PageHeader
+				title="Sensors & Devices"
+				description="Monitor sensor readings and control devices"
+			/>
 
 			{/* Connection warning */}
 			{!connected && (

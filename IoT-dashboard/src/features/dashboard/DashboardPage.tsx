@@ -1,269 +1,285 @@
-import { useAuthStore } from "@/store/auth"
-import { useDashboardStore } from "@/store/dashboard"
-import { backendClient } from "@/api/auth"
 import { useEffect, useState } from "react"
 import {
-  Users,
-  Thermometer,
-  Lightbulb,
-  Power,
-  Wifi,
-  WifiOff,
-  Droplets,
-  Sprout,
-  Activity,
-  Server,
-  Clock,
-  Fan,
+  Users, Power, Wifi, WifiOff,
+  Droplets, Activity, Server, Clock, Fan,
+  Lightbulb, Cpu, Network,
 } from "lucide-react"
+import { useAuthStore } from "@/store/use-auth-store"
+import { useDashboardStore } from "@/store/use-dashboard-store"
+import { backendClient } from "@/api/auth"
+import { getActivityLogs, type ActivityLog } from "@/api/activity"
+import { useHeader } from "@/hooks/useHeader"
+import { getMoistureCondition } from "@/lib/moistureUtils"
+import PageHeader from "@/components/PageHeader"
 
 type User = { id: number; role: string }
 
+const DEVICE_GROUPS = [
+  {
+    icon: Lightbulb,
+    label: "Lighting",
+    items: [
+      { name: "Red", key: "red_light", dot: "bg-red-500" },
+      { name: "Yellow", key: "yellow_light", dot: "bg-yellow-400" },
+      { name: "Green", key: "green_light", dot: "bg-green-500" },
+      { name: "Grow", key: "white_light", dot: "bg-blue-400" },
+    ],
+  },
+  {
+    icon: Fan,
+    label: "Ventilation",
+    items: [{ name: "Fan", key: "fan", dot: "bg-cyan-500" }],
+  },
+  {
+    icon: Droplets,
+    label: "Irrigation",
+    items: [{ name: "Water Pump", key: "water_pump", dot: "bg-blue-600" }],
+  },
+  {
+    icon: Power,
+    label: "Relay",
+    items: [{ name: "Relay", key: "relay", dot: "bg-indigo-500" }],
+  },
+]
+
 export default function DashboardPage() {
+  useHeader("Dashboard")
   const user = useAuthStore((s) => s.user)
   const moisture = useDashboardStore((s) => s.moisture)
   const devices = useDashboardStore((s) => s.devices)
   const connected = useDashboardStore((s) => s.connected)
   const sysInfo = useDashboardStore((s) => s.sysInfo)
-  const logs = useDashboardStore((s) => s.logs)
 
   const [userCount, setUserCount] = useState(0)
   const [roleBreakdown, setRoleBreakdown] = useState<Record<string, number>>({})
+  const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([])
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const { data } = await backendClient.get("/users")
+    backendClient
+      .get("/users")
+      .then(({ data }) => {
         const users: User[] = data.data.users
         setUserCount(users.length)
         const breakdown: Record<string, number> = {}
-        users.forEach((u) => {
-          breakdown[u.role] = (breakdown[u.role] || 0) + 1
-        })
+        users.forEach((u) => { breakdown[u.role] = (breakdown[u.role] || 0) + 1 })
         setRoleBreakdown(breakdown)
-      } catch {
-        // silently fail — stats will show 0
-      }
-    }
-    fetchUsers()
+      })
+      .catch(() => {})
+
+    getActivityLogs({ limit: 5 })
+      .then((r) => setRecentActivity(r.logs))
+      .catch(() => {})
   }, [])
 
+  const condition = getMoistureCondition(moisture)
   const activeDevices = Object.values(devices).filter((v) => v && v !== 0).length
   const totalDevices = Object.keys(devices).length
 
-  const roleLabels: Record<string, string> = {
-    farm_manager: "Farm Managers",
-    farm_worker: "Farm Workers",
-    technician: "Technicians",
-  }
-
   const stats = [
     {
-      icon: Users,
-      label: "Total Users",
-      value: userCount,
-      sub: `${roleBreakdown.farm_manager || 0} managers · ${roleBreakdown.farm_worker || 0} workers · ${roleBreakdown.technician || 0} technicians`,
-      color: "text-purple-600 dark:text-purple-400",
-      bg: "bg-purple-100 dark:bg-purple-900/30",
+      icon: connected ? Wifi : WifiOff,
+      label: "ESP32 Status",
+      value: connected ? "Online" : "Offline",
+      sub: connected ? sysInfo.ip : "No connection",
+      iconClass: connected
+        ? "bg-success/10 text-success"
+        : "bg-danger/10 text-danger",
     },
     {
-      icon: Thermometer,
-      label: "Sensors",
-      value: 1,
-      sub: `Soil moisture at ${moisture}%`,
-      color: "text-blue-600 dark:text-blue-400",
-      bg: "bg-blue-100 dark:bg-blue-900/30",
+      icon: Droplets,
+      label: "Soil Moisture",
+      value: `${moisture}%`,
+      sub: condition.label,
+      iconClass: `${condition.bgClass} ${condition.textClass}`,
     },
     {
       icon: Power,
       label: "Active Devices",
       value: `${activeDevices}/${totalDevices}`,
-      sub: `${activeDevices} currently ON`,
-      color: "text-green-600 dark:text-green-400",
-      bg: "bg-green-100 dark:bg-green-900/30",
+      sub: `${activeDevices} device${activeDevices !== 1 ? "s" : ""} running`,
+      iconClass: "bg-accent-light text-accent",
     },
     {
-      icon: connected ? Wifi : WifiOff,
-      label: "ESP32 Status",
-      value: connected ? "Online" : "Offline",
-      sub: connected ? sysInfo.ip : "Not connected",
-      color: connected ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400",
-      bg: connected ? "bg-green-100 dark:bg-green-900/30" : "bg-red-100 dark:bg-red-900/30",
+      icon: Users,
+      label: "Team",
+      value: userCount,
+      sub: `${roleBreakdown.farm_manager || 0} mgr · ${roleBreakdown.farm_worker || 0} workers`,
+      iconClass: "bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400",
     },
   ]
 
-  const deviceSummary = [
-    { icon: Lightbulb, label: "LEDs", count: 4, active: [devices.red_light, devices.yellow_light, devices.green_light, devices.white_light].filter(Boolean).length, color: "text-amber-500" },
-    { icon: Fan, label: "Fan", count: 1, active: devices.fan ? 1 : 0, color: "text-cyan-500" },
-    { icon: Droplets, label: "Water Pump", count: 1, active: devices.water_pump ? 1 : 0, color: "text-blue-500" },
-    { icon: Power, label: "Relay", count: 1, active: devices.relay ? 1 : 0, color: "text-indigo-500" },
+  const sysInfoItems = [
+    { icon: Clock, label: "Uptime", value: sysInfo.uptime },
+    { icon: Network, label: "Network", value: sysInfo.wifi },
+    { icon: Cpu, label: "Mode", value: sysInfo.mode },
   ]
 
   return (
     <div className="max-w-[1100px] mx-auto space-y-5">
-      {/* Welcome banner */}
-      <div className="card flex items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-          <Sprout className="w-6 h-6 text-green-600 dark:text-green-400" />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            Welcome back, {user?.name || "User"}
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Here's what's happening on your farm today
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={`Welcome back, ${user?.name || "User"}`}
+        description="Here's what's happening on your farm right now"
+      />
 
-      {/* Stats grid */}
+      {/* Stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="card flex items-start gap-3">
-            <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}>
-              <stat.icon className={`w-5 h-5 ${stat.color}`} />
+        {stats.map((s) => (
+          <div key={s.label} className="card flex items-start gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${s.iconClass}`}>
+              <s.icon className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                {stat.label}
-              </p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">
-                {stat.value}
-              </p>
-              <p className="text-[0.7rem] text-gray-400 dark:text-gray-500 mt-0.5 truncate">
-                {stat.sub}
-              </p>
+              <p className="text-xs text-text-muted font-medium">{s.label}</p>
+              <p className="text-xl font-bold text-text-primary mt-0.5">{s.value}</p>
+              <p className="text-[0.7rem] text-text-muted mt-0.5 truncate">{s.sub}</p>
             </div>
           </div>
         ))}
       </div>
 
       <div className="grid gap-5 lg:grid-cols-3">
-        {/* Device breakdown */}
+        {/* Device overview */}
         <div className="card lg:col-span-2 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            <Server size={18} className="text-gray-500" />
-            Device Overview
+          <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+            <Server size={15} className="text-text-muted" />
+            Device Status
           </h2>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {deviceSummary.map((d) => (
-              <div
-                key={d.label}
-                className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50"
-              >
-                <div className="w-9 h-9 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center shrink-0">
-                  <d.icon className={`w-4 h-4 ${d.color}`} />
+            {DEVICE_GROUPS.map((group) => {
+              const activeCount = group.items.filter(
+                (d) => devices[d.key as keyof typeof devices]
+              ).length
+              return (
+                <div
+                  key={group.label}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-bg-muted"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-bg-card border border-border flex items-center justify-center shrink-0">
+                    <group.icon className="w-4 h-4 text-text-muted" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-text-primary">{group.label}</p>
+                    <div className="flex gap-1.5 mt-1.5">
+                      {group.items.map((d) => (
+                        <span
+                          key={d.key}
+                          title={d.name}
+                          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                            devices[d.key as keyof typeof devices] ? d.dot : "bg-border"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <span
+                    className={`text-xs font-semibold tabular-nums ${
+                      activeCount > 0 ? "text-success" : "text-text-muted"
+                    }`}
+                  >
+                    {activeCount}/{group.items.length}
+                  </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {d.label}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {d.active}/{d.count} active
-                  </p>
-                </div>
-                <div className="w-16 h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-green-500 transition-all duration-500"
-                    style={{ width: `${d.count > 0 ? (d.active / d.count) * 100 : 0}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* Soil moisture bar */}
-          <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-            <div className="flex items-center justify-between mb-2">
+          <div className="p-4 rounded-xl bg-bg-muted">
+            <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-2">
-                <Droplets size={16} className="text-blue-500" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  Soil Moisture
-                </span>
+                <Droplets size={15} className="text-water" />
+                <span className="text-sm font-medium text-text-primary">Soil Moisture</span>
               </div>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
-                {moisture}%
-              </span>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-full ${condition.bgClass} ${condition.textClass}`}
+                >
+                  {condition.label}
+                </span>
+                <span className="text-sm font-bold text-text-primary">{moisture}%</span>
+              </div>
             </div>
-            <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+            <div className="w-full h-2 rounded-full bg-border overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-water to-blue-400 transition-all duration-500"
                 style={{ width: `${moisture}%` }}
               />
             </div>
           </div>
+
+          {/* System info strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {sysInfoItems.map((item) => (
+              <div key={item.label} className="flex items-center gap-2 p-2.5 rounded-lg bg-bg-muted">
+                <item.icon size={13} className="text-text-muted shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[0.6rem] text-text-muted">{item.label}</p>
+                  <p className="text-xs font-medium text-text-primary truncate">{item.value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Recent activity */}
-        <div className="card space-y-4">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            <Activity size={18} className="text-gray-500" />
+        <div className="card space-y-3">
+          <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+            <Activity size={15} className="text-text-muted" />
             Recent Activity
           </h2>
 
-          {logs.length === 0 ? (
+          {recentActivity.length === 0 ? (
             <div className="text-center py-8">
-              <Activity className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-              <p className="text-sm text-gray-400 dark:text-gray-500">
-                No activity yet
-              </p>
+              <Activity className="w-9 h-9 text-border mx-auto mb-2" />
+              <p className="text-sm text-text-muted">No activity yet</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {logs.slice(-5).reverse().map((log) => (
+            <div className="space-y-0.5">
+              {recentActivity.map((log) => (
                 <div
                   key={log.id}
-                  className="flex items-center gap-2 p-2 rounded-lg"
+                  className="flex items-start gap-2.5 px-2 py-2 rounded-lg hover:bg-bg-muted transition-colors"
                 >
                   <span
-                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                      log.type === "on"
-                        ? "bg-green-500"
-                        : log.type === "off"
-                          ? "bg-red-500"
-                          : log.type === "adjust"
-                            ? "bg-yellow-500"
-                            : "bg-blue-500"
+                    className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
+                      log.action === "ON"
+                        ? "bg-success"
+                        : log.action === "OFF"
+                          ? "bg-danger"
+                          : "bg-warning"
                     }`}
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-gray-700 dark:text-gray-300 truncate">
-                      {log.message}
+                    <p className="text-xs text-text-primary truncate">
+                      <span className="font-medium">{log.user.name || "User"}</span>
+                      {" · "}
+                      <span className="text-text-muted">{log.device.replace(/_/g, " ")}</span>
+                      {" "}
+                      <span
+                        className={`font-semibold ${
+                          log.action === "ON"
+                            ? "text-success"
+                            : log.action === "OFF"
+                              ? "text-danger"
+                              : "text-warning"
+                        }`}
+                      >
+                        {log.action}
+                      </span>
+                      {log.value !== null ? ` (${log.value}%)` : ""}
+                    </p>
+                    <p className="text-[0.65rem] text-text-muted mt-0.5">
+                      {new Date(log.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </div>
-                  <span className="text-[0.65rem] text-gray-400 dark:text-gray-500 shrink-0">
-                    {log.time}
-                  </span>
                 </div>
               ))}
             </div>
           )}
-        </div>
-      </div>
-
-      {/* System info row */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="card flex items-center gap-3">
-          <Clock size={18} className="text-gray-400" />
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Uptime</p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">{sysInfo.uptime}</p>
-          </div>
-        </div>
-        <div className="card flex items-center gap-3">
-          <Wifi size={18} className="text-gray-400" />
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Network</p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">{sysInfo.wifi}</p>
-          </div>
-        </div>
-        <div className="card flex items-center gap-3">
-          <Server size={18} className="text-gray-400" />
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Mode</p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">{sysInfo.mode}</p>
-          </div>
         </div>
       </div>
     </div>

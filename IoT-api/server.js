@@ -7,6 +7,9 @@ import { fileURLToPath } from "url";
 import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
+import activityRoutes from "./src/routes/activity.routes.js";
+import sensorRoutes from "./src/routes/sensor.routes.js";
+import { startCollector } from "./src/services/collector.service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,6 +25,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/sensors", sensorRoutes);
 
 app.get("/", (req, res) => {
 	res.json({
@@ -37,6 +42,7 @@ const start = async () => {
 
 	app.listen(PORT, () => {
 		console.log(`Smart Agriculture API is running on http://localhost:${PORT}`);
+		startCollector();
 	});
 };
 

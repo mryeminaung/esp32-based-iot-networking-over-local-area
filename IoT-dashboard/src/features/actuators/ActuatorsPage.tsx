@@ -1,6 +1,8 @@
-import { useDashboardStore, type DeviceKey } from "@/store/dashboard";
+import { useDashboardStore, type DeviceKey } from "@/store/use-dashboard-store";
 import { sendCommand } from "@/features/dashboard/hooks/useEsp32Sync";
 import { getMoistureCondition } from "@/lib/moistureUtils";
+import { useHeader } from "@/hooks/useHeader";
+import PageHeader from "@/components/PageHeader";
 import ControlItem from "./components/ControlItem";
 import {
 	Droplets,
@@ -60,6 +62,7 @@ const actuators: {
 ];
 
 export default function ActuatorsPage() {
+	useHeader("Actuators");
 	const devices = useDashboardStore((s) => s.devices);
 	const connected = useDashboardStore((s) => s.connected);
 	const moisture = useDashboardStore((s) => s.moisture);
@@ -82,19 +85,10 @@ export default function ActuatorsPage() {
 	return (
 		<div className="max-w-[1100px] mx-auto space-y-5">
 			{/* Header */}
-			<div className="card flex items-center gap-3">
-				<div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-					<Power className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-				</div>
-				<div>
-					<h1 className="text-xl font-bold text-gray-900 dark:text-white">
-						Actuators & Irrigation
-					</h1>
-					<p className="text-sm text-gray-500 dark:text-gray-400">
-						Control pumps, fans, lights and relays
-					</p>
-				</div>
-			</div>
+			<PageHeader
+				title="Actuators & Irrigation"
+				description="Control pumps, fans, lights and relays"
+			/>
 
 			{/* Connection warning */}
 			{!connected && (
@@ -150,10 +144,10 @@ export default function ActuatorsPage() {
 
 			{/* Irrigation Controls */}
 			<div className="card">
-				<div className="flex items-center justify-between mb-4">
-					<h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-						<Droplets size={18} className="text-blue-500" />
-						Irrigation Controls
+				<div className="flex items-center justify-between mb-4 gap-2">
+					<h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2 min-w-0">
+						<Droplets size={18} className="text-blue-500 shrink-0" />
+						<span className="truncate">Irrigation Controls</span>
 					</h2>
 					<div className="flex items-center gap-1.5">
 						<Power
@@ -172,7 +166,7 @@ export default function ActuatorsPage() {
 				</div>
 
 				{/* Moisture condition bar */}
-				<div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+				<div className="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
 					<div className="flex items-center gap-2">
 						<span className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
 							Mode

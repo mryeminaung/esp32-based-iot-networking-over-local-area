@@ -3,9 +3,9 @@ import {
   Activity,
   Users,
   Server,
-  Settings,
   Thermometer,
   Power,
+  BarChart3,
   type LucideIcon,
 } from "lucide-react"
 import { ROLES, type Role } from "./roles"
@@ -37,6 +37,12 @@ export const navigation: NavItem[] = [
     roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
   },
   {
+    path: "/analytics",
+    label: "Analytics",
+    icon: BarChart3,
+    roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
+  },
+  {
     path: "/users",
     label: "Users",
     icon: Users,
@@ -53,12 +59,6 @@ export const navigation: NavItem[] = [
     label: "Activity Logs",
     icon: Activity,
     roles: [ROLES.FARM_MANAGER],
-  },
-  {
-    path: "/settings",
-    label: "Settings",
-    icon: Settings,
-    roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
   },
 ]
 

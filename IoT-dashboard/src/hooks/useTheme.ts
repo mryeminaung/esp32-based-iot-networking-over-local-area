@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useDashboardStore } from "@/store/dashboard"
+import { useDashboardStore } from "@/store/use-dashboard-store"
 
 /**
  * Keeps <html data-theme> in sync with the store's theme value.

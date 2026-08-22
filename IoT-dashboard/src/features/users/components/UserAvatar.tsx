@@ -1,4 +1,4 @@
-import { getAvatarColor, getInitials } from "./userUtils";
+import { getAvatarColor, getInitials } from "../utils";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
