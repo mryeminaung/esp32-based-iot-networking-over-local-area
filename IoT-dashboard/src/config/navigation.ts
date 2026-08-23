@@ -36,12 +36,12 @@ export const navigation: NavItem[] = [
     icon: Power,
     roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
   },
-  {
-    path: "/analytics",
-    label: "Analytics",
-    icon: BarChart3,
-    roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
-  },
+  // {
+  //   path: "/analytics",
+  //   label: "Analytics",
+  //   icon: BarChart3,
+  //   roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
+  // },
   {
     path: "/users",
     label: "Users",

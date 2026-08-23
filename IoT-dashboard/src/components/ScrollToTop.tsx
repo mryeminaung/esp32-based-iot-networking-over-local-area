@@ -33,7 +33,7 @@ export default function ScrollToTop() {
 					className={`fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer transition-colors border ${
 						isDark
 							? "bg-bg-card border-border hover:bg-bg-card-hover text-text-primary"
-							: "bg-accent hover:bg-accent-hover text-white border-transparent"
+							: "bg-green hover:bg-green-hover text-white border-transparent"
 					}`}
 					aria-label="Scroll to top">
 					<ArrowUp size={20} />

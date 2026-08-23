@@ -1,4 +1,5 @@
 import { useDashboardStore } from "@/store/use-dashboard-store";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MoistureCard } from "./MoistureCard";
 
 export default function CardContainer() {
@@ -10,30 +11,34 @@ export default function CardContainer() {
 	const greenActive = moisture >= 50;
 
 	return (
-		<section className="card h-full">
-			<h2 className="text-[1.1rem] font-bold mb-5 max-sm:text-[1rem] max-sm:mb-[14px]">
-				Moisture Status Indicators
-			</h2>
-			<div className="flex flex-wrap md:flex-col-reverse items-center justify-between gap-3 sm:gap-4 md:gap-6">
-				<MoistureCard
-					name="Dry"
-					gpio={2}
-					color="red"
-					active={redActive}
-				/>
-				<MoistureCard
-					name="Moist"
-					gpio={4}
-					color="yellow"
-					active={yellowActive}
-				/>
-				<MoistureCard
-					name="Wet"
-					gpio={5}
-					color="green"
-					active={greenActive}
-				/>
-			</div>
-		</section>
+		<Card className="h-full">
+			<CardHeader className="pb-5 max-sm:pb-[14px]">
+				<h2 className="text-[1.1rem] font-bold max-sm:text-[1rem]">
+					Moisture Status Indicators
+				</h2>
+			</CardHeader>
+			<CardContent>
+				<div className="flex flex-wrap md:flex-col-reverse items-center justify-between gap-3 sm:gap-4 md:gap-6">
+					<MoistureCard
+						name="Dry"
+						gpio={2}
+						color="red"
+						active={redActive}
+					/>
+					<MoistureCard
+						name="Moist"
+						gpio={4}
+						color="yellow"
+						active={yellowActive}
+					/>
+					<MoistureCard
+						name="Wet"
+						gpio={5}
+						color="green"
+						active={greenActive}
+					/>
+				</div>
+			</CardContent>
+		</Card>
 	);
 }

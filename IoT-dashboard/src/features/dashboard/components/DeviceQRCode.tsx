@@ -78,14 +78,14 @@ export default function DeviceQRCode() {
 
 						<div className="flex items-center gap-2">
 							{/* Code block */}
-							<code className="flex-1 text-[0.8125rem] sm:text-[0.875rem] font-mono text-accent bg-bg-card border border-border rounded-lg px-3 py-2 truncate select-all">
+							<code className="flex-1 text-[0.8125rem] sm:text-[0.875rem] font-mono text-green bg-bg-card border border-border rounded-lg px-3 py-2 truncate select-all">
 								{DASHBOARD_URL}
 							</code>
 
 							{/* Copy button */}
 							<button
 								onClick={handleCopy}
-								className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-border bg-bg-card text-text-muted hover:text-accent hover:border-accent transition-all cursor-pointer"
+								className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-border bg-bg-card text-text-muted hover:text-green hover:border-green transition-all cursor-pointer"
 								title={copied ? "Copied!" : "Copy URL"}>
 								{copied ? (
 									<Check

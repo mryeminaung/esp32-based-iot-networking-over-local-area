@@ -1,7 +1,7 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarColor, getInitials } from "../utils";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
 interface UserAvatarProps {
 	name: string | null;
 	email: string;
@@ -25,19 +25,18 @@ export default function UserAvatar({
 	const fullUrl = imageUrl ? `${API_BASE}${imageUrl}` : null;
 
 	return (
-		<div
-			className={`${sizeClasses[size]} rounded-full flex items-center justify-center overflow-hidden shrink-0 border-2 border-gray-200 dark:border-gray-700 ${
-				fullUrl ? "" : `text-white font-bold ${getAvatarColor(name || email)}`
-			}`}>
-			{fullUrl ? (
-				<img
+		<Avatar
+			className={`${sizeClasses[size]} shrink-0 border-2  ${fullUrl ? "" : getAvatarColor(name || email)}`}>
+			{fullUrl && (
+				<AvatarImage
 					src={fullUrl}
 					alt={name || email}
-					className="w-full h-full object-cover"
+					className="object-cover"
 				/>
-			) : (
-				getInitials(name, email)
 			)}
-		</div>
+			<AvatarFallback className="text-white font-bold">
+				{getInitials(name, email)}
+			</AvatarFallback>
+		</Avatar>
 	);
 }

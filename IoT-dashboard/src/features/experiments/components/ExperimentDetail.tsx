@@ -1,7 +1,10 @@
-import { ExternalLink, X } from "lucide-react"
-import { useEffect } from "react"
+import { ExternalLink } from "lucide-react"
 import type { Experiment } from "../experiments"
 import { statusConfig } from "../experiments"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
 
 type Props = {
 	experiment: Experiment
@@ -13,46 +16,28 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 	const cfg = statusConfig[experiment.status]
 	const d = experiment.detail
 
-	useEffect(() => {
-		const handler = (e: KeyboardEvent) => {
-			if (e.key === "Escape") onClose()
-		}
-		document.addEventListener("keydown", handler)
-		return () => document.removeEventListener("keydown", handler)
-	}, [onClose])
-
 	return (
-		<div
-			className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-			onClick={(e) => {
-				if (e.target === e.currentTarget) onClose()
-			}}>
-			<div className="card max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-				{/* ── Header (sticky) ── */}
-				<div className="flex items-start justify-between shrink-0">
+		<Dialog open={true} onOpenChange={(v) => !v && onClose()}>
+			<DialogContent className="sm:max-w-xl max-h-[85vh] flex flex-col overflow-hidden">
+				<DialogHeader>
 					<div className="flex items-center gap-4 min-w-0">
 						<div
 							className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${experiment.iconBg} ${experiment.iconColor}`}>
 							<Icon size={22} />
 						</div>
 						<div className="min-w-0">
-							<h2 className="text-[1.15rem] font-bold truncate">
+							<DialogTitle className="truncate">
 								{experiment.title}
-							</h2>
-							<span
-								className={`inline-flex items-center gap-1.5 text-[0.65rem] font-semibold px-2.5 py-0.5 rounded-full border mt-1 ${cfg.badge}`}>
+							</DialogTitle>
+							<Badge
+								variant="outline"
+								className={`inline-flex items-center gap-1.5 text-[0.65rem] font-semibold px-2.5 py-0.5 mt-1 ${cfg.badge}`}>
 								<span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
 								{cfg.label}
-							</span>
+							</Badge>
 						</div>
 					</div>
-					<button
-						onClick={onClose}
-						className="w-8 h-8 rounded-lg flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-bg-muted transition-all cursor-pointer shrink-0 ml-4"
-						aria-label="Close">
-						<X size={16} />
-					</button>
-				</div>
+				</DialogHeader>
 
 				{/* ── Scrollable body ── */}
 				<div className="mt-6 space-y-5 overflow-y-auto pr-1 -mr-1">
@@ -66,7 +51,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 						</p>
 					</section>
 
-					<hr className="border-border" />
+					<Separator />
 
 					{/* Hardware */}
 					<section>
@@ -85,7 +70,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 						</ul>
 					</section>
 
-					<hr className="border-border" />
+					<Separator />
 
 					{/* Technologies */}
 					<section>
@@ -96,7 +81,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 							{d.technologies.map((t) => (
 								<span
 									key={t}
-									className="text-[0.7rem] font-semibold px-2.5 py-1 rounded-full bg-accent-light text-accent">
+									className="text-[0.7rem] font-semibold px-2.5 py-1 rounded-full bg-green-light text-green">
 									{t}
 								</span>
 							))}
@@ -106,7 +91,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 					{/* Circuit diagram placeholder */}
 					{d.circuitImage && (
 						<>
-							<hr className="border-border" />
+							<Separator />
 							<section>
 								<h3 className="text-[0.75rem] font-bold uppercase tracking-wider text-text-muted mb-2">
 									Circuit
@@ -119,7 +104,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 					)}
 
 					{/* Implementation steps */}
-					<hr className="border-border" />
+					<Separator />
 					<section>
 						<h3 className="text-[0.75rem] font-bold uppercase tracking-wider text-text-muted mb-2">
 							Implementation
@@ -138,7 +123,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 					{/* API Endpoints */}
 					{d.endpoints && (
 						<>
-							<hr className="border-border" />
+							<Separator />
 							<section>
 								<h3 className="text-[0.75rem] font-bold uppercase tracking-wider text-text-muted mb-2">
 									API Endpoints
@@ -148,7 +133,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 										<div
 											key={ep.path}
 											className="flex items-center gap-3 font-mono text-[0.8125rem]">
-											<span className="text-[0.65rem] font-bold px-2 py-0.5 rounded bg-accent-light text-accent uppercase">
+											<span className="text-[0.65rem] font-bold px-2 py-0.5 rounded bg-green-light text-green uppercase">
 												{ep.method}
 											</span>
 											<span className="text-text-secondary">
@@ -162,7 +147,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 					)}
 
 					{/* Result */}
-					<hr className="border-border" />
+					<Separator />
 					<section>
 						<h3 className="text-[0.75rem] font-bold uppercase tracking-wider text-text-muted mb-2">
 							Result
@@ -175,7 +160,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 					</section>
 
 					{/* Resources */}
-					<hr className="border-border" />
+					<Separator />
 					<section className="pb-1">
 						<h3 className="text-[0.75rem] font-bold uppercase tracking-wider text-text-muted mb-2">
 							Resources
@@ -192,7 +177,7 @@ export default function ExperimentDetail({ experiment, onClose }: Props) {
 						</div>
 					</section>
 				</div>
-			</div>
-		</div>
+			</DialogContent>
+		</Dialog>
 	)
 }

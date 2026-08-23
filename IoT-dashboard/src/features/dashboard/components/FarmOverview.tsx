@@ -2,6 +2,7 @@ import { useDashboardStore } from "@/store/use-dashboard-store";
 import { getMoistureCondition } from "@/lib/moistureUtils";
 import { Droplets, Wifi, Cpu, Sprout } from "lucide-react";
 import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
 
 const container = {
 	hidden: { opacity: 0 },
@@ -32,8 +33,8 @@ export default function FarmOverview() {
 			value: `${moisture}%`,
 			sub: condition.label,
 			subColor: condition.color,
-			bg: "bg-accent-light",
-			iconColor: "text-accent",
+			bg: "bg-green-light",
+			iconColor: "text-green",
 		},
 		{
 			icon: Droplets,
@@ -74,8 +75,8 @@ export default function FarmOverview() {
 				<motion.div
 					key={card.label}
 					variants={item}
-					whileHover={{ y: -4, boxShadow: "0 8px 25px rgba(0,0,0,0.08)" }}
-					className="bg-bg-card rounded-2xl p-4 sm:p-5 border border-border flex items-start gap-3 cursor-default">
+					whileHover={{ y: -4, boxShadow: "0 8px 25px rgba(0,0,0,0.08)" }}>
+					<Card className="p-4 sm:p-5 flex items-start gap-3 cursor-default">
 					<div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 ${card.bg}`}>
 						<card.icon size={20} className={card.iconColor} />
 					</div>
@@ -90,6 +91,7 @@ export default function FarmOverview() {
 							{card.sub}
 						</p>
 					</div>
+					</Card>
 				</motion.div>
 			))}
 		</motion.div>

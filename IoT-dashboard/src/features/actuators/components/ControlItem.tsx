@@ -1,14 +1,16 @@
 import { type LucideIcon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 
-// Map of color names → Tailwind classes for the icon circle
-const colorMap: Record<string, { bg: string; text: string; toggle: string }> = {
-	blue: { bg: "bg-water-light", text: "text-water", toggle: "blue" },
-	yellow: { bg: "bg-amber-100", text: "text-amber-600", toggle: "yellow" },
-	green: { bg: "bg-success/10", text: "text-success", toggle: "green" },
-	gray: { bg: "bg-bg-muted", text: "text-text-muted", toggle: "gray" },
-	teal: { bg: "bg-teal-100", text: "text-teal-600", toggle: "teal" },
-	purple: { bg: "bg-purple-100", text: "text-purple-600", toggle: "purple" },
-	red: { bg: "bg-danger/10", text: "text-danger", toggle: "red" },
+// Map of color names → Tailwind classes for the icon circle + CSS color for switch
+const colorMap: Record<string, { bg: string; text: string; cssColor: string }> = {
+	blue: { bg: "bg-water-light", text: "text-water", cssColor: "#0284C7" },
+	yellow: { bg: "bg-amber-100", text: "text-amber-600", cssColor: "#D97706" },
+	green: { bg: "bg-success/10", text: "text-success", cssColor: "#10B981" },
+	gray: { bg: "bg-bg-muted", text: "text-text-muted", cssColor: "#647067" },
+	teal: { bg: "bg-teal-100", text: "text-teal-600", cssColor: "#0D9488" },
+	purple: { bg: "bg-purple-100", text: "text-purple-600", cssColor: "#A855F7" },
+	red: { bg: "bg-danger/10", text: "text-danger", cssColor: "#EF4444" },
 };
 
 type ControlItemProps = {
@@ -39,7 +41,6 @@ export default function ControlItem({
 	hideGpio = false,
 }: ControlItemProps) {
 	const c = colorMap[color] ?? colorMap.blue;
-	const toggleColor = c.toggle;
 
 	return (
 		<div
@@ -70,30 +71,25 @@ export default function ControlItem({
 			{/* Slider or Toggle */}
 			{sliderValue !== undefined ? (
 				<div className="flex items-center gap-1.5 sm:gap-2 md:gap-[14px] min-w-0 shrink-0">
-					<input
-						type="range"
+					<Slider
 						min={0}
 						max={100}
-						value={sliderValue}
-						onChange={(e) => onSliderChange?.(Number(e.target.value))}
-						className="device-slider w-[70px] sm:w-[90px] md:w-[130px]"
+						value={[sliderValue]}
+						onValueChange={(v) => onSliderChange?.(v[0])}
+						className="w-[70px] sm:w-[90px] md:w-[130px]"
 					/>
-					<span className="text-[0.75rem] sm:text-[0.875rem] md:text-[0.9375rem] font-semibold text-accent min-w-[28px] sm:min-w-[32px] md:min-w-[42px] text-right">
+					<span className="text-[0.75rem] sm:text-[0.875rem] md:text-[0.9375rem] font-semibold text-green min-w-[28px] sm:min-w-[32px] md:min-w-[42px] text-right">
 						{sliderValue}%
 					</span>
 				</div>
 			) : (
-				<label
-					className={`toggle-switch ${toggleColor} relative inline-block shrink-0`}>
-					<input
-						type="checkbox"
-						checked={checked}
-						onChange={onToggle}
-						disabled={disabled}
-						className="opacity-0 w-0 h-0 absolute"
-					/>
-					<span className="toggle-slider" />
-				</label>
+				<Switch
+					checked={checked}
+					onCheckedChange={onToggle}
+					disabled={disabled}
+					style={{ "--primary": c.cssColor } as React.CSSProperties}
+					className="shrink-0"
+				/>
 			)}
 		</div>
 	);

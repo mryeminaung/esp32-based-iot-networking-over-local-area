@@ -3,6 +3,7 @@ import { sendCommand } from "@/features/dashboard/hooks/useEsp32Sync";
 import { getMoistureCondition } from "@/lib/moistureUtils";
 import { useHeader } from "@/hooks/useHeader";
 import PageHeader from "@/components/PageHeader";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ControlItem from "./components/ControlItem";
 import {
 	Droplets,
@@ -92,58 +93,68 @@ export default function ActuatorsPage() {
 
 			{/* Connection warning */}
 			{!connected && (
-				<div className="card bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm flex items-center gap-2">
-					<WifiOff size={16} />
-					ESP32 is offline — controls may not respond
-				</div>
+				<Card className="bg-red-50 border-red-200 ">
+					<CardContent className="text-red-700 text-sm flex items-center gap-2">
+						<WifiOff size={16} />
+						ESP32 is offline — controls may not respond
+					</CardContent>
+				</Card>
 			)}
 
 			{/* Status Overview */}
 			<div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
-				<div className="card flex items-center gap-3">
-					<div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-						<Power className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-					</div>
-					<div>
-						<p className="text-xs text-gray-500 dark:text-gray-400">Active</p>
-						<p className="text-lg font-bold text-gray-900 dark:text-white">
-							{activeCount}/{actuators.length}
-						</p>
-					</div>
-				</div>
-				<div className="card flex items-center gap-3">
-					<div className="w-9 h-9 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
-						<Thermometer className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-					</div>
-					<div>
-						<p className="text-xs text-gray-500 dark:text-gray-400">Soil</p>
-						<p className={`text-lg font-bold ${condition.color}`}>{condition.label}</p>
-					</div>
-				</div>
-				<div className="card flex items-center gap-3">
-					<div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-						<Droplets className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-					</div>
-					<div>
-						<p className="text-xs text-gray-500 dark:text-gray-400">Moisture</p>
-						<p className="text-lg font-bold text-gray-900 dark:text-white">{moisture}%</p>
-					</div>
-				</div>
-				<div className="card flex items-center gap-3">
-					<div className="w-9 h-9 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-						<Fan className="w-4 h-4 text-green-600 dark:text-green-400" />
-					</div>
-					<div>
-						<p className="text-xs text-gray-500 dark:text-gray-400">Fan</p>
-						<p className="text-lg font-bold text-gray-900 dark:text-white">
-							{devices.fan > 0 ? `${devices.fan}%` : "OFF"}
-						</p>
-					</div>
-				</div>
+				<Card>
+					<CardContent className="flex items-center gap-3">
+						<div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+							<Power className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+						</div>
+						<div>
+							<p className="text-xs text-text-muted">Active</p>
+							<p className="text-lg font-bold text-gray-900 dark:text-white">
+								{activeCount}/{actuators.length}
+							</p>
+						</div>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardContent className="flex items-center gap-3">
+						<div className="w-9 h-9 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+							<Thermometer className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+						</div>
+						<div>
+							<p className="text-xs text-text-muted">Soil</p>
+							<p className={`text-lg font-bold ${condition.color}`}>{condition.label}</p>
+						</div>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardContent className="flex items-center gap-3">
+						<div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
+							<Droplets className="w-4 h-4 text-blue-600 " />
+						</div>
+						<div>
+							<p className="text-xs text-text-muted">Moisture</p>
+							<p className="text-lg font-bold text-gray-900 dark:text-white">{moisture}%</p>
+						</div>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardContent className="flex items-center gap-3">
+						<div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center">
+							<Fan className="w-4 h-4 text-green-600 " />
+						</div>
+						<div>
+							<p className="text-xs text-text-muted">Fan</p>
+							<p className="text-lg font-bold text-gray-900 dark:text-white">
+								{devices.fan > 0 ? `${devices.fan}%` : "OFF"}
+							</p>
+						</div>
+					</CardContent>
+				</Card>
 			</div>
 
 			{/* Irrigation Controls */}
-			<div className="card">
+			<Card>
 				<div className="flex items-center justify-between mb-4 gap-2">
 					<h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2 min-w-0">
 						<Droplets size={18} className="text-blue-500 shrink-0" />
@@ -157,7 +168,7 @@ export default function ActuatorsPage() {
 						<span
 							className={`text-xs font-semibold ${
 								devices.water_pump
-									? "text-green-600 dark:text-green-400"
+									? "text-green-600 "
 									: "text-gray-400"
 							}`}>
 							{devices.water_pump ? "RUNNING" : "IDLE"}
@@ -166,18 +177,18 @@ export default function ActuatorsPage() {
 				</div>
 
 				{/* Moisture condition bar */}
-				<div className="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+				<div className="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-xl bg-bg-muted border border-border">
 					<div className="flex items-center gap-2">
-						<span className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
+						<span className="text-xs text-text-muted font-medium uppercase tracking-wider">
 							Mode
 						</span>
 						<span className="text-xs font-bold text-gray-900 dark:text-white">
 							MANUAL
 						</span>
 					</div>
-					<div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
+					<div className="w-px h-4 bg-border" />
 					<div className="flex items-center gap-2">
-						<span className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
+						<span className="text-xs text-text-muted font-medium uppercase tracking-wider">
 							Soil
 						</span>
 						<span className={`text-xs font-bold ${condition.color}`}>{condition.label}</span>
@@ -217,10 +228,10 @@ export default function ActuatorsPage() {
 						);
 					})}
 				</div>
-			</div>
+			</Card>
 
 			{/* Device Status Grid */}
-			<div className="card">
+			<Card>
 				<h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
 					<Power size={18} className="text-amber-500" />
 					Device Status
@@ -237,20 +248,20 @@ export default function ActuatorsPage() {
 								key={act.key}
 								className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
 									isOn
-										? "border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10"
-										: "border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30"
+										? "border-green-200 bg-green-50/50 dark:bg-green-900/10"
+										: "border-border bg-bg-muted"
 								}`}>
 								<div
 									className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
 										isOn
-											? "bg-green-100 dark:bg-green-900/30"
-											: "bg-gray-100 dark:bg-gray-800"
+											? "bg-green-100 "
+											: "bg-bg-muted"
 									}`}>
 									<Icon
 										className={`w-4 h-4 ${
 											isOn
-												? "text-green-600 dark:text-green-400"
-												: "text-gray-400 dark:text-gray-500"
+												? "text-green-600 "
+												: "text-text-muted"
 										}`}
 									/>
 								</div>
@@ -258,15 +269,15 @@ export default function ActuatorsPage() {
 									<p className="text-sm font-medium text-gray-900 dark:text-white">
 										{act.label}
 									</p>
-									<p className="text-xs text-gray-500 dark:text-gray-400">
+									<p className="text-xs text-text-muted">
 										{act.description}
 									</p>
 								</div>
 								<span
 									className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
 										isOn
-											? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-											: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500"
+											? "bg-green-100 text-green-700 "
+											: "bg-bg-muted text-text-muted"
 									}`}>
 									{typeof val === "number" && act.type === "slider"
 										? isOn
@@ -280,7 +291,7 @@ export default function ActuatorsPage() {
 						);
 					})}
 				</div>
-			</div>
+			</Card>
 		</div>
 	);
 }

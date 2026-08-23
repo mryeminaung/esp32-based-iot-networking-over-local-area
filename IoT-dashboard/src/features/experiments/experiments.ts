@@ -52,7 +52,7 @@ export const experiments: Experiment[] = [
 		description: "Configure ESP32 as a local WiFi network",
 		icon: Wifi,
 		iconColor: "text-blue-600",
-		iconBg: "bg-accent-light",
+		iconBg: "bg-green-light",
 		tags: ["ESP32 WiFi", "Access Point"],
 		status: "completed",
 		detail: {

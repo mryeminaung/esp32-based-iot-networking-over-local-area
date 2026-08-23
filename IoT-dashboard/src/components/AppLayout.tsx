@@ -44,7 +44,7 @@ export default function AppLayout() {
   const toggleMobile = () => setMobileOpen((prev) => !prev)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-bg-page">
       {/* Desktop sidebar (hidden on mobile) */}
       <div className="hidden md:block">
         <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />

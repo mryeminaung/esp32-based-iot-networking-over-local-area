@@ -3,6 +3,8 @@ import { Loader2, Plus, Search, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useHeader } from "@/hooks/useHeader";
 import PageHeader from "@/components/PageHeader";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import CreateUserModal from "./components/CreateUserModal";
 import DeleteUserDialog from "./components/DeleteUserDialog";
 import EditUserModal from "./components/EditUserModal";
@@ -108,35 +110,39 @@ export default function UserManagementPage() {
 				title="User Management"
 				description="Manage farm users and roles"
 			>
-				<button
-					onClick={() => setShowCreateModal(true)}
-					className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors cursor-pointer">
+				<Button onClick={() => setShowCreateModal(true)}>
 					<Plus size={16} />
 					Add User
-				</button>
+				</Button>
 			</PageHeader>
 
 			{/* Success */}
 			{success && (
-				<div className="card bg-success/10 border border-success/30 text-success text-sm">
-					{success}
-				</div>
+				<Card className="bg-success/10 border-success/30">
+					<CardContent className="text-success text-sm py-3">
+						{success}
+					</CardContent>
+				</Card>
 			)}
 
 			{/* Content */}
 			{loading ? (
-				<div className="card flex justify-center py-12">
+				<Card className="flex justify-center py-12">
 					<Loader2 className="w-6 h-6 animate-spin text-green-600" />
-				</div>
+				</Card>
 			) : error ? (
-				<div className="card bg-danger/10 border border-danger/30 text-danger text-sm">
-					{error}
-				</div>
+				<Card className="bg-danger/10 border-danger/30">
+					<CardContent className="text-danger text-sm py-3">
+						{error}
+					</CardContent>
+				</Card>
 			) : users.length === 0 ? (
-				<div className="card text-center py-12">
-					<Users className="w-12 h-12 text-border mx-auto mb-3" />
-					<p className="text-text-muted">No users found</p>
-				</div>
+				<Card className="text-center py-12">
+					<CardContent>
+						<Users className="w-12 h-12 text-border mx-auto mb-3" />
+						<p className="text-text-muted">No users found</p>
+					</CardContent>
+				</Card>
 			) : (
 				<div className="border border-border rounded-xl bg-bg-card overflow-hidden">
 					<UserToolbar

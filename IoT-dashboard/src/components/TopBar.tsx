@@ -51,13 +51,13 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
 
   return (
     <>
-      <header className="h-14 sm:h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-800/60 flex items-center justify-between px-3 sm:px-6 shrink-0 sticky top-0 z-30">
+      <header className="h-14 sm:h-16 bg-bg-card/80 backdrop-blur-xl border-b border-border flex items-center justify-between px-3 sm:px-6 shrink-0 sticky top-0 z-30">
         {/* Left: toggle + page title */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {/* Mobile hamburger */}
           <button
             onClick={onMobileToggle}
-            className="md:hidden w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer shrink-0"
+            className="md:hidden w-10 h-10 rounded-lg border border-border flex items-center justify-center text-text-muted hover:bg-bg-muted transition-colors cursor-pointer shrink-0"
             title="Open menu"
           >
             <Menu size={18} />
@@ -65,12 +65,12 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
           {/* Desktop sidebar toggle */}
           <button
             onClick={onToggle}
-            className="hidden md:flex w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer shrink-0"
+            className="hidden md:flex w-10 h-10 rounded-lg border border-border items-center justify-center text-text-muted hover:bg-bg-muted transition-colors cursor-pointer shrink-0"
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
           </button>
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate min-w-0">
+          <h2 className="text-base sm:text-lg font-semibold text-text-primary truncate min-w-0">
             {pageTitle}
           </h2>
         </div>
@@ -81,8 +81,8 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
           <div
             className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
               connected
-                ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                ? "bg-green-light text-green"
+                : "bg-red-100 text-red-600"
             }`}
           >
             <span
@@ -103,7 +103,7 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
           {/* QR code */}
           <button
             onClick={() => setShowQR(true)}
-            className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-text-muted hover:bg-bg-muted transition-colors cursor-pointer"
             title="Show QR code"
           >
             <QrCode size={16} />
@@ -112,7 +112,7 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
           {/* Theme toggle */}
           <button
             onClick={toggleTheme}
-            className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-text-muted hover:bg-bg-muted transition-colors cursor-pointer"
             title="Toggle dark mode"
           >
             {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
@@ -122,7 +122,7 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg border border-border hover:bg-bg-muted transition-colors cursor-pointer"
             >
               <UserAvatar
                 name={user?.name || null}
@@ -131,25 +131,25 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
                 size="xs"
               />
               <div className="hidden sm:block text-left">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 leading-tight">
+                <p className="text-sm font-medium text-text-secondary leading-tight">
                   {user?.name || user?.email}
                 </p>
-                <p className="text-[0.65rem] text-gray-400 dark:text-gray-500 leading-tight">
+                <p className="text-[0.65rem] text-text-muted leading-tight">
                   {roleLabels[user?.role] || user?.role}
                 </p>
               </div>
-              <ChevronDown size={14} className="text-gray-400" />
+              <ChevronDown size={14} className="text-text-muted" />
             </button>
 
             {/* Dropdown */}
             {showMenu && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg py-1 z-[60]">
+              <div className="absolute right-0 top-full mt-2 w-56 bg-bg-card border border-border rounded-xl shadow-lg py-1 z-[60]">
                 {/* User info */}
-                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <div className="px-4 py-3 border-b border-border">
+                  <p className="text-sm font-medium text-text-primary truncate">
                     {user?.name || "No name"}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <p className="text-xs text-text-muted truncate">
                     {user?.email}
                   </p>
                 </div>
@@ -160,7 +160,7 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
                     setShowMenu(false)
                     navigate("/settings/account")
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-text-secondary hover:bg-bg-muted transition-colors cursor-pointer"
                 >
                   <Mail size={16} />
                   Account
@@ -170,18 +170,18 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
                     setShowMenu(false)
                     navigate("/settings")
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-text-secondary hover:bg-bg-muted transition-colors cursor-pointer"
                 >
                   <Settings size={16} />
                   Settings
                 </button>
-                <div className="border-t border-gray-100 dark:border-gray-800 my-1" />
+                <div className="border-t border-border my-1" />
                 <button
                   onClick={() => {
                     setShowMenu(false)
                     logout()
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                 >
                   <LogOut size={16} />
                   Logout
@@ -203,7 +203,7 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
           <div className="relative">
             <button
               onClick={() => setShowQR(false)}
-              className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm hover:opacity-80 transition-all cursor-pointer shadow-lg"
+              className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-text-primary text-bg-card flex items-center justify-center text-sm hover:opacity-80 transition-all cursor-pointer shadow-lg"
             >
               ✕
             </button>

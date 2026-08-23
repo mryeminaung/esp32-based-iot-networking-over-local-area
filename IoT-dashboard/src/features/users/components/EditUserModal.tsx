@@ -1,9 +1,13 @@
 import { backendClient } from "@/api/auth";
-import { Eye, EyeOff, Loader2, RefreshCw, X } from "lucide-react";
+import { Eye, EyeOff, Loader2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { User } from "../types";
 import { ROLES } from "../types";
 import { generatePassword } from "../utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface EditUserModalProps {
 	open: boolean;
@@ -74,126 +78,105 @@ export default function EditUserModal({
 		}
 	};
 
-	if (!open || !user) return null;
+	if (!user) return null
 
 	return (
-		<div
-			className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-			onClick={(e) => {
-				if (e.target === e.currentTarget) handleClose();
-			}}>
-			<div className="card w-full max-w-md relative">
-				<button
-					onClick={handleClose}
-					className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer">
-					<X size={16} />
-				</button>
-
-				<h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">
-					Edit User
-				</h2>
+		<Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
+			<DialogContent className="sm:max-w-md">
+				<DialogHeader>
+					<DialogTitle>Edit User</DialogTitle>
+				</DialogHeader>
 
 				{formError && (
-					<div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm rounded-lg px-4 py-3">
+					<div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
 						{formError}
 					</div>
 				)}
 
-				<form
-					onSubmit={handleSubmit}
-					className="space-y-4">
+				<form onSubmit={handleSubmit} className="space-y-4">
 					<div>
-						<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+						<label className="block text-sm font-medium text-text-secondary mb-1.5">
 							Name
 						</label>
-						<input
+						<Input
 							type="text"
 							value={editName}
 							onChange={(e) => setEditName(e.target.value)}
 							placeholder="John Doe"
-							className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+							className="w-full px-4 rounded-lg border border-border bg-bg-card text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent text-sm"
 						/>
 					</div>
 
 					<div>
-						<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+						<label className="block text-sm font-medium text-text-secondary mb-1.5">
 							Email <span className="text-red-500">*</span>
 						</label>
-						<input
+						<Input
 							type="email"
 							required
 							value={editEmail}
 							onChange={(e) => setEditEmail(e.target.value)}
 							placeholder="user@farm.com"
-							className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+							className="w-full px-4 rounded-lg border border-border bg-bg-card text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent text-sm"
 						/>
 					</div>
 
-					{user.role !== "farm_manager" && (
+					{user?.role !== "farm_manager" && (
 						<>
 							<div>
-								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+								<label className="block text-sm font-medium text-text-secondary mb-1.5">
 									Role <span className="text-red-500">*</span>
 								</label>
-								<select
-									value={editRole}
-									onChange={(e) => setEditRole(e.target.value)}
-									className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm">
-									{ROLES.map((r) => (
-										<option
-											key={r.value}
-											value={r.value}>
-											{r.label}
-										</option>
-									))}
-								</select>
+								<Select value={editRole} onValueChange={(v) => v && setEditRole(v)}>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Select role" />
+									</SelectTrigger>
+									<SelectContent>
+										{ROLES.map((r) => (
+											<SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
 							</div>
 
 							<div>
-								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+								<label className="block text-sm font-medium text-text-secondary mb-1.5">
 									Reset Password
 								</label>
 								<div className="flex gap-2">
 									<div className="relative flex-1">
-										<input
+										<Input
 											type={showNewPassword ? "text" : "password"}
 											value={newPassword}
 											onChange={(e) => setNewPassword(e.target.value)}
 											placeholder="Leave blank to keep current"
 											minLength={newPassword ? 8 : undefined}
-											className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm pr-10"
+											className="w-full px-4 rounded-lg border border-border bg-bg-card text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent text-sm pr-10"
 										/>
 										{newPassword && (
-											<button
+											<Button
 												type="button"
+												variant="ghost"
+												size="icon"
 												onClick={() => setShowNewPassword(!showNewPassword)}
-												className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">
-												{showNewPassword ? (
-													<EyeOff size={14} />
-												) : (
-													<Eye size={14} />
-												)}
-											</button>
+												className="absolute right-0 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary">
+												{showNewPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+											</Button>
 										)}
 									</div>
-									<button
+									<Button
 										type="button"
-										onClick={() => {
-											setNewPassword(generatePassword());
-											setShowNewPassword(true);
-										}}
-										className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer shrink-0"
+										variant="outline"
+										onClick={() => { setNewPassword(generatePassword()); setShowNewPassword(true); }}
+										className="shrink-0"
 										title="Generate random password">
 										<RefreshCw size={14} />
 										Generate
-									</button>
+									</Button>
 								</div>
 								{showNewPassword && newPassword && (
 									<p className="mt-1.5 text-xs text-gray-400">
-										Password:{" "}
-										<span className="font-mono text-gray-600 dark:text-gray-300">
-											{newPassword}
-										</span>
+										Password: <span className="font-mono text-text-secondary">{newPassword}</span>
 									</p>
 								)}
 							</div>
@@ -201,31 +184,22 @@ export default function EditUserModal({
 					)}
 
 					<div className="flex gap-3 pt-2">
-						<button
-							type="button"
-							onClick={handleClose}
-							className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
+						<Button type="button" variant="outline" onClick={handleClose} className="flex-1 flex items-center justify-center gap-2 px-4 rounded-lg border border-border text-text-secondary text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer">
 							Cancel
-						</button>
-						<button
-							type="submit"
-							disabled={submitting}
-							className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white text-sm font-medium transition-colors cursor-pointer disabled:cursor-not-allowed">
+						</Button>
+						<Button type="submit" disabled={submitting} className="flex-1 flex items-center justify-center gap-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white text-sm font-medium transition-colors cursor-pointer disabled:cursor-not-allowed">
 							{submitting ? (
 								<>
-									<Loader2
-										size={14}
-										className="animate-spin"
-									/>
+									<Loader2 size={14} className="animate-spin" />
 									Saving...
 								</>
 							) : (
 								"Save Changes"
 							)}
-						</button>
+						</Button>
 					</div>
 				</form>
-			</div>
-		</div>
+			</DialogContent>
+		</Dialog>
 	);
 }

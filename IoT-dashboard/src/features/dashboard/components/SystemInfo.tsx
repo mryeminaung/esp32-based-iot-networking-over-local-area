@@ -1,5 +1,6 @@
 import { useDashboardStore } from "@/store/use-dashboard-store";
 import { Activity, Clock, Globe, Monitor, Network } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import InfoRow from "./InfoRow";
 
 export default function SystemInfo() {
@@ -16,21 +17,24 @@ export default function SystemInfo() {
 	];
 
 	return (
-		<section className="bg-bg-card rounded-2xl p-5 sm:p-6 border border-border">
-			<h2 className="text-[1rem] sm:text-[1.1rem] font-bold mb-4 text-text-primary">
-				Technical Details
-			</h2>
-
-			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-0">
-				{rows.map((r) => (
-					<InfoRow
-						key={r.label}
-						icon={r.icon}
-						label={r.label}
-						value={r.value}
-					/>
-				))}
-			</div>
-		</section>
+		<Card>
+			<CardHeader className="pb-4">
+				<h2 className="text-[1rem] sm:text-[1.1rem] font-bold text-text-primary">
+					Technical Details
+				</h2>
+			</CardHeader>
+			<CardContent className="pt-0">
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-0">
+					{rows.map((r) => (
+						<InfoRow
+							key={r.label}
+							icon={r.icon}
+							label={r.label}
+							value={r.value}
+						/>
+					))}
+				</div>
+			</CardContent>
+		</Card>
 	);
 }
