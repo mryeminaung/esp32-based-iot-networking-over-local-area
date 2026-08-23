@@ -1,12 +1,10 @@
-# ESP32 IoT Networking Lab
+# ESP32 Based IoT Networking Over Local Area
 
-ESP32-based IoT networking experiments and smart agriculture system using Wi-Fi communication, REST APIs, and a web-based monitoring dashboard.
-
-This repository contains a series of ESP32 experiments that demonstrate local network communication, web-based device control, sensor monitoring, and IoT automation using the Arduino framework.
+ESP32-based IoT networking over local area and agriculture system using Wi-Fi communication, REST APIs, and a web-based monitoring dashboard.
 
 ## Project Overview
 
-The goal of this project is to explore IoT networking using the ESP32 microcontroller by developing communication between embedded devices and web applications over a local network.
+The goal of this capstone project is to explore IoT networking using the ESP32 microcontroller by developing communication between embedded devices and web applications over a local network.
 
 The project covers:
 
@@ -38,7 +36,6 @@ The project covers:
 │   ├── docs/ARCHITECTURE.md # Frontend architecture & data flow
 │   └── docs/WORKFLOW.md     # Dev setup & release checklist
 │
-├── experiments/             # Experiment reference materials
 ├── LICENSE
 └── README.md                # This file
 ```
@@ -90,38 +87,6 @@ Open `http://localhost:3000` — the dashboard connects to the ESP32 and begins 
 - Tailwind CSS
 - Zustand (State Management)
 
-## Experiments
-
-### Experiment 01: ESP32 Wi-Fi Access Point
-
-- Configure ESP32 as a standalone Wi-Fi network
-- Understand local IP addressing
-- Connect client devices to ESP32 network
-
-### Experiment 02: ESP32 Local Web Server
-
-- Create a web server using ESP32
-- Control GPIO devices through HTTP requests
-- Implement LED ON/OFF control
-
-### Experiment 03: Motor Speed Control Using PWM
-
-- Generate PWM signals using ESP32
-- Control DC motor speed
-- Interface motor driver module
-
-### Experiment 04: Internet-Based Device Control
-
-- Connect ESP32 to the Internet
-- Control devices remotely
-- Exchange data through web services
-
-### Experiment 05: Smart Agriculture System
-
-- Monitor soil moisture level
-- Automatically control water pump
-- Display real-time sensor information through dashboard
-
 ## Learning Objectives
 
 Through this project, the following concepts are explored:
@@ -137,7 +102,7 @@ Through this project, the following concepts are explored:
 
 **Ye Min Aung**
 
-Capstone Project — **Arduino Based IoT Networking Over Local Area**
+Capstone Project — **ESP32 Based IoT Networking Over Local Area**
 
 ---
 
