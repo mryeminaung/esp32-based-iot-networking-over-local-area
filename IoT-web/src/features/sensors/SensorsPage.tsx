@@ -1,6 +1,7 @@
 import { motion } from "framer-motion"
 import CardContainer from "./components/CardContainer";
 import SensorCard from "./components/SensorCard";
+import SensorHealthCard from "./components/SensorHealthCard";
 import { useDashboardStore } from "@/store/use-dashboard-store";
 import { useHeader } from "@/hooks/useHeader";
 import PageHeader from "@/components/PageHeader";
@@ -117,7 +118,7 @@ export default function SensorsPage() {
 					initial="hidden"
 					animate="visible"
 				>
-					<CardContainer />
+					<SensorHealthCard />
 				</motion.div>
 			</div>
 

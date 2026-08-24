@@ -1,12 +1,4 @@
-import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
-import { PrismaClient } from "../generated/prisma/index.js";
-
-const adapter = new PrismaPg({
-	connectionString: process.env.DATABASE_URL,
-});
-
-const prisma = new PrismaClient({ adapter });
 
 // Realistic sensor value ranges for a greenhouse
 const RANGES = {
@@ -59,7 +51,7 @@ function generateReadings() {
 	return readings;
 }
 
-async function main() {
+async function seedSensorData(prisma) {
 	console.log("Clearing existing sensor readings...");
 	await prisma.sensorReading.deleteMany();
 
@@ -80,11 +72,4 @@ async function main() {
 	console.log(`\nDone! Inserted ${readings.length} sensor readings.`);
 }
 
-main()
-	.catch((e) => {
-		console.error("Seed failed:", e);
-		process.exit(1);
-	})
-	.finally(async () => {
-		await prisma.$disconnect();
-	});
+export default seedSensorData;

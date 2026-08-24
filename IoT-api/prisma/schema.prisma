@@ -39,8 +39,8 @@ model RefreshToken {
 
 model ActivityLog {
   id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   device    String
   action    String
   value     Int?
@@ -65,4 +65,21 @@ model SensorReading {
   @@index([deviceId])
   @@index([createdAt])
   @@map("sensor_readings")
+}
+
+model AutomationRule {
+  id            Int       @id @default(autoincrement())
+  name          String
+  enabled       Boolean   @default(true)
+  sensor        String    // soilMoisture, temperature, humidity, light, airQuality, waterLevel
+  condition     String    // below, above, equals
+  threshold     Float
+  action        String    // pump_on, pump_off, led_on, led_off
+  duration      Int?      // auto-off after N seconds (null = stay on until manual off)
+  cooldown      Int       @default(300) // minimum seconds between triggers
+  lastTriggered DateTime?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("automation_rules")
 }

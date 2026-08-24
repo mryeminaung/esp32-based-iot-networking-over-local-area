@@ -248,7 +248,7 @@ export default function DashboardPage() {
 										/>
 										<div className="min-w-0 flex-1">
 											<p className="text-xs text-text-primary truncate">
-												<span className="font-medium">{log.user.name || "User"}</span>
+												<span className="font-medium">{log.user?.name || "System"}</span>
 												{" · "}
 												<span className="text-text-muted">{log.device.replace(/_/g, " ")}</span>
 												{" "}

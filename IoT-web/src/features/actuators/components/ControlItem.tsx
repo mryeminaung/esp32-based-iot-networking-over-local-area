@@ -1,6 +1,7 @@
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { type LucideIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { type LucideIcon, Play } from "lucide-react";
 
 // Map of color names → Tailwind classes for the icon circle + CSS color for switch
 const colorMap: Record<string, { bg: string; text: string; cssColor: string }> =
@@ -25,6 +26,8 @@ type ControlItemProps = {
 	color?: string;
 	checked?: boolean;
 	onToggle?: () => void;
+	onTest?: () => void;
+	testing?: boolean;
 	disabled?: boolean;
 	sliderValue?: number;
 	onSliderChange?: (val: number) => void;
@@ -39,6 +42,8 @@ export default function ControlItem({
 	color = "blue",
 	checked = false,
 	onToggle,
+	onTest,
+	testing = false,
 	disabled = false,
 	sliderValue,
 	onSliderChange,
@@ -95,6 +100,19 @@ export default function ControlItem({
 					style={{ "--primary": c.cssColor } as React.CSSProperties}
 					className="shrink-0"
 				/>
+			)}
+
+			{/* Test button */}
+			{onTest && (
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={onTest}
+					disabled={testing}
+					title={testing ? "Testing..." : "Test (5s pulse)"}
+					className="h-8 w-8 text-text-muted hover:text-blue-600 hover:bg-blue-50 shrink-0">
+					<Play size={14} className={testing ? "animate-pulse" : ""} />
+				</Button>
 			)}
 		</div>
 	);

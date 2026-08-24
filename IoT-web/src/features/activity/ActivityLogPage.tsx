@@ -152,7 +152,8 @@ export default function ActivityLogPage() {
 			setLogs(result.logs);
 			setPagination(result.pagination);
 		} catch {
-			// Silently fail
+			setLogs([]);
+			setPagination({ page: 1, limit: 20, total: 0, totalPages: 0 });
 		} finally {
 			setLoading(false);
 		}
@@ -293,15 +294,15 @@ export default function ActivityLogPage() {
 								{/* User */}
 								<div className="col-span-3 flex items-center gap-2">
 									<div className="w-8 h-8 rounded-full bg-bg-muted flex items-center justify-center text-xs font-medium text-text-secondary shrink-0">
-										{(log.user.name || log.user.email).charAt(0).toUpperCase()}
+										{log.user ? (log.user.name || log.user.email).charAt(0).toUpperCase() : "S"}
 									</div>
 									<div className="min-w-0">
 										<p className="text-sm font-medium text-text-primary truncate">
-											{log.user.name || "Unnamed"}
+											{log.user?.name || "System"}
 										</p>
 										<span
-											className={`inline-block px-1.5 py-0.5 rounded text-[0.6rem] font-medium ${getRoleBadge(log.user.role)}`}>
-											{log.user.role.replace("_", " ")}
+											className={`inline-block px-1.5 py-0.5 rounded text-[0.6rem] font-medium ${getRoleBadge(log.user?.role || "system")}`}>
+											{log.user?.role?.replace("_", " ") || "system"}
 										</span>
 									</div>
 								</div>

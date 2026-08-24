@@ -27,7 +27,7 @@ export default function LoginPage() {
 			className="min-h-screen flex items-center justify-center bg-bg-page px-4 bg-cover bg-center bg-no-repeat relative"
 			style={{ backgroundImage: "url('/main_bg.png')" }}>
 			<div className="absolute inset-0 bg-black/20" />
-			<div className="w-full max-w-md relative z-10">
+			<div className="w-full max-w-lg relative z-10">
 				{/* Login Form */}
 				<form
 					onSubmit={handleSubmit}
@@ -42,9 +42,9 @@ export default function LoginPage() {
 						<div className="leading-tight">
 							<h1 className="text-xl font-bold text-text-primary">
 								{/* Smart Agriculture */}
-								ESP32-Based Smart Agriculture IoT System
+								ESP32-Based Smart Agriculture
 							</h1>
-							<p className="text-md text-text-muted">Sign in to your account</p>
+							<p className="text-md text-text-muted">IoT System</p>
 						</div>
 					</div>
 

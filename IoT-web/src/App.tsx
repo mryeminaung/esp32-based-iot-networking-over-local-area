@@ -13,6 +13,8 @@ import DashboardPage from "@/features/dashboard/DashboardPage";
 import DeviceInfoPage from "@/features/devices/DeviceInfoPage";
 import ExperimentsPage from "@/features/experiments/ExperimentsPage";
 import SensorsPage from "@/features/sensors/SensorsPage";
+import AutomationPage from "@/features/automation/AutomationPage";
+import DiagnosticsPage from "@/features/diagnostics/DiagnosticsPage";
 import SettingsLayout from "@/features/settings/SettingsLayout";
 import AccountPage from "@/features/settings/pages/AccountPage";
 import ProfilePage from "@/features/settings/pages/ProfilePage";
@@ -59,8 +61,12 @@ export default function App() {
 								</Route>
 								<Route
 									path="analytics"
-									element={<AnalyticsPage />}
-								/>
+									element={<RoleRoute allowedRoles={[ROLES.FARM_MANAGER]} />}>
+									<Route
+										index
+										element={<AnalyticsPage />}
+									/>
+								</Route>
 								<Route
 									path="users"
 									element={<RoleRoute allowedRoles={[ROLES.FARM_MANAGER]} />}>
@@ -108,6 +114,28 @@ export default function App() {
 									<Route
 										path="account"
 										element={<AccountPage />}
+									/>
+								</Route>
+								<Route
+									path="automation"
+									element={
+										<RoleRoute allowedRoles={[ROLES.FARM_MANAGER]} />
+									}>
+									<Route
+										index
+										element={<AutomationPage />}
+									/>
+								</Route>
+								<Route
+									path="diagnostics"
+									element={
+										<RoleRoute
+											allowedRoles={[ROLES.FARM_MANAGER, ROLES.TECHNICIAN]}
+										/>
+									}>
+									<Route
+										index
+										element={<DiagnosticsPage />}
 									/>
 								</Route>
 							</Route>

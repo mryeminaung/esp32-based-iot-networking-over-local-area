@@ -3,7 +3,7 @@ import { prisma } from "../config/db.js";
 export const createActivityLog = async (userId, device, action, value = null) => {
   return prisma.activityLog.create({
     data: {
-      userId,
+      userId: userId || null,
       device,
       action,
       value,

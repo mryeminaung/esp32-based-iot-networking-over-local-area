@@ -37,6 +37,7 @@ export type DashboardState = {
 	devices: DeviceKeys;
 	sysInfo: SysInfo;
 	moisture: number;
+	lastSeen: Date | null;
 	logs: LogEntry[];
 	theme: Theme;
 };
@@ -88,6 +89,7 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 		},
 		sysInfo: initialSysInfo,
 		moisture: 0,
+		lastSeen: null,
 		logs: [],
 		theme: (localStorage.getItem("theme") as Theme) || "light",
 
@@ -119,6 +121,7 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 				devices: devices ? { ...s.devices, ...devices } : s.devices,
 				connected: true,
 				connecting: false,
+				lastSeen: new Date(),
 			})),
 
 		setDisconnected: () => set({ connected: false, connecting: false }),

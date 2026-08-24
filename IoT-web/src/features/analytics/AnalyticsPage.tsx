@@ -58,7 +58,7 @@ export default function AnalyticsPage() {
 		 const data = await getSensorAnalytics(from, to)
 		 setAnalytics(data)
 	 } catch {
-		 // Silently fail
+		 setAnalytics([])
 	 } finally {
 		 setLoading(false)
 	 }

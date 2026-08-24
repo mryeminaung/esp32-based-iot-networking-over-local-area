@@ -6,6 +6,8 @@ import {
   Thermometer,
   Power,
   BarChart3,
+  Bot,
+  Stethoscope,
   type LucideIcon,
 } from "lucide-react"
 import { ROLES, type Role } from "./roles"
@@ -40,7 +42,7 @@ export const navigation: NavItem[] = [
     path: "/analytics",
     label: "Analytics",
     icon: BarChart3,
-    roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
+    roles: [ROLES.FARM_MANAGER],
   },
   {
     path: "/users",
@@ -59,6 +61,18 @@ export const navigation: NavItem[] = [
     label: "Activity Logs",
     icon: Activity,
     roles: [ROLES.FARM_MANAGER],
+  },
+  {
+    path: "/automation",
+    label: "Automation",
+    icon: Bot,
+    roles: [ROLES.FARM_MANAGER],
+  },
+  {
+    path: "/diagnostics",
+    label: "Diagnostics",
+    icon: Stethoscope,
+    roles: [ROLES.FARM_MANAGER, ROLES.TECHNICIAN],
   },
 ]
 

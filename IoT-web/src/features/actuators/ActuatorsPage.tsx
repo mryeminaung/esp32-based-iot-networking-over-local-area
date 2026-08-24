@@ -1,4 +1,5 @@
 import { motion } from "framer-motion"
+import { useState, useCallback } from "react"
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { sendCommand } from "@/features/dashboard/hooks/useEsp32Sync";
@@ -78,6 +79,7 @@ export default function ActuatorsPage() {
 	const connected = useDashboardStore((s) => s.connected);
 	const moisture = useDashboardStore((s) => s.moisture);
 	const condition = getMoistureCondition(moisture);
+	const [testing, setTesting] = useState<DeviceKey | null>(null);
 
 	const handleToggle = (key: DeviceKey) => {
 		const current = useDashboardStore.getState().devices[key];
@@ -87,6 +89,21 @@ export default function ActuatorsPage() {
 	const handleSlider = (key: DeviceKey, val: number) => {
 		sendCommand(key, val, val);
 	};
+
+	const handleTest = useCallback((key: DeviceKey) => {
+		if (testing) return;
+		setTesting(key);
+		const prev = useDashboardStore.getState().devices[key];
+
+		// Turn on
+		sendCommand(key, true);
+
+		// Auto-off after 5 seconds
+		setTimeout(() => {
+			sendCommand(key, false);
+			setTesting(null);
+		}, 5000);
+	}, [testing]);
 
 	const activeCount = actuators.filter((a) => {
 		const val = devices[a.key];
@@ -212,6 +229,8 @@ export default function ActuatorsPage() {
 											color={act.color}
 											sliderValue={val as number}
 											onSliderChange={(v) => handleSlider(act.key, v)}
+											onTest={() => handleTest(act.key)}
+											testing={testing === act.key}
 											last={isLast}
 											hideGpio
 										/>
@@ -224,6 +243,8 @@ export default function ActuatorsPage() {
 											color={act.color}
 											checked={val as boolean}
 											onToggle={() => handleToggle(act.key)}
+											onTest={() => handleTest(act.key)}
+											testing={testing === act.key}
 											last={isLast}
 											hideGpio
 										/>
