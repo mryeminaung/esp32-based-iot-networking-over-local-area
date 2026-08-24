@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import {
 	Users, Power, Wifi, WifiOff,
 	Droplets, Activity, Server, Fan,
-	Lightbulb,
+	Lightbulb, RefreshCw,
 } from "lucide-react"
 import { useAuthStore } from "@/store/use-auth-store"
 import { useDashboardStore } from "@/store/use-dashboard-store"
@@ -13,6 +13,8 @@ import { useHeader } from "@/hooks/useHeader"
 import { getMoistureCondition } from "@/lib/moistureUtils"
 import PageHeader from "@/components/PageHeader"
 import { Card, CardContent } from "@/components/ui/card"
+import LoadingState from "@/components/LoadingState"
+import ErrorState from "@/components/ErrorState"
 
 type User = { id: number; role: string }
 
@@ -63,18 +65,22 @@ export default function DashboardPage() {
 
 	const [userCount, setUserCount] = useState(0)
 	const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([])
+	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
+
+	const fetchData = () => {
+		setLoading(true)
+		setError(null)
+		Promise.all([
+			backendClient.get("/users").then(({ data }) => setUserCount(data.data.users.length)),
+			getActivityLogs({ limit: 5 }).then((r) => setRecentActivity(r.logs)),
+		])
+			.catch(() => setError("Failed to load dashboard data"))
+			.finally(() => setLoading(false))
+	}
 
 	useEffect(() => {
-		backendClient
-			.get("/users")
-			.then(({ data }) => {
-				setUserCount(data.data.users.length)
-			})
-			.catch(() => {})
-
-		getActivityLogs({ limit: 5 })
-			.then((r) => setRecentActivity(r.logs))
-			.catch(() => {})
+		fetchData()
 	}, [])
 
 	const condition = getMoistureCondition(moisture)
@@ -88,7 +94,22 @@ export default function DashboardPage() {
 				description="Here's what's happening on your farm right now"
 			/>
 
-			{/* Stat cards */}
+			{error && (
+				<ErrorState
+					message={error}
+					action={
+						<button onClick={fetchData} className="mt-2 inline-flex items-center gap-1.5 text-sm text-green hover:text-green/80">
+							<RefreshCw className="w-3.5 h-3.5" /> Retry
+						</button>
+					}
+				/>
+			)}
+
+			{loading ? (
+				<LoadingState message="Loading dashboard..." />
+			) : (
+				<>
+					{/* Stat cards */}
 			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				{[
 					{
@@ -279,6 +300,8 @@ export default function DashboardPage() {
 					</CardContent>
 				</Card>
 			</div>
+			</>
+			)}
 		</div>
 	)
 }

@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react"
-import { BarChart3 } from "lucide-react"
+import { BarChart3, RefreshCw } from "lucide-react"
 import { getSensorAnalytics, type SensorAnalytics } from "@/api/sensors"
 import { useHeader } from "@/hooks/useHeader"
 import PageHeader from "@/components/PageHeader"
-import { Card, CardContent } from "@/components/ui/card"
 import DateRangePicker, { getDateRange } from "./components/DateRangePicker"
 import AnalyticsSummary from "./components/AnalyticsSummary"
 import SensorChart from "./components/SensorChart"
+import LoadingState from "@/components/LoadingState"
+import EmptyState from "@/components/EmptyState"
+import ErrorState from "@/components/ErrorState"
 
 const CHART_SENSORS = [
  { key: "temperature" as const, title: "Temperature (24h trend)", color: "#f97316", unit: "°C" },
@@ -49,20 +51,23 @@ export default function AnalyticsPage() {
  const [preset, setPreset] = useState("7d")
  const [analytics, setAnalytics] = useState<SensorAnalytics[]>([])
  const [loading, setLoading] = useState(true)
+ const [error, setError] = useState<string | null>(null)
 
- useEffect(() => {
-	 const fetchAnalytics = async () => {
+ const fetchAnalytics = async () => {
 	 setLoading(true)
+	 setError(null)
 	 try {
 		 const { from, to } = getDateRange(preset)
 		 const data = await getSensorAnalytics(from, to)
 		 setAnalytics(data)
 	 } catch {
-		 setAnalytics([])
+		 setError("Failed to load analytics data")
 	 } finally {
 		 setLoading(false)
 	 }
-	 }
+ }
+
+ useEffect(() => {
 	 fetchAnalytics()
  }, [preset])
 
@@ -81,24 +86,25 @@ export default function AnalyticsPage() {
 	 <DateRangePicker preset={preset} onChange={setPreset} />
 	 </PageHeader>
 
+	 {error && (
+	 <ErrorState
+		 message={error}
+		 action={
+			 <button onClick={fetchAnalytics} className="mt-2 inline-flex items-center gap-1.5 text-sm text-green hover:text-green/80">
+				 <RefreshCw className="w-3.5 h-3.5" /> Retry
+			 </button>
+		 }
+	 />
+	 )}
+
 	 {loading ? (
-	 <Card className="text-center py-12">
-		 <CardContent>
-		 <div className="w-8 h-8 border-2 border-green border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-		 <p className="text-text-muted">Loading analytics...</p>
-		 </CardContent>
-	 </Card>
+	 <LoadingState message="Loading analytics..." />
 	 ) : analytics.length === 0 ? (
-	 <Card className="text-center py-12">
-		 <CardContent>
-		 <BarChart3 className="w-12 h-12 text-text-muted mx-auto mb-3" />
-		 <p className="text-text-muted">
-			 No sensor data available for the selected period.
-			 <br />
-			 <span className="text-sm">Data will appear once the collector starts recording.</span>
-		 </p>
-		 </CardContent>
-	 </Card>
+	 <EmptyState
+		 icon={<BarChart3 className="w-12 h-12" />}
+		 title="No sensor data available for the selected period"
+		 description="Data will appear once the collector starts recording."
+	 />
 	 ) : (
 	 <>
 		 {/* Summary Cards */}

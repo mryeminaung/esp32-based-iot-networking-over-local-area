@@ -120,8 +120,8 @@ export default function ActuatorsPage() {
 
 			{/* Connection warning */}
 			{!connected && (
-				<Card className="bg-red-50 border-red-200 hidden">
-					<CardContent className="text-red-700 text-sm flex items-center gap-2">
+				<Card className="bg-danger/10 border-danger/30">
+					<CardContent className="text-danger text-sm flex items-center gap-2">
 						<WifiOff size={16} />
 						ESP32 is offline — controls may not respond
 					</CardContent>

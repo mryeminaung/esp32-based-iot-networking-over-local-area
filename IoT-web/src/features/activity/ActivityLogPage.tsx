@@ -12,9 +12,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import LoadingState from "@/components/LoadingState";
+import EmptyState from "@/components/EmptyState";
+import ErrorState from "@/components/ErrorState";
 import { useHeader } from "@/hooks/useHeader";
 import { useAuthStore } from "@/store/use-auth-store";
-import { Activity, ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
+import { Activity, ChevronLeft, ChevronRight, Filter, X, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const DEVICE_OPTIONS = [
@@ -124,6 +127,7 @@ export default function ActivityLogPage() {
 
 	const [logs, setLogs] = useState<ActivityLog[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 	const [pagination, setPagination] = useState({
 		page: 1,
 		limit: 20,
@@ -139,6 +143,7 @@ export default function ActivityLogPage() {
 
 	const fetchLogs = async (page = 1) => {
 		setLoading(true);
+		setError(null);
 		try {
 			const filters: ActivityFilters = { page, limit: 20 };
 			if (deviceFilter && deviceFilter !== "all") filters.device = deviceFilter;
@@ -152,6 +157,7 @@ export default function ActivityLogPage() {
 			setLogs(result.logs);
 			setPagination(result.pagination);
 		} catch {
+			setError("Failed to load activity logs");
 			setLogs([]);
 			setPagination({ page: 1, limit: 20, total: 0, totalPages: 0 });
 		} finally {
@@ -203,14 +209,21 @@ export default function ActivityLogPage() {
 				</button>
 			</PageHeader>
 
+			{/* Error state */}
+			{error && (
+				<ErrorState
+					message={error}
+					action={
+						<button onClick={() => fetchLogs(1)} className="mt-2 inline-flex items-center gap-1.5 text-sm text-green hover:text-green/80">
+							<RefreshCw className="w-3.5 h-3.5" /> Retry
+						</button>
+					}
+				/>
+			)}
+
 			{/* Table card */}
 			{loading ? (
-				<Card className="text-center py-12">
-					<CardContent>
-						<div className="w-8 h-8 border-2 border-green border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-						<p className="text-text-muted">Loading activity...</p>
-					</CardContent>
-				</Card>
+				<LoadingState message="Loading activity..." />
 			) : (
 				<Card className="p-0 overflow-hidden">
 					{/* Inline filters */}
@@ -279,12 +292,10 @@ export default function ActivityLogPage() {
 
 					{/* Table rows or empty state */}
 					{logs.length === 0 ? (
-						<div className="text-center py-12">
-							<Activity className="w-10 h-10 text-text-muted mx-auto mb-2" />
-							<p className="text-sm text-text-muted">
-								No activity recorded for the selected filters
-							</p>
-						</div>
+						<EmptyState
+							icon={<Activity className="w-12 h-12" />}
+							title="No activity recorded for the selected filters"
+						/>
 					) : (
 					<div className="divide-y divide-border">
 						{logs.map((log) => (

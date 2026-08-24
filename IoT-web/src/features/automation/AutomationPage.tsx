@@ -3,7 +3,7 @@ import { useHeader } from "@/hooks/useHeader"
 import PageHeader from "@/components/PageHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Bot, Search } from "lucide-react"
+import { Plus, Bot, Search, RefreshCw } from "lucide-react"
 import AutomationTable, { type ViewMode } from "./components/AutomationTable"
 import AutomationToolbar from "./components/AutomationToolbar"
 import CreateRuleModal from "./components/CreateRuleModal"
@@ -15,12 +15,16 @@ import {
 } from "./services/automation.service"
 import type { AutomationRule, CreateRuleInput } from "./types"
 import { useToastManager } from "@/components/ui/toast"
+import LoadingState from "@/components/LoadingState"
+import EmptyState from "@/components/EmptyState"
+import ErrorState from "@/components/ErrorState"
 
 export default function AutomationPage() {
   useHeader("Automation")
 
   const [rules, setRules] = useState<AutomationRule[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingRule, setEditingRule] = useState<AutomationRule | null>(null)
   const toast = useToastManager()
@@ -38,15 +42,17 @@ export default function AutomationPage() {
   }
 
   const fetchRules = useCallback(async () => {
+    setLoading(true)
+    setError(null)
     try {
       const data = await getRules()
       setRules(data)
     } catch {
-      toast.add({ title: "Failed to load rules", type: "error" })
+      setError("Failed to load automation rules")
     } finally {
       setLoading(false)
     }
-  }, [toast])
+  }, [])
 
   useEffect(() => {
     fetchRules()
@@ -131,23 +137,38 @@ export default function AutomationPage() {
         </Button>
       </PageHeader>
 
+      {error && (
+        <ErrorState
+          message={error}
+          action={
+            <button onClick={fetchRules} className="mt-2 inline-flex items-center gap-1.5 text-sm text-green hover:text-green/80">
+              <RefreshCw className="w-3.5 h-3.5" /> Retry
+            </button>
+          }
+        />
+      )}
+
       {loading ? (
-        <Card className="text-center py-12">
-          <CardContent>
-            <div className="w-8 h-8 border-2 border-green border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-text-muted">Loading rules...</p>
-          </CardContent>
-        </Card>
+        <LoadingState message="Loading rules..." />
       ) : rules.length === 0 ? (
-        <Card className="text-center py-12">
-          <CardContent>
-            <Bot className="w-12 h-12 text-border mx-auto mb-3" />
-            <p className="text-text-muted">No automation rules yet</p>
-            <p className="text-xs text-text-muted mt-1">
-              Create a rule to automate device actions based on sensor readings.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<Bot className="w-12 h-12" />}
+          title="No automation rules yet"
+          description="Create a rule to automate device actions based on sensor readings."
+          action={
+            <Button
+              size="sm"
+              className="gap-1.5"
+              onClick={() => {
+                setEditingRule(null)
+                setModalOpen(true)
+              }}
+            >
+              <Plus className="size-4" />
+              Create Rule
+            </Button>
+          }
+        />
       ) : (
         <div className="border border-border rounded-xl bg-bg-card overflow-hidden">
           <AutomationToolbar
@@ -161,10 +182,10 @@ export default function AutomationPage() {
 
           <div className="p-0">
             {filteredRules.length === 0 ? (
-              <div className="text-center py-12">
-                <Search className="w-10 h-10 text-border mx-auto mb-3" />
-                <p className="text-text-muted">No rules match your search</p>
-              </div>
+              <EmptyState
+                icon={<Search className="w-10 h-10" />}
+                title="No rules match your search"
+              />
             ) : (
               <AutomationTable
                 rules={filteredRules}

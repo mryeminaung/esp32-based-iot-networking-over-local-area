@@ -1,10 +1,9 @@
 import { backendClient } from "@/api/auth";
 import { useToastManager } from "@/components/ui/toast";
-import { Plus, Search, Users } from "lucide-react";
+import { Plus, Search, Users, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useHeader } from "@/hooks/useHeader";
 import PageHeader from "@/components/PageHeader";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CreateUserModal from "./components/CreateUserModal";
 import DeleteUserDialog from "./components/DeleteUserDialog";
@@ -12,6 +11,9 @@ import EditUserModal from "./components/EditUserModal";
 import type { User } from "./types";
 import UserTable, { type ViewMode } from "./components/UserTable";
 import UserToolbar from "./components/UserToolbar";
+import LoadingState from "@/components/LoadingState";
+import EmptyState from "@/components/EmptyState";
+import ErrorState from "@/components/ErrorState";
 
 export default function UserManagementPage() {
 	useHeader("Farm User Management");
@@ -112,25 +114,21 @@ export default function UserManagementPage() {
 
 			{/* Content */}
 			{loading ? (
-				<Card className="text-center py-12">
-					<CardContent>
-						<div className="w-8 h-8 border-2 border-green border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-						<p className="text-text-muted">Loading users...</p>
-					</CardContent>
-				</Card>
+				<LoadingState message="Loading users..." />
 			) : error ? (
-				<Card className="bg-danger/10 border-danger/30">
-					<CardContent className="text-danger text-sm py-3">
-						{error}
-					</CardContent>
-				</Card>
+				<ErrorState
+					message={error}
+					action={
+						<button onClick={fetchUsers} className="mt-2 inline-flex items-center gap-1.5 text-sm text-green hover:text-green/80">
+							<RefreshCw className="w-3.5 h-3.5" /> Retry
+						</button>
+					}
+				/>
 			) : users.length === 0 ? (
-				<Card className="text-center py-12">
-					<CardContent>
-						<Users className="w-12 h-12 text-border mx-auto mb-3" />
-						<p className="text-text-muted">No users found</p>
-					</CardContent>
-				</Card>
+				<EmptyState
+					icon={<Users className="w-12 h-12" />}
+					title="No users found"
+				/>
 			) : (
 				<div className="border border-border rounded-xl bg-bg-card overflow-hidden">
 					<UserToolbar
@@ -144,10 +142,10 @@ export default function UserManagementPage() {
 
 					<div className="p-0">
 						{filteredUsers.length === 0 ? (
-							<div className="text-center py-12">
-								<Search className="w-10 h-10 text-border mx-auto mb-3" />
-								<p className="text-text-muted">No users match your search</p>
-							</div>
+							<EmptyState
+								icon={<Search className="w-10 h-10" />}
+								title="No users match your search"
+							/>
 						) : (
 							<UserTable
 								users={filteredUsers}
