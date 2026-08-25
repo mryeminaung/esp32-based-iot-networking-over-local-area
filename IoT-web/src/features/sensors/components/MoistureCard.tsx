@@ -39,7 +39,7 @@ export function MoistureCard({ name, gpio, color, active }: DeviceCardProps) {
 		<motion.div
 			whileHover={{ scale: 1.03 }}
 			whileTap={{ scale: 0.98 }}
-			className={`flex w-full flex-col items-center gap-2 py-4 rounded-2xl p-3 shadow-sm ${
+			className={`flex w-full h-full flex-col justify-center items-center gap-2 py-4 rounded-2xl p-3 shadow-sm ${
 				active
 					? `${c.activeBg} shadow-md`
 					: "bg-bg-card shadow-sm border border-border"

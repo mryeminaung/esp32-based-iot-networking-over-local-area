@@ -60,7 +60,7 @@ export const navigation: NavItem[] = [
     path: "/activity",
     label: "Activity Logs",
     icon: Activity,
-    roles: [ROLES.FARM_MANAGER],
+    roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER],
   },
   {
     path: "/automation",

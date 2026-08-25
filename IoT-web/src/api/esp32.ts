@@ -30,19 +30,24 @@ export type ControlResult = {
   status: string
 }
 
+type ApiResponse<T> = {
+  success: boolean
+  data: T
+}
+
 export async function getSystemInfo(): Promise<SystemInfo> {
-  const { data } = await apiClient.get<SystemInfo>("/system")
-  return data
+  const { data } = await apiClient.get<ApiResponse<AllData>>("/devices")
+  return data.data
 }
 
 export async function getSensors(): Promise<Sensors> {
-  const { data } = await apiClient.get<Sensors>("/sensors")
-  return data
+  const { data } = await apiClient.get<ApiResponse<AllData>>("/devices")
+  return data.data
 }
 
 export async function getAll(): Promise<AllData> {
-  const { data } = await apiClient.get<AllData>("/all")
-  return data
+  const { data } = await apiClient.get<ApiResponse<AllData>>("/devices")
+  return data.data
 }
 
 export async function controlDevice(
@@ -50,10 +55,13 @@ export async function controlDevice(
   state: number,
   value?: number,
 ): Promise<ControlResult> {
-  const { data } = await apiClient.post<ControlResult>("/control", {
-    device,
-    state,
-    value: value ?? 0,
-  })
-  return data
+  const { data } = await apiClient.post<ApiResponse<ControlResult>>(
+    "/devices/control",
+    {
+      device,
+      state,
+      value: value ?? 0,
+    },
+  )
+  return data.data
 }

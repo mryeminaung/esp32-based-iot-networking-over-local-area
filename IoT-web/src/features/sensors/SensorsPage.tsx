@@ -1,8 +1,9 @@
 import { motion } from "framer-motion"
-import CardContainer from "./components/CardContainer";
 import SensorCard from "./components/SensorCard";
+import { MoistureCard } from "./components/MoistureCard";
 import SensorHealthCard from "./components/SensorHealthCard";
 import { useDashboardStore } from "@/store/use-dashboard-store";
+import { useAuthStore } from "@/store/use-auth-store";
 import { useHeader } from "@/hooks/useHeader";
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -43,44 +44,45 @@ const deviceList = [
 		bg: "bg-green-100 ",
 		iconBg: "bg-green-100 ",
 	},
-	{
-		key: "white_light" as const,
-		label: "Grow Light",
-		onColor: "text-amber-400",
-		offColor: "text-text-muted",
-		bg: "bg-bg-muted",
-		iconBg: "bg-amber-100 dark:bg-amber-900/30",
-	},
-	{
-		key: "fan" as const,
-		label: "Fan",
-		onColor: "text-cyan-500",
-		offColor: "text-text-muted",
-		bg: "bg-cyan-100 dark:bg-cyan-900/30",
-		iconBg: "bg-cyan-100 dark:bg-cyan-900/30",
-	},
-	{
-		key: "water_pump" as const,
-		label: "Water Pump",
-		onColor: "text-indigo-500",
-		offColor: "text-text-muted",
-		bg: "bg-indigo-100 dark:bg-indigo-900/30",
-		iconBg: "bg-indigo-100 dark:bg-indigo-900/30",
-	},
-	{
-		key: "relay" as const,
-		label: "Relay",
-		onColor: "text-amber-500",
-		offColor: "text-text-muted",
-		bg: "bg-amber-100 dark:bg-amber-900/30",
-		iconBg: "bg-amber-100 dark:bg-amber-900/30",
-	},
 ];
 
 export default function SensorsPage() {
 	useHeader("Sensors");
 	const devices = useDashboardStore((s) => s.devices);
+	const moisture = useDashboardStore((s) => s.moisture);
 	const connected = useDashboardStore((s) => s.connected);
+	const user = useAuthStore((s) => s.user);
+	const isTechnician = user?.role === "technician";
+
+	// Technician sees sensor health overview only
+	if (isTechnician) {
+		return (
+			<div className="max-w-[1100px] mx-auto space-y-5">
+				<PageHeader
+					title="Sensor Health"
+					description="Monitor sensor connection status and health"
+				/>
+
+				{!connected && (
+					<Card className="bg-danger/10 border-danger/30">
+						<CardContent className="text-danger text-sm flex items-center gap-2">
+							<WifiOff size={16} />
+							ESP32 is offline — readings may be stale
+						</CardContent>
+					</Card>
+				)}
+
+				<motion.div
+					custom={0}
+					variants={fadeInUp}
+					initial="hidden"
+					animate="visible"
+				>
+					<SensorHealthCard />
+				</motion.div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="max-w-[1100px] mx-auto space-y-5">
@@ -100,7 +102,67 @@ export default function SensorsPage() {
 				</Card>
 			)}
 
-			{/* Soil Moisture Gauge + LED Status Indicators */}
+			{/* Device States Grid */}
+			<motion.div
+				custom={0}
+				variants={fadeInUp}
+				initial="hidden"
+				animate="visible"
+			>
+				<Card>
+					<CardHeader>
+						<h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
+							<Power
+								size={18}
+								className="text-amber-500"
+							/>
+							Sensors Status
+						</h2>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+							{deviceList.map((device, i) => {
+								const isOn = !!devices[device.key];
+								return (
+									<motion.div
+										key={device.key}
+										custom={i}
+										variants={fadeInUp}
+										initial="hidden"
+										animate="visible"
+										className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
+											isOn
+												? "border-green-200 bg-green-50/50 dark:bg-green-900/10"
+												: "border-border bg-bg-muted"
+										}`}>
+										<div
+											className={`w-9 h-9 rounded-lg ${device.iconBg} flex items-center justify-center shrink-0`}>
+											<Power
+												className={`w-4 h-4 ${isOn ? device.onColor : device.offColor}`}
+											/>
+										</div>
+										<div className="flex-1 min-w-0">
+											<p className="text-sm font-medium text-text-primary">
+												{device.label}
+											</p>
+										</div>
+										<span
+											className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+												isOn
+													? "bg-green-100 text-green-700 "
+													: "bg-bg-muted text-text-muted"
+											}`}>
+											{isOn ? "ON" : "OFF"}
+										</span>
+									</motion.div>
+								);
+							})}
+						</div>
+					</CardContent>
+				</Card>
+			</motion.div>
+
+			{/* Soil Moisture Gauge + Moisture Threshold LEDs */}
 			<div className="grid gap-5 grid-cols-1 md:grid-cols-3">
 				<motion.div
 					className="md:col-span-2"
@@ -112,13 +174,15 @@ export default function SensorsPage() {
 					<SensorCard />
 				</motion.div>
 				<motion.div
-					className="md:col-span-1"
+					className="md:col-span-1 flex gap-2 flex-col-reverse"
 					custom={1}
 					variants={fadeInUp}
 					initial="hidden"
 					animate="visible"
 				>
-					<SensorHealthCard />
+					<MoistureCard name="Dry" gpio={2} color="red" active={moisture <= 30} />
+					<MoistureCard name="Moist" gpio={4} color="yellow" active={moisture > 30 && moisture < 50} />
+					<MoistureCard name="Optimal" gpio={5} color="green" active={moisture >= 50} />
 				</motion.div>
 			</div>
 
@@ -207,65 +271,6 @@ export default function SensorsPage() {
 				</motion.div>
 			</div>
 
-			{/* Device States Grid */}
-			<motion.div
-				custom={4}
-				variants={fadeInUp}
-				initial="hidden"
-				animate="visible"
-			>
-				<Card>
-					<CardHeader>
-						<h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
-							<Power
-								size={18}
-								className="text-amber-500"
-							/>
-							Sensors Status
-						</h2>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-							{deviceList.map((device, i) => {
-								const isOn = !!devices[device.key];
-								return (
-									<motion.div
-										key={device.key}
-										custom={i}
-										variants={fadeInUp}
-										initial="hidden"
-										animate="visible"
-										className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-											isOn
-												? "border-green-200 bg-green-50/50 dark:bg-green-900/10"
-												: "border-border bg-bg-muted"
-										}`}>
-										<div
-											className={`w-9 h-9 rounded-lg ${device.iconBg} flex items-center justify-center shrink-0`}>
-											<Power
-												className={`w-4 h-4 ${isOn ? device.onColor : device.offColor}`}
-											/>
-										</div>
-										<div className="flex-1 min-w-0">
-											<p className="text-sm font-medium text-text-primary">
-												{device.label}
-											</p>
-										</div>
-										<span
-											className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-												isOn
-													? "bg-green-100 text-green-700 "
-													: "bg-bg-muted text-text-muted"
-											}`}>
-											{isOn ? "ON" : "OFF"}
-										</span>
-									</motion.div>
-								);
-							})}
-						</div>
-					</CardContent>
-				</Card>
-			</motion.div>
 		</div>
 	);
 }

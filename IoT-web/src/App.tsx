@@ -53,7 +53,7 @@ export default function App() {
 								/>
 								<Route
 									path="activity"
-									element={<RoleRoute allowedRoles={[ROLES.FARM_MANAGER]} />}>
+									element={<RoleRoute allowedRoles={[ROLES.FARM_MANAGER, ROLES.FARM_WORKER]} />}>
 									<Route
 										index
 										element={<ActivityLogPage />}

@@ -10,6 +10,7 @@ import {
   resetPassword,
   uploadAvatar,
 } from "../services/user.service.js";
+import { createActivityLog } from "../services/activity.service.js";
 
 export const listUsers = async (req, res) => {
   try {
@@ -44,6 +45,7 @@ export const getUser = async (req, res) => {
 export const createUserHandler = async (req, res) => {
   try {
     const user = await createUser(req.body);
+    await createActivityLog(req.user?.id, "user", `Created user: ${user.email} (${user.role})`);
     res.status(201).json({
       success: true,
       message: "User created successfully",
@@ -60,6 +62,8 @@ export const createUserHandler = async (req, res) => {
 export const updateUserHandler = async (req, res) => {
   try {
     const user = await updateUser(Number(req.params.id), req.body);
+    const changes = Object.keys(req.body).filter(k => k !== "password").join(", ");
+    await createActivityLog(req.user?.id, "user", `Updated user: ${user.email} (${changes})`);
     res.status(200).json({
       success: true,
       message: "User updated successfully",
@@ -84,6 +88,7 @@ export const changeUserRole = async (req, res) => {
     }
 
     const user = await updateUserRole(Number(req.params.id), role);
+    await createActivityLog(req.user?.id, "user", `Changed role: ${user.email} → ${role}`);
     res.status(200).json({
       success: true,
       message: "Role updated successfully",
@@ -99,10 +104,12 @@ export const changeUserRole = async (req, res) => {
 
 export const removeUser = async (req, res) => {
   try {
-    const result = await deleteUser(Number(req.params.id));
+    const user = await getUserById(Number(req.params.id));
+    await deleteUser(user.id);
+    await createActivityLog(req.user?.id, "user", `Deleted user: ${user.email}`);
     res.status(200).json({
       success: true,
-      message: result.message,
+      message: "User deleted successfully",
     });
   } catch (error) {
     res.status(error.status || 500).json({
@@ -158,10 +165,12 @@ export const changePasswordHandler = async (req, res) => {
 
 export const resetPasswordHandler = async (req, res) => {
   try {
-    const result = await resetPassword(Number(req.params.id), req.body.newPassword);
+    const user = await getUserById(Number(req.params.id));
+    await resetPassword(user.id, req.body.newPassword);
+    await createActivityLog(req.user?.id, "user", `Reset password for: ${user.email}`);
     res.status(200).json({
       success: true,
-      message: result.message,
+      message: "Password reset successfully",
     });
   } catch (error) {
     res.status(error.status || 500).json({
