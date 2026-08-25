@@ -10,6 +10,7 @@ import userRoutes from "./src/routes/user.routes.js";
 import activityRoutes from "./src/routes/activity.routes.js";
 import sensorRoutes from "./src/routes/sensor.routes.js";
 import automationRoutes from "./src/routes/automation.routes.js";
+import deviceRoutes from "./src/routes/device.routes.js";
 import { startCollector } from "./src/services/collector.service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,6 +30,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/sensors", sensorRoutes);
 app.use("/api/automation", automationRoutes);
+app.use("/api/devices", deviceRoutes);
 
 app.get("/", (req, res) => {
 	res.json({
