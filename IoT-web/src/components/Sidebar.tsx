@@ -1,6 +1,6 @@
-import { memo } from "react"
+import { getNavSections } from "@/config/navigation"
 import { useAuthStore } from "@/store/use-auth-store"
-import { getNavItems } from "@/config/navigation"
+import { memo } from "react"
 import { NavLink, useLocation } from "react-router"
 
 type SidebarProps = {
@@ -11,7 +11,7 @@ type SidebarProps = {
 export default memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const user = useAuthStore((s) => s.user)
   const location = useLocation()
-  const navItems = getNavItems(user?.role)
+  const sections = getNavSections(user?.role)
 
   return (
 		<aside
@@ -36,28 +36,51 @@ export default memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
 			</div>
 
 			{/* Navigation */}
-			<nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-				{navItems.map((item) => {
-					const isActive =
-						item.path === "/"
-							? location.pathname === "/"
-							: location.pathname.startsWith(item.path);
+			<nav className="flex-1 py-4 px-3 space-y-4 overflow-y-auto">
+				{sections.map((section, sectionIndex) => (
+					<div
+						className="my-0"
+						key={sectionIndex}>
+						{/* Divider between sections (except first) */}
+						{sectionIndex > 0 && (
+							<div
+								className={`border-t border-green-300 my-3 ${collapsed ? "mx-2" : ""}`}
+							/>
+						)}
 
-					return (
-						<NavLink
-							key={item.path}
-							to={item.path}
-							className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-								isActive
-									? "bg-green-light text-green-hover font-semibold border-l-3 border-green-hover"
-									: "text-text-secondary hover:bg-bg-muted hover:text-text-primary"
-							}`}
-							title={collapsed ? item.label : undefined}>
-							<item.icon className="w-5 h-5 shrink-0" />
-							{!collapsed && <span>{item.label}</span>}
-						</NavLink>
-					);
-				})}
+						{/* Section title */}
+						{section.title && !collapsed && (
+							<h3 className="px-3 mb-1 text-[0.65rem] font-semibold text-text-muted uppercase tracking-wider">
+								{section.title}
+							</h3>
+						)}
+
+						{/* Section items */}
+						<div className="space-y-1">
+							{section.items.map((item) => {
+								const isActive =
+									item.path === "/"
+										? location.pathname === "/"
+										: location.pathname.startsWith(item.path);
+
+								return (
+									<NavLink
+										key={item.path}
+										to={item.path}
+										className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+											isActive
+												? "bg-green-light text-green-hover font-semibold border-l-3 border-green-hover"
+												: "text-text-secondary hover:bg-bg-muted hover:text-text-primary"
+										}`}
+										title={collapsed ? item.label : undefined}>
+										<item.icon className="w-[18px] h-[18px] shrink-0" />
+										{!collapsed && <span>{item.label}</span>}
+									</NavLink>
+								);
+							})}
+						</div>
+					</div>
+				))}
 			</nav>
 		</aside>
 	);

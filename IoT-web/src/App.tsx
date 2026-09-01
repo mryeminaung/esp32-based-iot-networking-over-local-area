@@ -79,7 +79,7 @@ export default function App() {
 									path="devices"
 									element={
 										<RoleRoute
-											allowedRoles={[ROLES.FARM_MANAGER, ROLES.TECHNICIAN]}
+											allowedRoles={[ROLES.TECHNICIAN]}
 										/>
 									}>
 									<Route
@@ -130,7 +130,7 @@ export default function App() {
 									path="diagnostics"
 									element={
 										<RoleRoute
-											allowedRoles={[ROLES.FARM_MANAGER, ROLES.TECHNICIAN]}
+											allowedRoles={[ROLES.TECHNICIAN]}
 										/>
 									}>
 									<Route

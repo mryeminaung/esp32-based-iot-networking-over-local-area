@@ -55,3 +55,25 @@ export const SENSOR_UNITS: Record<string, string> = {
   airQuality: "AQI",
   waterLevel: "cm",
 }
+
+export const sensorLabels: Record<string, string> = {
+  soilMoisture: "Soil Moisture",
+  temperature: "Temperature",
+  humidity: "Humidity",
+  light: "Light",
+  airQuality: "Air Quality",
+  waterLevel: "Water Level",
+}
+
+export const conditionLabels: Record<string, string> = {
+  below: "Below",
+  above: "Above",
+  equals: "Equals",
+}
+
+export const actionLabels: Record<string, string> = {
+  pump_on: "Turn Pump On",
+  pump_off: "Turn Pump Off",
+  led_on: "Turn LED On",
+  led_off: "Turn LED Off",
+}

@@ -1,23 +1,23 @@
 import bcrypt from "bcryptjs";
-import "dotenv/config";
+import "dotenv";
 import { ROLES } from "../../src/config/permissions.ts";
 
 const USERS = [
 	{
-		email: process.env.ADMIN_EMAIL || "admin@farm.com",
-		password: process.env.ADMIN_PASSWORD || "admin123",
+		email: "admin@farm.com",
+		password: "Admin@!23456",
 		name: "Farm Manager",
 		role: ROLES.FARM_MANAGER,
 	},
 	{
 		email: "worker@farm.com",
-		password: "worker123",
+		password: "Worker@!23456",
 		name: "Farm Worker",
 		role: ROLES.FARM_WORKER,
 	},
 	{
 		email: "technician@farm.com",
-		password: "tech123",
+		password: "Tech@!23456",
 		name: "Technician",
 		role: ROLES.TECHNICIAN,
 	},
@@ -32,7 +32,7 @@ async function seedUsers(prisma: any) {
 		});
 
 		if (existing) {
-			console.log(`  User already exists: ${userData.email}`);
+			console.log(`User already exists: ${userData.email}`);
 		} else {
 			const hashed = await bcrypt.hash(userData.password, 12);
 			const user = await prisma.user.create({

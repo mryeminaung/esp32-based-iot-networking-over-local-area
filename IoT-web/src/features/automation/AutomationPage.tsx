@@ -125,7 +125,7 @@ export default function AutomationPage() {
         description="Configure automatic actions based on sensor readings"
       >
         <Button
-          size="sm"
+          size="lg"
           className="gap-1.5"
           onClick={() => {
             setEditingRule(null)
@@ -157,7 +157,7 @@ export default function AutomationPage() {
           description="Create a rule to automate device actions based on sensor readings."
           action={
             <Button
-              size="sm"
+              size="lg"
               className="gap-1.5"
               onClick={() => {
                 setEditingRule(null)

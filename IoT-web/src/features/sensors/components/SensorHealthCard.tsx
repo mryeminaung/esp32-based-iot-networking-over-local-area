@@ -3,8 +3,6 @@ import { Badge } from "@/components/ui/badge"
 import {
 	Wifi,
 	WifiOff,
-	Clock,
-	Activity,
 	Thermometer,
 	Droplets,
 	Sun,
@@ -13,10 +11,6 @@ import {
 	Lightbulb,
 	Fan,
 	Plug,
-	Zap,
-	Server,
-	Globe,
-	Fingerprint,
 } from "lucide-react"
 import { useDashboardStore } from "@/store/use-dashboard-store"
 
@@ -39,20 +33,8 @@ const deviceFields = [
 	{ key: "relay" as const, label: "Relay", icon: Plug, color: "text-amber-500" },
 ]
 
-function formatLastSeen(date: Date | null): string {
-	if (!date) return "Never"
-	const now = new Date()
-	const diff = Math.floor((now.getTime() - date.getTime()) / 1000)
-	if (diff < 10) return "Just now"
-	if (diff < 60) return `${diff}s ago`
-	if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-	if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-	return date.toLocaleDateString()
-}
-
 export default function SensorHealthCard() {
 	const connected = useDashboardStore((s) => s.connected)
-	const lastSeen = useDashboardStore((s) => s.lastSeen)
 	const sysInfo = useDashboardStore((s) => s.sysInfo)
 	const moisture = useDashboardStore((s) => s.moisture)
 	const devices = useDashboardStore((s) => s.devices)
@@ -88,80 +70,6 @@ export default function SensorHealthCard() {
 					</div>
 				</CardContent>
 			</Card>
-
-			{/* Network & System Info */}
-			<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-				<Card className="py-3">
-					<CardContent className="flex items-center gap-3 px-4">
-						<div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-							<Globe size={16} className="text-blue-600" />
-						</div>
-						<div>
-							<p className="text-xs text-text-muted">IP Address</p>
-							<p className="text-sm font-semibold text-text-primary">{sysInfo.ip}</p>
-						</div>
-					</CardContent>
-				</Card>
-				<Card className="py-3">
-					<CardContent className="flex items-center gap-3 px-4">
-						<div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-							<Fingerprint size={16} className="text-purple-600" />
-						</div>
-						<div>
-							<p className="text-xs text-text-muted">MAC Address</p>
-							<p className="text-sm font-semibold text-text-primary">{sysInfo.mac}</p>
-						</div>
-					</CardContent>
-				</Card>
-				<Card className="py-3">
-					<CardContent className="flex items-center gap-3 px-4">
-						<div className="w-9 h-9 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
-							<Server size={16} className="text-cyan-600" />
-						</div>
-						<div>
-							<p className="text-xs text-text-muted">WiFi Network</p>
-							<p className="text-sm font-semibold text-text-primary">{sysInfo.wifi}</p>
-						</div>
-					</CardContent>
-				</Card>
-				<Card className="py-3">
-					<CardContent className="flex items-center gap-3 px-4">
-						<div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-							<Zap size={16} className="text-amber-600" />
-						</div>
-						<div>
-							<p className="text-xs text-text-muted">Mode</p>
-							<p className="text-sm font-semibold text-text-primary">{sysInfo.mode}</p>
-						</div>
-					</CardContent>
-				</Card>
-			</div>
-
-			{/* Uptime & Last Seen */}
-			<div className="grid grid-cols-2 gap-3">
-				<Card className="py-3">
-					<CardContent className="flex items-center gap-3 px-4">
-						<div className="w-9 h-9 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-							<Activity size={16} className="text-green-600" />
-						</div>
-						<div>
-							<p className="text-xs text-text-muted">Uptime</p>
-							<p className="text-sm font-bold text-text-primary">{sysInfo.uptime}</p>
-						</div>
-					</CardContent>
-				</Card>
-				<Card className="py-3">
-					<CardContent className="flex items-center gap-3 px-4">
-						<div className="w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-							<Clock size={16} className="text-orange-600" />
-						</div>
-						<div>
-							<p className="text-xs text-text-muted">Last Seen</p>
-							<p className="text-sm font-bold text-text-primary">{formatLastSeen(lastSeen)}</p>
-						</div>
-					</CardContent>
-				</Card>
-			</div>
 
 			{/* Sensor Readings */}
 			<Card>

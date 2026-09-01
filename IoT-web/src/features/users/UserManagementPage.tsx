@@ -106,7 +106,7 @@ export default function UserManagementPage() {
 				title="Farm User Management"
 				description="Manage farm users and roles"
 			>
-				<Button onClick={() => setShowCreateModal(true)}>
+				<Button size="lg" onClick={() => setShowCreateModal(true)}>
 					<Plus size={16} />
 					Add User
 				</Button>

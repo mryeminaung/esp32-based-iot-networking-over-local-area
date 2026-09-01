@@ -1,14 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/use-auth-store";
-import { Eye, EyeOff, Loader2, UserCog, Tractor, Wrench } from "lucide-react";
+import { Eye, EyeOff, Loader2, Tractor, UserCog, Wrench } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
 const DEMO_USERS = [
-	{ label: "Manager", email: "admin@farm.com", password: "admin123", icon: UserCog },
-	{ label: "Worker", email: "worker@farm.com", password: "worker123", icon: Tractor },
-	{ label: "Technician", email: "technician@farm.com", password: "tech123", icon: Wrench },
+	{
+		label: "Manager",
+		email: "admin@farm.com",
+		password: "Admin@!23456",
+		icon: UserCog,
+	},
+	{
+		label: "Worker",
+		email: "worker@farm.com",
+		password: "Worker@!23456",
+		icon: Tractor,
+	},
+	{
+		label: "Technician",
+		email: "technician@farm.com",
+		password: "Tech@!23456",
+		icon: Wrench,
+	},
 ] as const;
 
 export default function LoginPage() {
@@ -78,7 +93,9 @@ export default function LoginPage() {
 							<h1 className="text-xl font-bold text-text-primary">
 								ESP32-Based Smart Agriculture
 							</h1>
-							<p className="text-md text-text-muted">IoT System</p>
+							<p className="text-md text-text-muted">
+								IoT Real-Time Monitoring System
+							</p>
 						</div>
 					</div>
 
