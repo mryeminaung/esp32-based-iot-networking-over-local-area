@@ -1,16 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/use-auth-store";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, UserCog, Tractor, Wrench } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+
+const DEMO_USERS = [
+	{ label: "Manager", email: "admin@farm.com", password: "admin123", icon: UserCog },
+	{ label: "Worker", email: "worker@farm.com", password: "worker123", icon: Tractor },
+	{ label: "Technician", email: "technician@farm.com", password: "tech123", icon: Wrench },
+] as const;
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+	const [activeDemo, setActiveDemo] = useState<number | null>(null);
 	const { login, loading, error } = useAuthStore();
 	const navigate = useNavigate();
+
+	const handleDemoClick = (index: number) => {
+		const user = DEMO_USERS[index];
+		setEmail(user.email);
+		setPassword(user.password);
+		setActiveDemo(index);
+	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -28,6 +42,27 @@ export default function LoginPage() {
 			style={{ backgroundImage: "url('/main_bg.png')" }}>
 			<div className="absolute inset-0 bg-black/20" />
 			<div className="w-full max-w-lg relative z-10">
+				{/* Demo Users */}
+				<div className="flex gap-2 mb-3">
+					{DEMO_USERS.map((user, i) => {
+						const Icon = user.icon;
+						return (
+							<button
+								key={user.email}
+								type="button"
+								onClick={() => handleDemoClick(i)}
+								className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-medium transition-all cursor-pointer ${
+									activeDemo === i
+										? "bg-green-600 text-white border-green-600"
+										: "bg-bg-card text-text-secondary border-border hover:border-green-400 hover:text-green-700"
+								}`}>
+								<Icon className="w-4 h-4" />
+								{user.label}
+							</button>
+						);
+					})}
+				</div>
+
 				{/* Login Form */}
 				<form
 					onSubmit={handleSubmit}
@@ -41,7 +76,6 @@ export default function LoginPage() {
 						/>
 						<div className="leading-tight">
 							<h1 className="text-xl font-bold text-text-primary">
-								{/* Smart Agriculture */}
 								ESP32-Based Smart Agriculture
 							</h1>
 							<p className="text-md text-text-muted">IoT System</p>

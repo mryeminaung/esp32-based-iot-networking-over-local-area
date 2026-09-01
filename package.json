@@ -1,0 +1,16 @@
+{
+  "name": "esp32-iot-lab",
+  "private": true,
+  "scripts": {
+    "install:all": "pnpm install",
+    "dev": "concurrently -n web,api -c blue,green \"pnpm dev:web\" \"pnpm dev:api\"",
+    "dev:web": "pnpm --filter Iot-web dev",
+    "dev:api": "pnpm --filter IoT-api dev",
+    "build": "pnpm --filter iot-dashboard build",
+    "start:api": "pnpm --filter IoT-api start",
+    "lint": "pnpm --filter iot-dashboard lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

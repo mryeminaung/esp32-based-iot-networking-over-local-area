@@ -3,14 +3,6 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-/* ── Font ── */
-@font-face {
-  font-family: "Space Grotesk";
-  src: url("./assets/fonts/SpaceGrotesk.ttf") format("truetype");
-  font-weight: 300 700;
-  font-display: swap;
-}
-
 /* ── Design Tokens ── */
 :root {
   /* Surface — mapped to shadcn standard */
@@ -97,13 +89,13 @@
 }
 
 @theme {
-  --font-sans: "Space Grotesk", system-ui, sans-serif;
+  --font-sans: "Geist Variable", system-ui, sans-serif;
 }
 
 /* ── Base ── */
 html,
 body {
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: "Geist Variable", system-ui, sans-serif;
   background: var(--bg-page);
   color: var(--text-primary);
   min-height: 100vh;
@@ -124,7 +116,7 @@ body::-webkit-scrollbar {
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
+  --font-sans: "Geist Variable", system-ui, sans-serif;
 
   /* App semantic color tokens (runtime-resolved for dark mode) */
   --color-bg-page: var(--bg-page);

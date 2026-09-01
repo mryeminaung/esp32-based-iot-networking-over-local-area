@@ -8,6 +8,7 @@ import {
   BarChart3,
   Bot,
   Stethoscope,
+  Settings,
   type LucideIcon,
 } from "lucide-react"
 import { ROLES, type Role } from "./roles"
@@ -73,6 +74,12 @@ export const navigation: NavItem[] = [
     label: "Diagnostics",
     icon: Stethoscope,
     roles: [ROLES.FARM_MANAGER, ROLES.TECHNICIAN],
+  },
+  {
+    path: "/settings",
+    label: "Settings",
+    icon: Settings,
+    roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
   },
 ]
 
