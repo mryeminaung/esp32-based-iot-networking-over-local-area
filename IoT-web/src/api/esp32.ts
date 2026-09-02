@@ -13,12 +13,15 @@ export type SystemInfo = {
 
 export type Sensors = {
   soilMoisture: number
+  temperature: number
+  humidity: number
+  waterLevel: number
+  light: number
+  airQuality: number
   red_light: boolean
   yellow_light: boolean
   green_light: boolean
   white_light: boolean
-  fan: boolean
-  fanValue: number
   relay: boolean
   water_pump: boolean
 }

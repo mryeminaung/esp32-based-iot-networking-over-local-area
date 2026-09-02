@@ -4,7 +4,7 @@ import { useNavigate } from "react-router"
 import {
   Wifi, WifiOff, Server, Droplets, Power,
   Cpu, Globe, Monitor, Clock, Stethoscope,
-  RefreshCw, ArrowRight, Fan, Lightbulb, Zap,
+  RefreshCw, ArrowRight, Lightbulb, Zap,
 } from "lucide-react"
 import { useDashboardStore } from "@/store/use-dashboard-store"
 import { getMoistureCondition } from "@/lib/moistureUtils"
@@ -15,7 +15,6 @@ const DEVICE_ICONS: Record<string, typeof Lightbulb> = {
   yellow_light: Lightbulb,
   green_light: Lightbulb,
   white_light: Lightbulb,
-  fan: Fan,
   water_pump: Droplets,
   relay: Zap,
 }
@@ -25,7 +24,6 @@ const DEVICE_LABELS: Record<string, string> = {
   yellow_light: "Yellow LED",
   green_light: "Green LED",
   white_light: "Grow Light",
-  fan: "Fan",
   water_pump: "Water Pump",
   relay: "Relay",
 }

@@ -1,17 +1,16 @@
-import { motion } from "framer-motion"
-import { useState, useCallback } from "react"
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { sendCommand } from "@/features/dashboard/hooks/useEsp32Sync";
 import { useHeader } from "@/hooks/useHeader";
 import { getMoistureCondition } from "@/lib/moistureUtils";
 import { useDashboardStore, type DeviceKey } from "@/store/use-dashboard-store";
+import { motion } from "framer-motion";
 import {
 	Droplets,
-	Fan,
 	Lightbulb,
 	Power,
 	Thermometer,
+	Wifi,
 	WifiOff,
 	Zap,
 } from "lucide-react";
@@ -24,7 +23,7 @@ const fadeInUp = {
 		y: 0,
 		transition: { delay: i * 0.08, duration: 0.4, ease: "easeOut" },
 	}),
-}
+};
 
 const actuators: {
 	key: DeviceKey;
@@ -32,7 +31,6 @@ const actuators: {
 	label: string;
 	gpio: string;
 	color: string;
-	type: "toggle" | "slider";
 	description: string;
 }[] = [
 	{
@@ -41,7 +39,6 @@ const actuators: {
 		label: "Irrigation Pump",
 		gpio: "GPIO 22",
 		color: "blue",
-		type: "toggle",
 		description: "Pumps water to irrigation lines",
 	},
 	{
@@ -50,26 +47,7 @@ const actuators: {
 		label: "Relay",
 		gpio: "GPIO 21",
 		color: "teal",
-		type: "toggle",
 		description: "Controls external power circuits",
-	},
-	{
-		key: "fan",
-		icon: Fan,
-		label: "Ventilation Fan",
-		gpio: "GPIO 19",
-		color: "gray",
-		type: "slider",
-		description: "Adjustable speed ventilation",
-	},
-	{
-		key: "white_light",
-		icon: Lightbulb,
-		label: "Grow Light",
-		gpio: "GPIO 18",
-		color: "purple",
-		type: "toggle",
-		description: "Supplemental grow lighting",
 	},
 ];
 
@@ -79,31 +57,11 @@ export default function ActuatorsPage() {
 	const connected = useDashboardStore((s) => s.connected);
 	const moisture = useDashboardStore((s) => s.moisture);
 	const condition = getMoistureCondition(moisture);
-	const [testing, setTesting] = useState<DeviceKey | null>(null);
 
 	const handleToggle = (key: DeviceKey) => {
 		const current = useDashboardStore.getState().devices[key];
 		sendCommand(key, !current);
 	};
-
-	const handleSlider = (key: DeviceKey, val: number) => {
-		sendCommand(key, val, val);
-	};
-
-	const handleTest = useCallback((key: DeviceKey) => {
-		if (testing) return;
-		setTesting(key);
-		const prev = useDashboardStore.getState().devices[key];
-
-		// Turn on
-		sendCommand(key, true);
-
-		// Auto-off after 5 seconds
-		setTimeout(() => {
-			sendCommand(key, false);
-			setTesting(null);
-		}, 5000);
-	}, [testing]);
 
 	const activeCount = actuators.filter((a) => {
 		const val = devices[a.key];
@@ -115,42 +73,65 @@ export default function ActuatorsPage() {
 			{/* Header */}
 			<PageHeader
 				title="Actuators & Irrigation"
-				description="Control pumps, fans, lights and relays"
+				description="Control pumps, lights and relays"
 			/>
-
-			{/* Connection warning */}
-			{!connected && (
-				<Card className="bg-danger/10 border-danger/30">
-					<CardContent className="text-danger text-sm flex items-center gap-2">
-						<WifiOff size={16} />
-						ESP32 is offline — controls may not respond
-					</CardContent>
-				</Card>
-			)}
 
 			{/* Status Overview */}
 			<div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
 				{[
-					{ icon: <Power className="w-4 h-4 text-amber-600 dark:text-amber-400" />, bg: "bg-amber-100 dark:bg-amber-900/30", label: "Active", value: `${activeCount}/${actuators.length}` },
-					{ icon: <Thermometer className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />, bg: "bg-cyan-100 dark:bg-cyan-900/30", label: "Soil", value: condition.label, valueClass: condition.color },
-					{ icon: <Droplets className="w-4 h-4 text-blue-600" />, bg: "bg-blue-100", label: "Moisture", value: `${moisture}%` },
-					{ icon: <Fan className="w-4 h-4 text-green-600" />, bg: "bg-green-100", label: "Fan", value: devices.fan > 0 ? `${devices.fan}%` : "OFF" },
+					{
+						icon: connected ? (
+							<Wifi className="w-4 h-4 text-success" />
+						) : (
+							<WifiOff className="w-4 h-4 text-danger" />
+						),
+						bg: connected ? "bg-success/10" : "bg-danger/10",
+						label: "Status",
+						value: connected ? "Online" : "Offline",
+						valueClass: connected ? "text-success" : "text-danger",
+					},
+					{
+						icon: (
+							<Power className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+						),
+						bg: "bg-amber-100 dark:bg-amber-900/30",
+						label: "Active",
+						value: `${activeCount}/${actuators.length}`,
+					},
+					{
+						icon: (
+							<Thermometer className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+						),
+						bg: "bg-cyan-100 dark:bg-cyan-900/30",
+						label: "Soil",
+						value: condition.label,
+						valueClass: condition.color,
+					},
+					{
+						icon: <Droplets className="w-4 h-4 text-blue-600" />,
+						bg: "bg-blue-100",
+						label: "Moisture",
+						value: `${moisture}%`,
+					},
 				].map((stat, i) => (
 					<motion.div
 						key={stat.label}
 						custom={i}
 						variants={fadeInUp}
 						initial="hidden"
-						animate="visible"
-					>
+						animate="visible">
 						<Card>
 							<CardContent className="flex items-center gap-3">
-								<div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
+								<div
+									className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
 									{stat.icon}
 								</div>
 								<div>
 									<p className="text-xs text-text-muted">{stat.label}</p>
-									<p className={`text-lg font-bold ${stat.valueClass || "text-text-primary"}`}>{stat.value}</p>
+									<p
+										className={`text-lg font-bold ${stat.valueClass || "text-text-primary"}`}>
+										{stat.value}
+									</p>
 								</div>
 							</CardContent>
 						</Card>
@@ -165,8 +146,7 @@ export default function ActuatorsPage() {
 					custom={4}
 					variants={fadeInUp}
 					initial="hidden"
-					animate="visible"
-				>
+					animate="visible">
 					<Card>
 						<CardContent>
 							<div className="flex items-center justify-between mb-4 gap-2">
@@ -193,48 +173,13 @@ export default function ActuatorsPage() {
 								</div>
 							</div>
 
-							{/* Moisture condition bar */}
-							<div className="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-xl bg-bg-muted border border-border">
-								<div className="flex items-center gap-2">
-									<span className="text-xs text-text-muted font-medium uppercase tracking-wider">
-										Mode
-									</span>
-									<span className="text-xs font-bold text-text-primary">
-										MANUAL
-									</span>
-								</div>
-								<div className="w-px h-4 bg-border" />
-								<div className="flex items-center gap-2">
-									<span className="text-xs text-text-muted font-medium uppercase tracking-wider">
-										Soil
-									</span>
-									<span className={`text-xs font-bold ${condition.color}`}>
-										{condition.label}
-									</span>
-								</div>
-							</div>
-
 							{/* Device list */}
 							<div className="space-y-0">
 								{actuators.map((act, i) => {
 									const isLast = i === actuators.length - 1;
 									const val = devices[act.key];
 
-									return act.type === "slider" ? (
-										<ControlItem
-											key={act.key}
-											icon={act.icon}
-											label={act.label}
-											gpio={act.gpio}
-											color={act.color}
-											sliderValue={val as number}
-											onSliderChange={(v) => handleSlider(act.key, v)}
-											onTest={() => handleTest(act.key)}
-											testing={testing === act.key}
-											last={isLast}
-											hideGpio
-										/>
-									) : (
+									return (
 										<ControlItem
 											key={act.key}
 											icon={act.icon}
@@ -243,8 +188,6 @@ export default function ActuatorsPage() {
 											color={act.color}
 											checked={val as boolean}
 											onToggle={() => handleToggle(act.key)}
-											onTest={() => handleTest(act.key)}
-											testing={testing === act.key}
 											last={isLast}
 											hideGpio
 										/>
@@ -260,8 +203,7 @@ export default function ActuatorsPage() {
 					custom={5}
 					variants={fadeInUp}
 					initial="hidden"
-					animate="visible"
-				>
+					animate="visible">
 					<Card>
 						<CardContent>
 							<h2 className="text-base font-semibold text-text-primary flex items-center gap-2 mb-4">
@@ -304,7 +246,9 @@ export default function ActuatorsPage() {
 												<p className="text-sm font-medium text-text-primary">
 													{act.label}
 												</p>
-												<p className="text-xs text-text-muted">{act.description}</p>
+												<p className="text-xs text-text-muted">
+													{act.description}
+												</p>
 											</div>
 											<span
 												className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
@@ -312,13 +256,7 @@ export default function ActuatorsPage() {
 														? "bg-green-100 text-green-700 "
 														: "bg-bg-muted text-text-muted"
 												}`}>
-												{typeof val === "number" && act.type === "slider"
-													? isOn
-														? `${val}%`
-														: "OFF"
-													: isOn
-														? "ON"
-														: "OFF"}
+												{isOn ? "ON" : "OFF"}
 											</span>
 										</motion.div>
 									);

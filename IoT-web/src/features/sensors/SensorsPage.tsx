@@ -1,14 +1,22 @@
-import { motion } from "framer-motion"
-import SensorCard from "./components/SensorCard";
-import { MoistureCard } from "./components/MoistureCard";
-import SensorHealthCard from "./components/SensorHealthCard";
-import { useDashboardStore } from "@/store/use-dashboard-store";
-import { useAuthStore } from "@/store/use-auth-store";
-import { useHeader } from "@/hooks/useHeader";
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Power, WifiOff, Droplets, Waves, Thermometer } from "lucide-react";
+import { useHeader } from "@/hooks/useHeader";
+import { useAuthStore } from "@/store/use-auth-store";
+import { useDashboardStore } from "@/store/use-dashboard-store";
+import { motion } from "framer-motion";
+import {
+	Droplets,
+	Power,
+	Sun,
+	Thermometer,
+	Waves,
+	WifiOff,
+	Wind,
+} from "lucide-react";
+import { MoistureCard } from "./components/MoistureCard";
+import SensorCard from "./components/SensorCard";
+import SensorGaugeCard from "./components/SensorGaugeCard";
+import SensorHealthCard from "./components/SensorHealthCard";
 
 const fadeInUp = {
 	hidden: { opacity: 0, y: 16 },
@@ -17,7 +25,7 @@ const fadeInUp = {
 		y: 0,
 		transition: { delay: i * 0.08, duration: 0.4, ease: "easeOut" },
 	}),
-}
+};
 
 const deviceList = [
 	{
@@ -44,12 +52,141 @@ const deviceList = [
 		bg: "bg-green-100 ",
 		iconBg: "bg-green-100 ",
 	},
+	{
+		key: "white_light" as const,
+		label: "Grow Light",
+		onColor: "text-purple-500",
+		offColor: "text-text-muted",
+		bg: "bg-purple-100 dark:bg-purple-900/30",
+		iconBg: "bg-purple-100 dark:bg-purple-900/30",
+	},
+];
+
+const tempThresholds = [
+	{
+		max: 15,
+		label: "COLD",
+		bgClass: "bg-blue-100 dark:bg-blue-900/30",
+		textClass: "text-blue-600",
+		barColor: "bg-blue-500",
+	},
+	{
+		max: 30,
+		label: "NORMAL",
+		bgClass: "bg-green-100 dark:bg-green-900/30",
+		textClass: "text-green-600",
+		barColor: "bg-green-500",
+	},
+	{
+		max: 100,
+		label: "HOT",
+		bgClass: "bg-red-100 dark:bg-red-900/30",
+		textClass: "text-red-600",
+		barColor: "bg-red-500",
+	},
+];
+
+const humidityThresholds = [
+	{
+		max: 30,
+		label: "DRY",
+		bgClass: "bg-amber-100 dark:bg-amber-900/30",
+		textClass: "text-amber-600",
+		barColor: "bg-amber-500",
+	},
+	{
+		max: 70,
+		label: "NORMAL",
+		bgClass: "bg-green-100 dark:bg-green-900/30",
+		textClass: "text-green-600",
+		barColor: "bg-green-500",
+	},
+	{
+		max: 100,
+		label: "HUMID",
+		bgClass: "bg-blue-100 dark:bg-blue-900/30",
+		textClass: "text-blue-600",
+		barColor: "bg-blue-500",
+	},
+];
+
+const waterLevelThresholds = [
+	{
+		max: 20,
+		label: "LOW",
+		bgClass: "bg-red-100 dark:bg-red-900/30",
+		textClass: "text-red-600",
+		barColor: "bg-red-500",
+	},
+	{
+		max: 60,
+		label: "MID",
+		bgClass: "bg-amber-100 dark:bg-amber-900/30",
+		textClass: "text-amber-600",
+		barColor: "bg-amber-500",
+	},
+	{
+		max: 100,
+		label: "FULL",
+		bgClass: "bg-green-100 dark:bg-green-900/30",
+		textClass: "text-green-600",
+		barColor: "bg-green-500",
+	},
+];
+
+const lightThresholds = [
+	{
+		max: 200,
+		label: "DIM",
+		bgClass: "bg-purple-100 dark:bg-purple-900/30",
+		textClass: "text-purple-600",
+		barColor: "bg-purple-500",
+	},
+	{
+		max: 600,
+		label: "NORMAL",
+		bgClass: "bg-green-100 dark:bg-green-900/30",
+		textClass: "text-green-600",
+		barColor: "bg-green-500",
+	},
+	{
+		max: 1024,
+		label: "BRIGHT",
+		bgClass: "bg-amber-100 dark:bg-amber-900/30",
+		textClass: "text-amber-600",
+		barColor: "bg-amber-500",
+	},
+];
+
+const airQualityThresholds = [
+	{
+		max: 150,
+		label: "GOOD",
+		bgClass: "bg-green-100 dark:bg-green-900/30",
+		textClass: "text-green-600",
+		barColor: "bg-green-500",
+	},
+	{
+		max: 300,
+		label: "MODERATE",
+		bgClass: "bg-amber-100 dark:bg-amber-900/30",
+		textClass: "text-amber-600",
+		barColor: "bg-amber-500",
+	},
+	{
+		max: 500,
+		label: "POOR",
+		bgClass: "bg-red-100 dark:bg-red-900/30",
+		textClass: "text-red-600",
+		barColor: "bg-red-500",
+	},
 ];
 
 export default function SensorsPage() {
 	useHeader("Sensors");
 	const devices = useDashboardStore((s) => s.devices);
 	const moisture = useDashboardStore((s) => s.moisture);
+	const sensors = useDashboardStore((s) => s.sensors);
 	const connected = useDashboardStore((s) => s.connected);
 	const user = useAuthStore((s) => s.user);
 	const isTechnician = user?.role === "technician";
@@ -76,8 +213,7 @@ export default function SensorsPage() {
 					custom={0}
 					variants={fadeInUp}
 					initial="hidden"
-					animate="visible"
-				>
+					animate="visible">
 					<SensorHealthCard />
 				</motion.div>
 			</div>
@@ -107,8 +243,7 @@ export default function SensorsPage() {
 				custom={0}
 				variants={fadeInUp}
 				initial="hidden"
-				animate="visible"
-			>
+				animate="visible">
 				<Card>
 					<CardHeader>
 						<h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
@@ -120,7 +255,7 @@ export default function SensorsPage() {
 						</h2>
 					</CardHeader>
 					<CardContent className="space-y-4">
-						<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+						<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 							{deviceList.map((device, i) => {
 								const isOn = !!devices[device.key];
 								return (
@@ -169,8 +304,7 @@ export default function SensorsPage() {
 					custom={0}
 					variants={fadeInUp}
 					initial="hidden"
-					animate="visible"
-				>
+					animate="visible">
 					<SensorCard />
 				</motion.div>
 				<motion.div
@@ -178,99 +312,132 @@ export default function SensorsPage() {
 					custom={1}
 					variants={fadeInUp}
 					initial="hidden"
-					animate="visible"
-				>
-					<MoistureCard name="Dry" gpio={2} color="red" active={moisture <= 30} />
-					<MoistureCard name="Moist" gpio={4} color="yellow" active={moisture > 30 && moisture < 50} />
-					<MoistureCard name="Optimal" gpio={5} color="green" active={moisture >= 50} />
+					animate="visible">
+					<MoistureCard
+						name="Dry"
+						gpio={2}
+						color="red"
+						active={moisture <= 30}
+					/>
+					<MoistureCard
+						name="Moist"
+						gpio={4}
+						color="yellow"
+						active={moisture > 30 && moisture < 50}
+					/>
+					<MoistureCard
+						name="Optimal"
+						gpio={5}
+						color="green"
+						active={moisture >= 50}
+					/>
 				</motion.div>
 			</div>
 
-			{/* DHT22 & Water Level Placeholder Cards */}
-			<div className="grid gap-5 grid-cols-1 md:grid-cols-2">
-				{/* DHT22 Temperature & Humidity */}
-				<motion.div
-					custom={2}
-					variants={fadeInUp}
-					initial="hidden"
-					animate="visible"
-				>
-					<Card className="relative overflow-hidden">
-						<div className="absolute top-3 right-3">
-							<Badge variant="outline" className="text-[0.625rem] font-semibold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800">
-								COMING SOON
-							</Badge>
-						</div>
-						<CardContent>
-							<div className="flex items-center gap-2 mb-4">
-								<Thermometer size={18} className="text-cyan-500" />
-								<h2 className="text-[1rem] sm:text-[1.1rem] font-bold text-text-primary">
-									DHT22 Sensor
-								</h2>
-							</div>
-							<div className="flex items-center justify-center py-8">
-								<div className="text-center">
-									<div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-bg-muted flex items-center justify-center">
-										<Thermometer className="w-8 h-8 text-text-muted" />
-									</div>
-									<p className="text-sm text-text-muted mb-1">
-										Temperature & Humidity
-									</p>
-									<p className="text-xs text-text-muted">
-										Requires DHT22 sensor wiring to ESP32
-									</p>
-								</div>
-							</div>
-							<div className="flex items-center justify-between text-xs text-text-muted border-t border-border pt-3">
-								<span>GPIO: TBD</span>
-								<span>Protocol: One-Wire</span>
-							</div>
-						</CardContent>
-					</Card>
-				</motion.div>
+			{/* Additional Sensor Cards */}
+			<motion.div
+				custom={2}
+				variants={fadeInUp}
+				initial="hidden"
+				animate="visible">
+				<h2 className="text-sm font-semibold text-text-primary mb-3">
+					Environmental Sensors
+				</h2>
+			</motion.div>
 
-				{/* Water Level Sensor */}
+			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				<motion.div
 					custom={3}
 					variants={fadeInUp}
 					initial="hidden"
-					animate="visible"
-				>
-					<Card className="relative overflow-hidden">
-						<div className="absolute top-3 right-3">
-							<Badge variant="outline" className="text-[0.625rem] font-semibold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800">
-								COMING SOON
-							</Badge>
-						</div>
-						<CardContent>
-							<div className="flex items-center gap-2 mb-4">
-								<Waves size={18} className="text-blue-500" />
-								<h2 className="text-[1rem] sm:text-[1.1rem] font-bold text-text-primary">
-									Water Level
-								</h2>
-							</div>
-							<div className="flex items-center justify-center py-8">
-								<div className="text-center">
-									<div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-bg-muted flex items-center justify-center">
-										<Droplets className="w-8 h-8 text-text-muted" />
-									</div>
-									<p className="text-sm text-text-muted mb-1">
-										Water Tank Level
-									</p>
-									<p className="text-xs text-text-muted">
-										Requires ultrasonic or float sensor
-									</p>
-								</div>
-							</div>
-							<div className="flex items-center justify-between text-xs text-text-muted border-t border-border pt-3">
-								<span>GPIO: TBD</span>
-								<span>Protocol: Analog</span>
-							</div>
-						</CardContent>
-					</Card>
+					animate="visible">
+					<SensorGaugeCard
+						label="Temperature"
+						value={sensors.temperature}
+						unit="°C"
+						icon={Thermometer}
+						color="text-cyan-500"
+						bgColor="bg-cyan-100 dark:bg-cyan-900/30"
+						min={0}
+						max={50}
+						thresholds={tempThresholds}
+						decimals={1}
+					/>
+				</motion.div>
+
+				<motion.div
+					custom={4}
+					variants={fadeInUp}
+					initial="hidden"
+					animate="visible">
+					<SensorGaugeCard
+						label="Humidity"
+						value={sensors.humidity}
+						unit="%"
+						icon={Droplets}
+						color="text-blue-500"
+						bgColor="bg-blue-100 dark:bg-blue-900/30"
+						min={0}
+						max={100}
+						thresholds={humidityThresholds}
+						decimals={1}
+					/>
+				</motion.div>
+
+				<motion.div
+					custom={5}
+					variants={fadeInUp}
+					initial="hidden"
+					animate="visible">
+					<SensorGaugeCard
+						label="Water Level"
+						value={sensors.waterLevel}
+						unit="%"
+						icon={Waves}
+						color="text-indigo-500"
+						bgColor="bg-indigo-100 dark:bg-indigo-900/30"
+						min={0}
+						max={100}
+						thresholds={waterLevelThresholds}
+					/>
+				</motion.div>
+
+				<motion.div
+					custom={6}
+					variants={fadeInUp}
+					initial="hidden"
+					animate="visible">
+					<SensorGaugeCard
+						label="Light Intensity"
+						value={sensors.light}
+						unit="lux"
+						icon={Sun}
+						color="text-amber-500"
+						bgColor="bg-amber-100 dark:bg-amber-900/30"
+						min={0}
+						max={1024}
+						thresholds={lightThresholds}
+					/>
+				</motion.div>
+
+				<motion.div
+					custom={7}
+					variants={fadeInUp}
+					initial="hidden"
+					animate="visible">
+					<SensorGaugeCard
+						label="Air Quality"
+						value={sensors.airQuality}
+						unit="AQI"
+						icon={Wind}
+						color="text-purple-500"
+						bgColor="bg-purple-100 dark:bg-purple-900/30"
+						min={0}
+						max={500}
+						thresholds={airQualityThresholds}
+					/>
 				</motion.div>
 			</div>
-
 		</div>
 	);
 }

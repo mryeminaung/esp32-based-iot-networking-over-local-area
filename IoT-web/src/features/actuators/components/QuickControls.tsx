@@ -1,7 +1,7 @@
 import { sendCommand } from "@/features/dashboard/hooks/useEsp32Sync";
 import { useDashboardStore, type DeviceKey } from "@/store/use-dashboard-store";
 import { getMoistureCondition } from "@/lib/moistureUtils";
-import { Droplets, Fan, Lightbulb, Square, Power, Zap } from "lucide-react";
+import { Droplets, Lightbulb, Square, Power, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ControlItem from "./ControlItem";
 
@@ -30,22 +30,6 @@ const allDevices: {
 		color: "teal",
 		type: "toggle",
 	},
-	{
-		key: "fan",
-		icon: Fan,
-		label: "Ventilation Fan",
-		gpio: "GPIO 19",
-		color: "gray",
-		type: "slider",
-	},
-	{
-		key: "white_light",
-		icon: Lightbulb,
-		label: "Grow Light",
-		gpio: "GPIO 18",
-		color: "purple",
-		type: "toggle",
-	},
 ];
 
 export default function QuickControls() {
@@ -57,10 +41,6 @@ export default function QuickControls() {
 	const handleToggle = (key: DeviceKey) => {
 		const current = useDashboardStore.getState().devices[key];
 		sendCommand(key, !current);
-	};
-
-	const handleSlider = (key: DeviceKey, val: number) => {
-		sendCommand(key, val, val);
 	};
 
 	return (
@@ -99,19 +79,7 @@ export default function QuickControls() {
 					const isLast = i === allDevices.length - 1;
 					const val = devicesState[dev.key];
 
-					return dev.type === "slider" ? (
-						<ControlItem
-							key={dev.key}
-							icon={dev.icon}
-							label={dev.label}
-							gpio={dev.gpio}
-							color={dev.color}
-							sliderValue={val as number}
-							onSliderChange={(v) => handleSlider(dev.key, v)}
-							last={isLast}
-							hideGpio
-						/>
-					) : (
+					return (
 						<ControlItem
 							key={dev.key}
 							icon={dev.icon}

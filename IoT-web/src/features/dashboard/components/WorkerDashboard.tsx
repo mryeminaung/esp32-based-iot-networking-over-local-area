@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { useNavigate } from "react-router"
 import {
   Droplets, Activity, Power, WifiOff,
-  Lightbulb, Fan, Zap, ArrowRight,
+  Lightbulb, Zap, ArrowRight,
 } from "lucide-react"
 import { useDashboardStore, type DeviceKey } from "@/store/use-dashboard-store"
 import { sendCommand } from "@/features/dashboard/hooks/useEsp32Sync"
@@ -22,7 +22,6 @@ const QUICK_DEVICES: {
   activeColor: string
 }[] = [
   { key: "water_pump", icon: Droplets, label: "Water Pump", color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600", activeColor: "bg-blue-600 text-white" },
-  { key: "fan", icon: Fan, label: "Fan", color: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600", activeColor: "bg-cyan-600 text-white" },
   { key: "white_light", icon: Lightbulb, label: "Grow Light", color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600", activeColor: "bg-purple-600 text-white" },
   { key: "relay", icon: Zap, label: "Relay", color: "bg-teal-100 dark:bg-teal-900/30 text-teal-600", activeColor: "bg-teal-600 text-white" },
 ]

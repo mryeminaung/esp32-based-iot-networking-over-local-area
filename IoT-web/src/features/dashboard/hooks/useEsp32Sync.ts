@@ -3,15 +3,12 @@ import { controlDevice, getAll } from "@/api/esp32";
 import { useDashboardStore, type DeviceKey } from "@/store/use-dashboard-store";
 import { useEffect } from "react";
 
-const sliderKeys = new Set<DeviceKey>(["fan"]);
-
 const deviceLabels: Record<DeviceKey, string> = {
 	red_light: "Red Light",
 	yellow_light: "Yellow Light",
 	green_light: "Green Light",
 	white_light: "Grow Light",
 	relay: "Relay",
-	fan: "Ventilation Fan",
 	water_pump: "Irrigation Pump",
 };
 
@@ -105,15 +102,7 @@ export default function useEsp32Sync() {
 				// Map ESP32 sensor keys → frontend store
 				const devices: Partial<Record<DeviceKey, boolean | number>> = {};
 				for (const key of Object.keys(deviceLabels) as DeviceKey[]) {
-					if (sliderKeys.has(key)) {
-						const valKey = `${key}Value` as string;
-						devices[key] =
-							typeof data[valKey as keyof typeof data] === "number"
-								? (data[valKey as keyof typeof data] as number)
-								: 0;
-					} else {
-						devices[key] = data[key as keyof typeof data] === true;
-					}
+					devices[key] = data[key as keyof typeof data] === true;
 				}
 
 				syncFromESP32(
@@ -128,6 +117,14 @@ export default function useEsp32Sync() {
 					},
 					data.soilMoisture,
 					devices,
+					{
+						soilMoisture: data.soilMoisture,
+						temperature: data.temperature,
+						humidity: data.humidity,
+						waterLevel: data.waterLevel,
+						light: data.light,
+						airQuality: data.airQuality,
+					},
 				);
 
 				// Log moisture changes

@@ -17,8 +17,6 @@ export type SensorHealth = {
   yellow_light: boolean
   green_light: boolean
   white_light: boolean
-  fan: boolean
-  fanValue: number
   relay: boolean
   water_pump: boolean
 }
@@ -36,11 +34,9 @@ export const DEVICE_LABELS: Record<string, string> = {
   yellow_light: "Yellow LED",
   green_light: "Green LED",
   white_light: "White LED",
-  fan: "Fan",
   relay: "Relay",
   water_pump: "Water Pump",
 }
 
 export const LED_DEVICES = ["red_light", "yellow_light", "green_light", "white_light"] as const
 export const DIGITAL_DEVICES = ["relay", "water_pump"] as const
-export const PWM_DEVICES = ["fan"] as const

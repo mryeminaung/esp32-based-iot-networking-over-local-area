@@ -27,10 +27,10 @@ export default memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
 				/>
 				{!collapsed && (
 					<div className="min-w-0 leading-tight">
-						<h1 className="text-[10px] font-bold text-text-primary truncate">
-							ESP32-Based Smart Agriculture
+						<h1 className="text-[12px]  font-bold text-text-primary truncate">
+							Smart Agriculture
 						</h1>
-						<span className="text-[0.65rem] text-text-muted">IoT System</span>
+						<span className="text-[0.65rem] text-text-muted">IoT Monitoring System</span>
 					</div>
 				)}
 			</div>
