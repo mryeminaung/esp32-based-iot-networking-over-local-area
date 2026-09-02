@@ -7,8 +7,7 @@
  * - Yellow Light: GPIO 4
  * - Green Light: GPIO 5
  * - White Light: GPIO 18
- * - Fan: GPIO 19 (PWM)
- * - Relay: GPIO 21 (PWM)
+ * - Relay: GPIO 21
  * - Water Pump: GPIO 22
  * - Soil Moisture Sensor: GPIO 34 (analog)
  */
@@ -31,30 +30,29 @@ WebServer server(80);
 #define YELLOW_LIGHT_PIN 4
 #define GREEN_LIGHT_PIN 5
 #define WHITE_LIGHT_PIN 18
-#define FAN_PIN 19
 #define RELAY_PIN 21
 #define PUMP_PIN 22
 #define SOIL_MOISTURE_PIN 34
-
-
-
-// PWM Configuration
-#define PWM_FREQUENCY 1000
-#define PWM_RESOLUTION 8
 
 // Device States
 bool redLightState = false;
 bool yellowLightState = false;
 bool greenLightState = false;
 bool whiteLightState = false;
-bool fanState = false;
-int fanValue = 0;
 bool relayState = false;
 int relayValue = 0;
 bool pumpState = false;
 
 // Sensor Values
 int soilMoistureValue = 0;
+
+// Additional sensor values (placeholder — update when hardware is wired)
+// DHT22: GPIO 13, Water Level: GPIO 35, LDR: GPIO 36, MQ-135: GPIO 39
+float temperatureValue = 25.0;
+float humidityValue = 60.0;
+int waterLevelValue = 50;
+int lightValue = 500;
+int airQualityValue = 100;
 
 // Timing
 unsigned long lastSensorRead = 0;
@@ -71,7 +69,6 @@ void handleCORSPreflight();
 
 // Device control helpers
 void setLight(int pin, bool state);
-void setPWMDevice(int pin, bool state, int value);
 
 void setup()
 {
@@ -83,20 +80,15 @@ void setup()
   pinMode(YELLOW_LIGHT_PIN, OUTPUT);
   pinMode(GREEN_LIGHT_PIN, OUTPUT);
   pinMode(WHITE_LIGHT_PIN, OUTPUT);
-  pinMode(FAN_PIN, OUTPUT);
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(PUMP_PIN, OUTPUT);
   pinMode(SOIL_MOISTURE_PIN, INPUT);
-
-  // Setup PWM (fan only, relay is now toggle)
-  ledcAttach(FAN_PIN, PWM_FREQUENCY, PWM_RESOLUTION);
 
   // Initial state - all off
   digitalWrite(RED_LIGHT_PIN, LOW);
   digitalWrite(YELLOW_LIGHT_PIN, LOW);
   digitalWrite(GREEN_LIGHT_PIN, LOW);
   digitalWrite(WHITE_LIGHT_PIN, LOW);
-  ledcWrite(FAN_PIN, 0);
   digitalWrite(RELAY_PIN, LOW);
   digitalWrite(PUMP_PIN, LOW);
 
@@ -267,11 +259,11 @@ void handleRoot()
   html += "<div class=\"endpoint\"><span class=\"method method-get\">GET</span><span class=\"path\">/system</span>";
   html += "<p>System info: device name, IP, MAC, uptime, free heap, WiFi SSID.</p></div>";
   html += "<div class=\"endpoint\"><span class=\"method method-get\">GET</span><span class=\"path\">/sensors</span>";
-  html += "<p>Sensor readings and device states: soil moisture, lights, fan, relay, pump.</p></div>";
+  html += "<p>Sensor readings and device states: soil moisture, lights, relay, pump.</p></div>";
   html += "<div class=\"endpoint\"><span class=\"method method-post\">POST</span><span class=\"path\">/control</span>";
   html += "<p>Control devices. Send JSON body with device name, state, and optional value.</p>";
   html += "<div class=\"code-block\">{\n  \"device\": \"red_light\",\n  \"state\": 1,\n  \"value\": 0\n}</div>";
-  html += "<p style=\"margin-top:6px\">Devices: red_light, yellow_light, green_light, white_light, fan, relay, water_pump</p></div>";
+  html += "<p style=\"margin-top:6px\">Devices: red_light, yellow_light, green_light, white_light, relay, water_pump</p></div>";
   html += "</div>";
   html += "<div class=\"footer\">IoT Monitoring & Irrigation System</div></div></body></html>";
 
@@ -316,12 +308,6 @@ void handleControl()
       {
         whiteLightState = state;
         setLight(WHITE_LIGHT_PIN, state);
-      }
-      else if (deviceStr == "fan")
-      {
-        fanState = state;
-        fanValue = value;
-        setPWMDevice(FAN_PIN, state, value);
       }
       else if (deviceStr == "relay")
       {
@@ -384,15 +370,18 @@ void handleSystem()
 // Sensors & Devices endpoint
 void handleSensors()
 {
-  StaticJsonDocument<400> doc;
+  StaticJsonDocument<512> doc;
 
   doc["soilMoisture"] = soilMoistureValue;
+  doc["temperature"] = temperatureValue;
+  doc["humidity"] = humidityValue;
+  doc["waterLevel"] = waterLevelValue;
+  doc["light"] = lightValue;
+  doc["airQuality"] = airQualityValue;
   doc["red_light"] = redLightState;
   doc["yellow_light"] = yellowLightState;
   doc["green_light"] = greenLightState;
   doc["white_light"] = whiteLightState;
-  doc["fan"] = fanState;
-  doc["fanValue"] = fanValue;
   doc["relay"] = relayState;
   doc["water_pump"] = pumpState;
 
@@ -404,7 +393,7 @@ void handleSensors()
 // Combined /all endpoint (system + sensors in one call)
 void handleAll()
 {
-  StaticJsonDocument<512> doc;
+  StaticJsonDocument<768> doc;
 
   // ── System info ──
   unsigned long uptime = (millis() - startTime) / 1000;
@@ -432,12 +421,15 @@ void handleAll()
 
   // ── Sensors / devices ──
   doc["soilMoisture"] = soilMoistureValue;
+  doc["temperature"] = temperatureValue;
+  doc["humidity"] = humidityValue;
+  doc["waterLevel"] = waterLevelValue;
+  doc["light"] = lightValue;
+  doc["airQuality"] = airQualityValue;
   doc["red_light"] = redLightState;
   doc["yellow_light"] = yellowLightState;
   doc["green_light"] = greenLightState;
   doc["white_light"] = whiteLightState;
-  doc["fan"] = fanState;
-  doc["fanValue"] = fanValue;
   doc["relay"] = relayState;
   doc["water_pump"] = pumpState;
 
@@ -450,19 +442,6 @@ void handleAll()
 void setLight(int pin, bool state)
 {
   digitalWrite(pin, state ? HIGH : LOW);
-}
-
-void setPWMDevice(int pin, bool state, int value)
-{
-  if (state)
-  {
-    int pwmValue = map(value, 0, 100, 0, 255);
-    ledcWrite(pin, pwmValue);
-  }
-  else
-  {
-    ledcWrite(pin, 0);
-  }
 }
 
 int readSoilMoisture()

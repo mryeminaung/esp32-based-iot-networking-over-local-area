@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { useNavigate } from "react-router"
 import {
   Users, Power, Wifi, WifiOff,
-  Droplets, Activity, Server, Fan,
+  Droplets, Activity, Server,
   Lightbulb, BarChart3, Bot, RefreshCw, ArrowRight,
 } from "lucide-react"
 import { useAuthStore } from "@/store/use-auth-store"
@@ -27,11 +27,6 @@ const DEVICE_GROUPS = [
       { name: "Green", key: "green_light", dot: "bg-green-500" },
       { name: "Grow", key: "white_light", dot: "bg-blue-400" },
     ],
-  },
-  {
-    icon: Fan,
-    label: "Ventilation",
-    items: [{ name: "Fan", key: "fan", dot: "bg-cyan-500" }],
   },
   {
     icon: Droplets,
@@ -132,7 +127,7 @@ export default function ManagerDashboard() {
               {
                 icon: <Users className="w-5 h-5" />,
                 iconClass: "bg-purple-100 dark:bg-purple-900/20 text-purple-600",
-                label: "Team",
+                label: "Farm Users",
                 value: userCount,
               },
             ].map((stat, i) => (

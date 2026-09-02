@@ -9,7 +9,6 @@ import {
 	Wind,
 	Waves,
 	Lightbulb,
-	Fan,
 	Plug,
 } from "lucide-react"
 import { useDashboardStore } from "@/store/use-dashboard-store"
@@ -28,7 +27,6 @@ const deviceFields = [
 	{ key: "yellow_light" as const, label: "Yellow LED", icon: Lightbulb, color: "text-amber-500" },
 	{ key: "green_light" as const, label: "Green LED", icon: Lightbulb, color: "text-green-500" },
 	{ key: "white_light" as const, label: "Grow Light", icon: Lightbulb, color: "text-amber-400" },
-	{ key: "fan" as const, label: "Fan", icon: Fan, color: "text-cyan-500" },
 	{ key: "water_pump" as const, label: "Water Pump", icon: Droplets, color: "text-indigo-500" },
 	{ key: "relay" as const, label: "Relay", icon: Plug, color: "text-amber-500" },
 ]

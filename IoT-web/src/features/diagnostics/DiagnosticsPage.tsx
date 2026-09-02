@@ -33,8 +33,6 @@ export default memo(function DiagnosticsPage() {
         yellow_light: devices.yellow_light as boolean,
         green_light: devices.green_light as boolean,
         white_light: devices.white_light as boolean,
-        fan: devices.fan as boolean,
-        fanValue: devices.fanValue as number,
         relay: devices.relay as boolean,
         water_pump: devices.water_pump as boolean,
       }

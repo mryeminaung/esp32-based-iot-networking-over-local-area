@@ -26,7 +26,6 @@ const DEVICE_OPTIONS = [
 	{ value: "green_light", label: "Green Light" },
 	{ value: "white_light", label: "Grow Light" },
 	{ value: "relay", label: "Relay" },
-	{ value: "fan", label: "Ventilation Fan" },
 	{ value: "water_pump", label: "Irrigation Pump" },
 ];
 

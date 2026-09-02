@@ -7,7 +7,6 @@ export type DeviceKey =
 	| "green_light"
 	| "white_light"
 	| "relay"
-	| "fan"
 	| "water_pump";
 
 export type LogEntry = {
@@ -31,12 +30,22 @@ export type Theme = "light" | "dark";
 
 export type DeviceKeys = Record<DeviceKey, boolean | number>;
 
+export type SensorReadings = {
+	soilMoisture: number;
+	temperature: number;
+	humidity: number;
+	waterLevel: number;
+	light: number;
+	airQuality: number;
+};
+
 export type DashboardState = {
 	connected: boolean;
 	connecting: boolean;
 	devices: DeviceKeys;
 	sysInfo: SysInfo;
 	moisture: number;
+	sensors: SensorReadings;
 	lastSeen: Date | null;
 	logs: LogEntry[];
 	theme: Theme;
@@ -53,6 +62,7 @@ export type DashboardActions = {
 		sysInfo: Partial<SysInfo>,
 		moisture: number,
 		devices?: Partial<DeviceKeys>,
+		sensors?: Partial<SensorReadings>,
 	) => void;
 	setDisconnected: () => void;
 	addLog: (entry: Omit<LogEntry, "id">) => void;
@@ -84,11 +94,18 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 			green_light: false,
 			white_light: false,
 			relay: false,
-			fan: 0,
 			water_pump: false,
 		},
 		sysInfo: initialSysInfo,
 		moisture: 0,
+		sensors: {
+			soilMoisture: 0,
+			temperature: 0,
+			humidity: 0,
+			waterLevel: 0,
+			light: 0,
+			airQuality: 0,
+		},
 		lastSeen: null,
 		logs: [],
 		theme: (localStorage.getItem("theme") as Theme) || "light",
@@ -114,10 +131,11 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 
 		setMoisture: (moisture) => set({ moisture }),
 
-		syncFromESP32: (sysInfo, moisture, devices) =>
+		syncFromESP32: (sysInfo, moisture, devices, sensors) =>
 			set((s) => ({
 				sysInfo: { ...s.sysInfo, ...sysInfo },
 				moisture,
+				sensors: sensors ? { ...s.sensors, ...sensors } : s.sensors,
 				devices: devices ? { ...s.devices, ...devices } : s.devices,
 				connected: true,
 				connecting: false,

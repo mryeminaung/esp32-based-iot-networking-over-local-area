@@ -9,7 +9,6 @@ import {
 import {
   Droplets,
   Lightbulb,
-  Fan,
   Power,
   Waves,
 } from "lucide-react"
@@ -120,51 +119,6 @@ function DeviceIndicator({
   )
 }
 
-function FanIndicator({
-  isOn,
-  speed,
-  delay,
-}: {
-  isOn: boolean
-  speed: number
-  delay: number
-}) {
-  return (
-    <motion.div
-      variants={fadeInUp}
-      custom={delay}
-      initial="hidden"
-      animate="visible"
-      className="flex items-center gap-3 p-2.5 rounded-lg bg-bg-muted/50"
-    >
-      <Fan
-        className={cn(
-          "w-4 h-4",
-          isOn ? "text-success animate-spin" : "text-text-muted"
-        )}
-      />
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-text-primary">Fan</p>
-      </div>
-      <div className="text-right">
-        <span
-          className={cn(
-            "text-xs font-medium",
-            isOn ? "text-success" : "text-text-muted"
-          )}
-        >
-          {isOn ? "ON" : "OFF"}
-        </span>
-        {isOn && (
-          <span className="text-xs text-text-muted ml-1">
-            ({speed}%)
-          </span>
-        )}
-      </div>
-    </motion.div>
-  )
-}
-
 export default memo(function SensorHealthCard({
   sensors,
   connected,
@@ -199,11 +153,6 @@ export default memo(function SensorHealthCard({
                     delay={i + 1}
                   />
                 ))}
-                <FanIndicator
-                  isOn={sensors.fan}
-                  speed={sensors.fanValue}
-                  delay={5}
-                />
                 {DIGITAL_DEVICES.map((device, i) => (
                   <DeviceIndicator
                     key={device}

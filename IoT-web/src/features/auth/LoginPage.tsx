@@ -91,10 +91,10 @@ export default function LoginPage() {
 						/>
 						<div className="leading-tight">
 							<h1 className="text-xl font-bold text-text-primary">
-								ESP32-Based Smart Agriculture
+								Smart Agriculture
 							</h1>
 							<p className="text-md text-text-muted">
-								IoT Real-Time Monitoring System
+								IoT Monitoring System
 							</p>
 						</div>
 					</div>
