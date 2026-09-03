@@ -33,6 +33,10 @@ WebServer server(80);
 #define RELAY_PIN 21
 #define PUMP_PIN 22
 #define SOIL_MOISTURE_PIN 34
+#define WATER_LEVEL_PIN 35
+#define LIGHT_PIN 36
+#define AIR_QUALITY_PIN 39
+#define BUZZER_PIN 25
 
 // Device States
 bool redLightState = false;
@@ -42,6 +46,7 @@ bool whiteLightState = false;
 bool relayState = false;
 int relayValue = 0;
 bool pumpState = false;
+bool buzzerState = false;
 
 // Sensor Values
 int soilMoistureValue = 0;
@@ -83,6 +88,10 @@ void setup()
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(PUMP_PIN, OUTPUT);
   pinMode(SOIL_MOISTURE_PIN, INPUT);
+  pinMode(WATER_LEVEL_PIN, INPUT);
+  pinMode(LIGHT_PIN, INPUT);
+  pinMode(AIR_QUALITY_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
 
   // Initial state - all off
   digitalWrite(RED_LIGHT_PIN, LOW);
@@ -91,6 +100,7 @@ void setup()
   digitalWrite(WHITE_LIGHT_PIN, LOW);
   digitalWrite(RELAY_PIN, LOW);
   digitalWrite(PUMP_PIN, LOW);
+  digitalWrite(BUZZER_PIN, LOW);
 
   startTime = millis();
 
@@ -171,6 +181,21 @@ void loop()
   if (millis() - lastSensorRead > sensorReadInterval)
   {
     soilMoistureValue = readSoilMoisture();
+    waterLevelValue = readWaterLevel();
+    lightValue = readLight();
+    airQualityValue = readAirQuality();
+
+    // Auto buzzer based on water level
+    if (waterLevelValue < 10 && !buzzerState) {
+      buzzerState = true;
+      digitalWrite(BUZZER_PIN, HIGH);
+      Serial.println("Buzzer ON: Water level critical");
+    } else if (waterLevelValue >= 10 && buzzerState) {
+      buzzerState = false;
+      digitalWrite(BUZZER_PIN, LOW);
+      Serial.println("Buzzer OFF: Water level recovered");
+    }
+
     lastSensorRead = millis();
 
     // Auto LED based on soil moisture
@@ -319,6 +344,11 @@ void handleControl()
         pumpState = state;
         digitalWrite(PUMP_PIN, state ? HIGH : LOW);
       }
+      else if (deviceStr == "buzzer")
+      {
+        buzzerState = state;
+        digitalWrite(BUZZER_PIN, state ? HIGH : LOW);
+      }
 
       Serial.printf("Control: device=%s, state=%d, value=%d\n", device, state, value);
       server.send(200, "application/json", "{\"status\":\"ok\"}");
@@ -384,6 +414,7 @@ void handleSensors()
   doc["white_light"] = whiteLightState;
   doc["relay"] = relayState;
   doc["water_pump"] = pumpState;
+  doc["buzzer"] = buzzerState;
 
   String response;
   serializeJson(doc, response);
@@ -432,6 +463,7 @@ void handleAll()
   doc["white_light"] = whiteLightState;
   doc["relay"] = relayState;
   doc["water_pump"] = pumpState;
+  doc["buzzer"] = buzzerState;
 
   String response;
   serializeJson(doc, response);
@@ -450,4 +482,23 @@ int readSoilMoisture()
   int moisturePercent = map(rawValue, 0, 4095, 100, 0); // inverted sensor: dry=high, wet=low
   moisturePercent = constrain(moisturePercent, 0, 100);
   return moisturePercent;
+}
+
+int readWaterLevel()
+{
+  int rawValue = analogRead(WATER_LEVEL_PIN);
+  int levelPercent = map(rawValue, 0, 4095, 0, 100);
+  return constrain(levelPercent, 0, 100);
+}
+
+int readAirQuality()
+{
+  return analogRead(AIR_QUALITY_PIN); // raw 0-4095, higher = worse air
+}
+
+int readLight()
+{
+  int rawValue = analogRead(LIGHT_PIN);
+  int luxApprox = map(rawValue, 0, 4095, 0, 100); // 0-100% brightness
+  return constrain(luxApprox, 0, 100);
 }

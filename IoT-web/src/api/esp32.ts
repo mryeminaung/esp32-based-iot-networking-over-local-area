@@ -24,6 +24,7 @@ export type Sensors = {
   white_light: boolean
   relay: boolean
   water_pump: boolean
+  buzzer: boolean
 }
 
 /** Combined /all endpoint response */

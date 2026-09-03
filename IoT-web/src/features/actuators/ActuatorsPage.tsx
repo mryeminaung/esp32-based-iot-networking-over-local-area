@@ -6,6 +6,7 @@ import { getMoistureCondition } from "@/lib/moistureUtils";
 import { useDashboardStore, type DeviceKey } from "@/store/use-dashboard-store";
 import { motion } from "framer-motion";
 import {
+	Bell,
 	Droplets,
 	Lightbulb,
 	Power,
@@ -48,6 +49,14 @@ const actuators: {
 		gpio: "GPIO 21",
 		color: "teal",
 		description: "Controls external power circuits",
+	},
+	{
+		key: "buzzer",
+		icon: Bell,
+		label: "Buzzer",
+		gpio: "GPIO 25",
+		color: "amber",
+		description: "Water level alert alarm",
 	},
 ];
 

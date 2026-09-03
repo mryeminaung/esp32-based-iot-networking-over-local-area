@@ -129,6 +129,10 @@ function buildCommand(action: string): { device: string; state: number } | null 
       return { device: "green_light", state: 1 };
     case "led_off":
       return { device: "green_light", state: 0 };
+    case "buzzer_on":
+      return { device: "buzzer", state: 1 };
+    case "buzzer_off":
+      return { device: "buzzer", state: 0 };
     default:
       return null;
   }

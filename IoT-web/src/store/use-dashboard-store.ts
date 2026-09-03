@@ -7,7 +7,8 @@ export type DeviceKey =
 	| "green_light"
 	| "white_light"
 	| "relay"
-	| "water_pump";
+	| "water_pump"
+	| "buzzer";
 
 export type LogEntry = {
 	id: number;
@@ -95,6 +96,7 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 			white_light: false,
 			relay: false,
 			water_pump: false,
+			buzzer: false,
 		},
 		sysInfo: initialSysInfo,
 		moisture: 0,

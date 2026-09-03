@@ -8,6 +8,7 @@ const DEVICES = [
   "fan",
   "relay",
   "water_pump",
+  "buzzer",
 ];
 
 export const controlDeviceSchema = z.object({

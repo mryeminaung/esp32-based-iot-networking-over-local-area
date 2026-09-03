@@ -83,7 +83,7 @@ export const navigation: NavSection[] = [
       },
       {
         path: "/automation",
-        label: "Automation",
+        label: "Device Settings",
         icon: Bot,
         roles: [ROLES.FARM_MANAGER],
       },

@@ -5,6 +5,8 @@ import { useAuthStore } from "@/store/use-auth-store";
 import { useDashboardStore } from "@/store/use-dashboard-store";
 import { motion } from "framer-motion";
 import {
+	AlertTriangle,
+	Bell,
 	Droplets,
 	Power,
 	Sun,
@@ -59,6 +61,14 @@ const deviceList = [
 		offColor: "text-text-muted",
 		bg: "bg-purple-100 dark:bg-purple-900/30",
 		iconBg: "bg-purple-100 dark:bg-purple-900/30",
+	},
+	{
+		key: "buzzer" as const,
+		label: "Buzzer",
+		onColor: "text-amber-500",
+		offColor: "text-text-muted",
+		bg: "bg-amber-100 dark:bg-amber-900/30",
+		iconBg: "bg-amber-100 dark:bg-amber-900/30",
 	},
 ];
 
@@ -238,6 +248,28 @@ export default function SensorsPage() {
 				</Card>
 			)}
 
+			{/* Low water alert */}
+			{sensors.waterLevel < 10 && connected && (
+				<Card className="bg-amber-50 border-amber-300 dark:bg-amber-900/20 dark:border-amber-700">
+					<CardContent className="flex items-center gap-3">
+						<div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+							<AlertTriangle size={18} className="text-amber-600 dark:text-amber-400" />
+						</div>
+						<div>
+							<p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+								Water tank empty
+							</p>
+							<p className="text-xs text-amber-600 dark:text-amber-400">
+								Buzzer is active — refill water tank
+							</p>
+						</div>
+						<span className="ml-auto px-2.5 py-1 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-xs font-semibold animate-pulse">
+							{sensors.waterLevel}%
+						</span>
+					</CardContent>
+				</Card>
+			)}
+
 			{/* Device States Grid */}
 			<motion.div
 				custom={0}
@@ -255,7 +287,7 @@ export default function SensorsPage() {
 						</h2>
 					</CardHeader>
 					<CardContent className="space-y-4">
-						<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+						<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
 							{deviceList.map((device, i) => {
 								const isOn = !!devices[device.key];
 								return (
