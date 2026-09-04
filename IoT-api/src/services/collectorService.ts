@@ -1,5 +1,4 @@
 import { recordReading } from "./sensorService.js";
-import { evaluateRules } from "./automationService.js";
 import { createActivityLog } from "./activityService.js";
 
 const ESP32_API_URL = process.env.ESP32_API_URL || "http://192.168.4.1";
@@ -28,9 +27,6 @@ async function collectReading() {
     };
 
     await recordReading({ deviceId: 1, ...reading });
-
-    // Evaluate automation rules against the latest reading
-    await evaluateRules(reading);
   } catch (error) {
     const message = (error as Error).message;
     console.error("[Collector] Failed to collect reading:", message);

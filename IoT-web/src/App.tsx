@@ -10,11 +10,11 @@ import ActuatorsPage from "@/features/actuators/ActuatorsPage";
 import AnalyticsPage from "@/features/analytics/AnalyticsPage";
 import LoginPage from "@/features/auth/LoginPage";
 import DashboardPage from "@/features/dashboard/DashboardPage";
+import DeviceSettingsPage from "@/features/device-settings/DeviceSettingsPage";
 import DeviceInfoPage from "@/features/devices/DeviceInfoPage";
+import DiagnosticsPage from "@/features/diagnostics/DiagnosticsPage";
 import ExperimentsPage from "@/features/experiments/ExperimentsPage";
 import SensorsPage from "@/features/sensors/SensorsPage";
-import AutomationPage from "@/features/automation/AutomationPage";
-import DiagnosticsPage from "@/features/diagnostics/DiagnosticsPage";
 import SettingsLayout from "@/features/settings/SettingsLayout";
 import AccountPage from "@/features/settings/pages/AccountPage";
 import ProfilePage from "@/features/settings/pages/ProfilePage";
@@ -53,7 +53,11 @@ export default function App() {
 								/>
 								<Route
 									path="activity"
-									element={<RoleRoute allowedRoles={[ROLES.FARM_MANAGER, ROLES.FARM_WORKER]} />}>
+									element={
+										<RoleRoute
+											allowedRoles={[ROLES.FARM_MANAGER, ROLES.FARM_WORKER]}
+										/>
+									}>
 									<Route
 										index
 										element={<ActivityLogPage />}
@@ -77,11 +81,7 @@ export default function App() {
 								</Route>
 								<Route
 									path="devices"
-									element={
-										<RoleRoute
-											allowedRoles={[ROLES.TECHNICIAN]}
-										/>
-									}>
+									element={<RoleRoute allowedRoles={[ROLES.TECHNICIAN]} />}>
 									<Route
 										index
 										element={<DeviceInfoPage />}
@@ -117,22 +117,16 @@ export default function App() {
 									/>
 								</Route>
 								<Route
-									path="automation"
-									element={
-										<RoleRoute allowedRoles={[ROLES.FARM_MANAGER]} />
-									}>
+									path="device-settings"
+									element={<RoleRoute allowedRoles={[ROLES.FARM_MANAGER]} />}>
 									<Route
 										index
-										element={<AutomationPage />}
+										element={<DeviceSettingsPage />}
 									/>
 								</Route>
 								<Route
 									path="diagnostics"
-									element={
-										<RoleRoute
-											allowedRoles={[ROLES.TECHNICIAN]}
-										/>
-									}>
+									element={<RoleRoute allowedRoles={[ROLES.TECHNICIAN]} />}>
 									<Route
 										index
 										element={<DiagnosticsPage />}

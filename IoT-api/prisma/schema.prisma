@@ -67,19 +67,21 @@ model SensorReading {
   @@map("sensor_readings")
 }
 
-model AutomationRule {
-  id            Int       @id @default(autoincrement())
-  name          String
-  enabled       Boolean   @default(true)
-  sensor        String    // soilMoisture, temperature, humidity, light, airQuality, waterLevel
-  condition     String    // below, above, equals
-  threshold     Float
-  action        String    // pump_on, pump_off, led_on, led_off
-  duration      Int?      // auto-off after N seconds (null = stay on until manual off)
-  cooldown      Int       @default(300) // minimum seconds between triggers
-  lastTriggered DateTime?
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+model DeviceSettings {
+  id                     Int      @id @default(autoincrement())
+  soilDryThreshold       Float    @default(30)
+  soilOptimalThreshold   Float    @default(50)
+  waterLowThreshold      Float    @default(25)
+  waterCriticalThreshold Float    @default(10)
+  waterWarningEnabled    Boolean  @default(true)
+  fanEnabled             Boolean  @default(true)
+  fanSpeed               Int      @default(65)
+  buzzerEnabled          Boolean  @default(true)
+  buzzerLowWater         Boolean  @default(true)
+  buzzerDrySoil          Boolean  @default(true)
+  buzzerSensorError      Boolean  @default(false)
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
 
-  @@map("automation_rules")
+  @@map("device_settings")
 }

@@ -6,9 +6,9 @@ import {
   Thermometer,
   Power,
   BarChart3,
-  Bot,
   Stethoscope,
   Settings,
+  SlidersHorizontal,
   type LucideIcon,
 } from "lucide-react"
 import { ROLES, type Role } from "./roles"
@@ -82,9 +82,9 @@ export const navigation: NavSection[] = [
         roles: [ROLES.TECHNICIAN],
       },
       {
-        path: "/automation",
+        path: "/device-settings",
         label: "Device Settings",
-        icon: Bot,
+        icon: SlidersHorizontal,
         roles: [ROLES.FARM_MANAGER],
       },
       {

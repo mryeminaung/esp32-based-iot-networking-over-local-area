@@ -9,8 +9,8 @@ import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import activityRoutes from "./src/routes/activityRoutes.js";
 import sensorRoutes from "./src/routes/sensorRoutes.js";
-import automationRoutes from "./src/routes/automationRoutes.js";
 import deviceRoutes from "./src/routes/deviceRoutes.js";
+import deviceSettingsRoutes from "./src/routes/deviceSettingsRoutes.js";
 import { startCollector } from "./src/services/collectorService.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,8 +29,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/sensors", sensorRoutes);
-app.use("/api/automation", automationRoutes);
 app.use("/api/devices", deviceRoutes);
+app.use("/api/device-settings", deviceSettingsRoutes);
 
 app.get("/", (req: Request, res: Response) => {
 	res.json({
