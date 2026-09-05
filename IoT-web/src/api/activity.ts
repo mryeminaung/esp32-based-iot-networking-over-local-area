@@ -18,6 +18,7 @@ export type ActivityLog = {
 export type ActivityFilters = {
   userId?: number
   action?: string
+  actionStartsWith?: string
   device?: string
   startDate?: string
   endDate?: string
@@ -44,6 +45,7 @@ export async function getActivityLogs(
   const params = new URLSearchParams()
   if (filters.userId) params.append("userId", String(filters.userId))
   if (filters.action) params.append("action", filters.action)
+  if (filters.actionStartsWith) params.append("actionStartsWith", filters.actionStartsWith)
   if (filters.device) params.append("device", filters.device)
   if (filters.startDate) params.append("startDate", filters.startDate)
   if (filters.endDate) params.append("endDate", filters.endDate)

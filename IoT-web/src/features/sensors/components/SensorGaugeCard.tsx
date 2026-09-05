@@ -21,6 +21,7 @@ type SensorGaugeCardProps = {
 	max: number;
 	thresholds?: Threshold[];
 	decimals?: number;
+	alert?: boolean;
 };
 
 function getThreshold(value: number, thresholds: Threshold[]): Threshold {
@@ -29,6 +30,16 @@ function getThreshold(value: number, thresholds: Threshold[]): Threshold {
 	}
 	return thresholds[thresholds.length - 1];
 }
+
+const shakeAnimation = {
+	x: [0, -4, 4, -4, 3, -2, 1, 0],
+	transition: {
+		duration: 0.5,
+		repeat: Infinity,
+		repeatDelay: 1.5,
+		ease: "easeInOut" as const,
+	},
+};
 
 export default function SensorGaugeCard({
 	label,
@@ -41,6 +52,7 @@ export default function SensorGaugeCard({
 	max,
 	thresholds,
 	decimals = 0,
+	alert = false,
 }: SensorGaugeCardProps) {
 	const clamped = Math.max(min, Math.min(max, value));
 	const percentage = ((clamped - min) / (max - min)) * 100;
@@ -48,8 +60,16 @@ export default function SensorGaugeCard({
 	const displayValue =
 		decimals > 0 ? clamped.toFixed(decimals) : Math.round(clamped);
 
-	return (
-		<Card>
+	const cardContent = (
+		<Card className={alert ? "border-red-300 dark:border-red-700 relative" : ""}>
+			{alert && (
+				<div className="absolute -top-1 -right-1">
+					<span className="flex h-3 w-3">
+						<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+						<span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+					</span>
+				</div>
+			)}
 			<CardContent className="space-y-3">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2">
@@ -90,4 +110,14 @@ export default function SensorGaugeCard({
 			</CardContent>
 		</Card>
 	);
+
+	if (alert) {
+		return (
+			<motion.div animate={shakeAnimation}>
+				{cardContent}
+			</motion.div>
+		);
+	}
+
+	return cardContent;
 }

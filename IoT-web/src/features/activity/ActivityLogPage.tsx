@@ -4,7 +4,7 @@ import {
 	type ActivityLog,
 } from "@/api/activity";
 import PageHeader from "@/components/PageHeader";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
 	Select,
 	SelectContent,
@@ -17,7 +17,7 @@ import EmptyState from "@/components/EmptyState";
 import ErrorState from "@/components/ErrorState";
 import { useHeader } from "@/hooks/useHeader";
 import { useAuthStore } from "@/store/use-auth-store";
-import { Activity, ChevronLeft, ChevronRight, Filter, X, RefreshCw } from "lucide-react";
+import { Activity, ChevronLeft, ChevronRight, X, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const DEVICE_OPTIONS = [
@@ -27,12 +27,18 @@ const DEVICE_OPTIONS = [
 	{ value: "white_light", label: "Grow Light" },
 	{ value: "relay", label: "Relay" },
 	{ value: "water_pump", label: "Irrigation Pump" },
+	{ value: "user", label: "User Management" },
 ];
 
 const ACTION_OPTIONS = [
 	{ value: "ON", label: "On" },
 	{ value: "OFF", label: "Off" },
 	{ value: "ADJUST", label: "Adjust" },
+	{ value: "Created", label: "Created" },
+	{ value: "Updated", label: "Updated" },
+	{ value: "Deleted", label: "Deleted" },
+	{ value: "Changed", label: "Changed" },
+	{ value: "Reset", label: "Reset" },
 ];
 
 const DATE_PRESETS = [
@@ -78,16 +84,18 @@ function getDateRange(preset: string): {
 }
 
 function getActionColor(action: string) {
-	switch (action) {
-		case "On":
-			return "bg-green-light text-green";
-		case "Off":
-			return "bg-red-100 text-red-600";
-		case "Adjust":
-			return "bg-amber-100 text-amber-600";
-		default:
-			return "bg-bg-muted text-text-muted";
-	}
+	const lower = action.toLowerCase();
+	if (lower === "on" || lower.startsWith("created"))
+		return "bg-green-light text-green";
+	if (lower === "off" || lower.startsWith("deleted"))
+		return "bg-red-100 text-red-600";
+	if (lower === "adjust" || lower.startsWith("updated"))
+		return "bg-amber-100 text-amber-600";
+	if (lower.startsWith("changed"))
+		return "bg-blue-100 text-blue-600";
+	if (lower.startsWith("reset"))
+		return "bg-purple-100 text-purple-600";
+	return "bg-bg-muted text-text-muted";
 }
 
 function getRoleBadge(role: string) {
@@ -138,7 +146,6 @@ export default function ActivityLogPage() {
 	const [deviceFilter, setDeviceFilter] = useState("all");
 	const [actionFilter, setActionFilter] = useState("all");
 	const [datePreset, setDatePreset] = useState("today");
-	const [showFilters, setShowFilters] = useState(false);
 
 	const fetchLogs = async (page = 1) => {
 		setLoading(true);
@@ -146,7 +153,15 @@ export default function ActivityLogPage() {
 		try {
 			const filters: ActivityFilters = { page, limit: 20 };
 			if (deviceFilter && deviceFilter !== "all") filters.device = deviceFilter;
-			if (actionFilter && actionFilter !== "all") filters.action = actionFilter;
+			if (actionFilter && actionFilter !== "all") {
+				// Device actions (ON, OFF, ADJUST) use exact match
+				// User management actions (Created, Updated, etc.) use prefix match
+				if (["ON", "OFF", "ADJUST"].includes(actionFilter)) {
+					filters.action = actionFilter;
+				} else {
+					filters.actionStartsWith = actionFilter;
+				}
+			}
 
 			const dateRange = getDateRange(datePreset);
 			if (dateRange.startDate) filters.startDate = dateRange.startDate;
@@ -192,21 +207,7 @@ export default function ActivityLogPage() {
 					isManager
 						? "All user activity across the system"
 						: "Your device control history"
-				}>
-				<button
-					onClick={() => setShowFilters(!showFilters)}
-					className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-						showFilters || hasActiveFilters
-							? "bg-green-100 text-green-600"
-							: "bg-bg-muted text-text-muted hover:bg-bg-card-hover"
-					}`}>
-					<Filter className="w-4 h-4" />
-					Filters
-					{hasActiveFilters && (
-						<span className="w-2 h-2 rounded-full bg-green-500" />
-					)}
-				</button>
-			</PageHeader>
+				} />
 
 			{/* Error state */}
 			{error && (
@@ -225,60 +226,58 @@ export default function ActivityLogPage() {
 				<LoadingState message="Loading activity..." />
 			) : (
 				<Card className="p-0 overflow-hidden">
-					{/* Inline filters */}
-					{showFilters && (
-						<div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-border bg-bg-muted/50">
-							<Select
-								value={deviceFilter}
-								onValueChange={setDeviceFilter}>
-								<SelectTrigger className="w-40 h-8 text-xs">
-									<SelectValue placeholder="All Devices">{deviceLabel || "All Devices"}</SelectValue>
-								</SelectTrigger>
-								<SelectContent alignItemWithTrigger={false}>
-									<SelectItem value="all">All Devices</SelectItem>
-									{DEVICE_OPTIONS.map((opt) => (
-										<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+					{/* Filters */}
+					<div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-border bg-bg-muted/50">
+						<Select
+							value={deviceFilter}
+							onValueChange={setDeviceFilter}>
+							<SelectTrigger className="w-40 h-8 text-xs">
+								<SelectValue placeholder="All Devices">{deviceLabel || "All Devices"}</SelectValue>
+							</SelectTrigger>
+							<SelectContent alignItemWithTrigger={false}>
+								<SelectItem value="all">All Devices</SelectItem>
+								{DEVICE_OPTIONS.map((opt) => (
+									<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 
-							<Select
-								value={actionFilter}
-								onValueChange={setActionFilter}>
-								<SelectTrigger className="w-32 h-8 text-xs">
-									<SelectValue placeholder="All Actions">{actionLabel || "All Actions"}</SelectValue>
-								</SelectTrigger>
-								<SelectContent alignItemWithTrigger={false}>
-									<SelectItem value="all">All Actions</SelectItem>
-									{ACTION_OPTIONS.map((opt) => (
-										<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+						<Select
+							value={actionFilter}
+							onValueChange={setActionFilter}>
+							<SelectTrigger className="w-32 h-8 text-xs">
+								<SelectValue placeholder="All Actions">{actionLabel || "All Actions"}</SelectValue>
+							</SelectTrigger>
+							<SelectContent alignItemWithTrigger={false}>
+								<SelectItem value="all">All Actions</SelectItem>
+								{ACTION_OPTIONS.map((opt) => (
+									<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 
-							<Select
-								value={datePreset}
-								onValueChange={setDatePreset}>
-								<SelectTrigger className="w-32 h-8 text-xs">
-									<SelectValue>{dateLabel || "Today"}</SelectValue>
-								</SelectTrigger>
-								<SelectContent alignItemWithTrigger={false}>
-									{DATE_PRESETS.map((opt) => (
-										<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+						<Select
+							value={datePreset}
+							onValueChange={setDatePreset}>
+							<SelectTrigger className="w-32 h-8 text-xs">
+								<SelectValue>{dateLabel || "Today"}</SelectValue>
+							</SelectTrigger>
+							<SelectContent alignItemWithTrigger={false}>
+								{DATE_PRESETS.map((opt) => (
+									<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 
-							{hasActiveFilters && (
-								<button
-									onClick={clearFilters}
-									className="flex items-center gap-1 px-2 py-1 rounded text-xs text-text-muted hover:text-text-primary hover:bg-bg-muted transition-colors">
-									<X className="w-3 h-3" />
-									Clear
-								</button>
-							)}
-						</div>
-					)}
+						{hasActiveFilters && (
+							<button
+								onClick={clearFilters}
+								className="flex items-center gap-1 px-2 py-1 rounded text-xs text-text-muted hover:text-text-primary hover:bg-bg-muted transition-colors">
+								<X className="w-3 h-3" />
+								Clear
+							</button>
+						)}
+					</div>
 
 					{/* Table header */}
 					<div className="hidden md:grid grid-cols-12 gap-4 px-5 py-3 bg-bg-muted border-b border-border text-xs font-medium text-text-muted uppercase tracking-wider">
@@ -304,15 +303,15 @@ export default function ActivityLogPage() {
 								{/* User */}
 								<div className="col-span-3 flex items-center gap-2">
 									<div className="w-8 h-8 rounded-full bg-bg-muted flex items-center justify-center text-xs font-medium text-text-secondary shrink-0">
-										{log.user ? (log.user.name || log.user.email).charAt(0).toUpperCase() : "S"}
+										{(log.user?.name || log.user?.email || "?").charAt(0).toUpperCase()}
 									</div>
 									<div className="min-w-0">
 										<p className="text-sm font-medium text-text-primary truncate">
-											{log.user?.name || "System"}
+											{log.user?.name || log.user?.email}
 										</p>
 										<span
-											className={`inline-block px-1.5 py-0.5 rounded text-[0.6rem] font-medium ${getRoleBadge(log.user?.role || "system")}`}>
-											{log.user?.role?.replace("_", " ") || "system"}
+											className={`inline-block px-1.5 py-0.5 rounded text-[0.6rem] font-medium ${getRoleBadge(log.user?.role || "")}`}>
+											{log.user?.role?.replace("_", " ") || "unknown"}
 										</span>
 									</div>
 								</div>
@@ -328,8 +327,9 @@ export default function ActivityLogPage() {
 								{/* Action */}
 								<div className="col-span-2 flex items-center">
 									<span
-										className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getActionColor(log.action)}`}>
-										{log.action}
+										className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getActionColor(log.action)}`}
+										title={log.action}>
+										{log.action.length > 20 ? `${log.action.slice(0, 20)}…` : log.action}
 									</span>
 								</div>
 

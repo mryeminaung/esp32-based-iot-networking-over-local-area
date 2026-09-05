@@ -69,7 +69,7 @@ export default memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
 										to={item.path}
 										className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 ${
 											isActive
-												? "bg-green-light text-green-hover font-semibold border-l-3 border-green-hover"
+												? "bg-green-light text-green-hover font-semibold border-l-4 border-green-hover"
 												: "text-text-secondary hover:bg-bg-muted hover:text-text-primary"
 										}`}
 										title={collapsed ? item.label : undefined}>

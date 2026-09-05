@@ -19,6 +19,7 @@ export const createActivityLog = async (
 interface ActivityFilters {
   userId?: string;
   action?: string;
+  actionStartsWith?: string;
   device?: string;
   startDate?: string;
   endDate?: string;
@@ -30,9 +31,14 @@ export const getActivityLogs = async (
   filters: ActivityFilters = {},
   requestingUser: { id: number; role: string } | null = null
 ) => {
-  const { userId, action, device, startDate, endDate, page = "1", limit = "20" } = filters;
+  const { userId, action, actionStartsWith, device, startDate, endDate, page = "1", limit = "20" } = filters;
 
   const where: Record<string, unknown> = {};
+
+  // Build AND conditions to always exclude system logs while allowing other filters
+  const conditions: Record<string, unknown>[] = [
+    { device: { not: "system" } },
+  ];
 
   if (requestingUser && requestingUser.role !== "farm_manager") {
     where.userId = requestingUser.id;
@@ -40,8 +46,13 @@ export const getActivityLogs = async (
     where.userId = parseInt(userId, 10);
   }
 
-  if (action) where.action = action;
-  if (device) where.device = device;
+  if (action) conditions.push({ action });
+  if (actionStartsWith) conditions.push({ action: { startsWith: actionStartsWith } });
+  if (device) conditions.push({ device });
+
+  if (conditions.length > 0) {
+    where.AND = conditions;
+  }
 
   if (startDate || endDate) {
     where.createdAt = {};
