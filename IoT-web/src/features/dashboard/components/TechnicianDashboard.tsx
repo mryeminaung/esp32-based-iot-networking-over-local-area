@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router"
 import {
-  Wifi, WifiOff, Server, Droplets, Power,
+  Wifi, Server, Droplets, Power,
   Cpu, Globe, Monitor, Clock, Stethoscope,
   RefreshCw, ArrowRight, Lightbulb, Zap,
 } from "lucide-react"
@@ -33,7 +33,7 @@ const fadeInUp = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.08, duration: 0.4, ease: "easeOut" },
+    transition: { delay: i * 0.08, duration: 0.4, ease: "easeOut" as const },
   }),
 }
 
@@ -58,25 +58,6 @@ export default function TechnicianDashboard() {
 
   return (
     <>
-      {/* Connection status banner */}
-      <Card className={connected ? "bg-success/10 border-success/30" : "bg-danger/10 border-danger/30"}>
-        <CardContent className="flex items-center gap-3">
-          {connected ? (
-            <Wifi className="w-5 h-5 text-success" />
-          ) : (
-            <WifiOff className="w-5 h-5 text-danger" />
-          )}
-          <div>
-            <p className={`text-sm font-semibold ${connected ? "text-success" : "text-danger"}`}>
-              {connected ? "ESP32 Connected" : "ESP32 Disconnected"}
-            </p>
-            <p className="text-xs text-text-muted">
-              {connected ? `Mode: ${sysInfo.status || "—"}` : "Unable to reach device"}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
       <div className="grid gap-5 lg:grid-cols-3">
         {/* System info */}
         <motion.div

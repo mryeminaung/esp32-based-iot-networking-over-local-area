@@ -47,7 +47,7 @@ export function MoistureCard({ name, gpio, color, active }: DeviceCardProps) {
 			{/* Icon */}
 			<motion.div
 				animate={active ? { scale: [1, 1.1, 1] } : { scale: 1 }}
-				transition={{ duration: 0.4, ease: "easeOut" }}
+				transition={{ duration: 0.4, ease: "easeOut" as const }}
 				className={`flex h-10 w-10 items-center justify-center rounded-xl ${active ? c.activeIconBg : c.bg}`}>
 				<Lightbulb
 					className={`h-5 w-5 transition-colors duration-300 ${active ? "text-white" : c.text}`}

@@ -2,9 +2,8 @@ import { memo, useState, useRef, useEffect } from "react"
 import { useDashboardStore } from "@/store/use-dashboard-store"
 import { useAuthStore } from "@/store/use-auth-store"
 import { useHeaderStore } from "@/store/use-header-store"
-import { Moon, Sun, QrCode, PanelLeftClose, PanelLeft, ChevronDown, Settings, LogOut, Mail, Menu } from "lucide-react"
+import { Moon, Sun, PanelLeftClose, PanelLeft, ChevronDown, Settings, LogOut, Mail, Menu } from "lucide-react"
 import { useNavigate, useLocation } from "react-router"
-import DeviceQRCode from "@/features/dashboard/components/DeviceQRCode"
 import UserAvatar from "@/features/users/components/UserAvatar"
 
 const roleLabels: Record<string, string> = {
@@ -29,7 +28,6 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
   const theme = useDashboardStore((s) => s.theme)
   const toggleTheme = useDashboardStore((s) => s.toggleTheme)
   const pageTitle = useHeaderStore((s) => s.title)
-  const [showQR, setShowQR] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -99,15 +97,6 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
             }`}
             title={connected ? "Online" : "Offline"}
           />
-
-          {/* QR code */}
-          <button
-            onClick={() => setShowQR(true)}
-            className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-text-muted hover:bg-bg-muted transition-colors cursor-pointer"
-            title="Show QR code"
-          >
-            <QrCode size={16} />
-          </button>
 
           {/* Theme toggle */}
           <button
@@ -191,26 +180,6 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
           </div>
         </div>
       </header>
-
-      {/* QR modal */}
-      {showQR && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowQR(false)
-          }}
-        >
-          <div className="relative">
-            <button
-              onClick={() => setShowQR(false)}
-              className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-text-primary text-bg-card flex items-center justify-center text-sm hover:opacity-80 transition-all cursor-pointer shadow-lg"
-            >
-              ✕
-            </button>
-            <DeviceQRCode />
-          </div>
-        </div>
-      )}
     </>
   )
 })

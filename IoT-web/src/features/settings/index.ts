@@ -3,6 +3,7 @@ export { default as ProfilePage } from "./pages/ProfilePage"
 export { default as SecurityPage } from "./pages/SecurityPage"
 export { default as ThemePage } from "./pages/ThemePage"
 export { default as AccountPage } from "./pages/AccountPage"
+export { default as QRCodePage } from "./pages/QRCodePage"
 
 // Layout
 export { default as SettingsLayout } from "./SettingsLayout"

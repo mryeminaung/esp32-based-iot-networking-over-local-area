@@ -84,7 +84,7 @@ export default function SensorGaugeCard({
 						className={`h-full rounded-full ${condition?.barColor || color}`}
 						initial={{ width: 0 }}
 						animate={{ width: `${percentage}%` }}
-						transition={{ duration: 0.5, ease: "easeOut" }}
+						transition={{ duration: 0.5, ease: "easeOut" as const }}
 					/>
 				</div>
 			</CardContent>

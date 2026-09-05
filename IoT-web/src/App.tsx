@@ -20,6 +20,7 @@ import AccountPage from "@/features/settings/pages/AccountPage";
 import ProfilePage from "@/features/settings/pages/ProfilePage";
 import SecurityPage from "@/features/settings/pages/SecurityPage";
 import ThemePage from "@/features/settings/pages/ThemePage";
+import QRCodePage from "@/features/settings/pages/QRCodePage";
 import UserManagementPage from "@/features/users/UserManagementPage";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
@@ -114,6 +115,10 @@ export default function App() {
 									<Route
 										path="account"
 										element={<AccountPage />}
+									/>
+									<Route
+										path="qr-code"
+										element={<QRCodePage />}
 									/>
 								</Route>
 								<Route

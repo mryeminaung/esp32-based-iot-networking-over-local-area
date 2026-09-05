@@ -1,5 +1,6 @@
-import { User, Shield, Palette, Mail } from "lucide-react"
+import { User, Shield, Palette, Mail, QrCode } from "lucide-react"
 import { NavLink } from "react-router"
+import { useAuthStore } from "@/store/use-auth-store"
 
 const tabs = [
  { path: "/settings/profile", label: "Profile", icon: User },
@@ -8,10 +9,19 @@ const tabs = [
  { path: "/settings/account", label: "Account", icon: Mail },
 ]
 
+const managerTabs = [
+ { path: "/settings/qr-code", label: "QR Code", icon: QrCode },
+]
+
 export default function SettingsSidebar() {
+ const user = useAuthStore((s) => s.user)
+ const visibleTabs = user?.role === "farm_manager"
+	? [...tabs, ...managerTabs]
+	: tabs
+
  return (
  <nav className="w-56 shrink-0 space-y-1">
- {tabs.map((tab) => (
+ {visibleTabs.map((tab) => (
  <NavLink
  key={tab.path}
  to={tab.path}
