@@ -60,10 +60,11 @@ export default function SensorsPage() {
 	const devices = useDashboardStore((s) => s.devices);
 	const sensors = useDashboardStore((s) => s.sensors);
 	const connected = useDashboardStore((s) => s.connected);
+	const deviceSettings = useDashboardStore((s) => s.deviceSettings);
 	const user = useAuthStore((s) => s.user);
 	const isTechnician = user?.role === "technician";
 
-	const isWaterLow = sensors.waterLevel <= 20;
+	const isWaterLow = sensors.waterLevel <= deviceSettings.waterCriticalThreshold;
 
 	// Technician sees sensor health overview only
 	if (isTechnician) {
@@ -94,7 +95,7 @@ export default function SensorsPage() {
 			/>
 
 			{/* Low water alert */}
-			{sensors.waterLevel < 10 && connected && (
+			{sensors.waterLevel < deviceSettings.waterCriticalThreshold && connected && (
 				<Card className="bg-amber-50 border-amber-300 dark:bg-amber-900/20 dark:border-amber-700">
 					<CardContent className="flex items-center gap-3">
 						<div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -184,7 +185,10 @@ export default function SensorsPage() {
 					variants={fadeInUp}
 					initial="hidden"
 					animate="visible">
-					<SensorCard />
+					<SensorCard
+					dryThreshold={deviceSettings.soilDryThreshold}
+					optimalThreshold={deviceSettings.soilOptimalThreshold}
+				/>
 				</motion.div>
 				<motion.div
 					custom={1}
@@ -218,21 +222,25 @@ export default function SensorsPage() {
 					variants={fadeInUp}
 					initial="hidden"
 					animate="visible">
-					<BuzzerIndicator active={isWaterLow && connected} />
+					<BuzzerIndicator
+						active={isWaterLow && connected}
+						buzzerEnabled={deviceSettings.buzzerEnabled}
+						buzzerLowWater={deviceSettings.buzzerLowWater}
+					/>
 					<WaterLevelIndicator
 						name="Full"
 						color="green"
-						active={sensors.waterLevel > 60}
+						active={sensors.waterLevel > Math.round((deviceSettings.waterLowThreshold + 100) / 2)}
 					/>
 					<WaterLevelIndicator
 						name="Mid"
 						color="yellow"
-						active={sensors.waterLevel > 20 && sensors.waterLevel <= 60}
+						active={sensors.waterLevel > deviceSettings.waterLowThreshold && sensors.waterLevel <= Math.round((deviceSettings.waterLowThreshold + 100) / 2)}
 					/>
 					<WaterLevelIndicator
 						name="Low"
 						color="red"
-						active={sensors.waterLevel <= 20}
+						active={sensors.waterLevel <= deviceSettings.waterLowThreshold}
 					/>
 				</motion.div>
 			</div>

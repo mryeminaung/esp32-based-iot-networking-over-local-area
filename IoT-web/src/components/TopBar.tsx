@@ -2,7 +2,7 @@ import { memo, useState, useRef, useEffect } from "react"
 import { useDashboardStore } from "@/store/use-dashboard-store"
 import { useAuthStore } from "@/store/use-auth-store"
 import { useHeaderStore } from "@/store/use-header-store"
-import { Moon, Sun, PanelLeftClose, PanelLeft, ChevronDown, Settings, LogOut, Mail, Menu } from "lucide-react"
+import { Moon, Sun, Monitor, PanelLeftClose, PanelLeft, ChevronDown, Settings, LogOut, Mail, Menu } from "lucide-react"
 import { useNavigate, useLocation } from "react-router"
 import UserAvatar from "@/features/users/components/UserAvatar"
 
@@ -102,9 +102,9 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
           <button
             onClick={toggleTheme}
             className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-text-muted hover:bg-bg-muted transition-colors cursor-pointer"
-            title="Toggle dark mode"
+            title={`Theme: ${theme}`}
           >
-            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+            {theme === "light" ? <Moon size={16} /> : theme === "dark" ? <Sun size={16} /> : <Monitor size={16} />}
           </button>
 
           {/* User menu */}
@@ -117,14 +117,14 @@ export default memo(function TopBar({ collapsed, onToggle, onMobileToggle }: Top
                 name={user?.name || null}
                 email={user?.email || ""}
                 imageUrl={user?.image}
-                size="xs"
+                size="sm"
               />
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-medium text-text-secondary leading-tight">
                   {user?.name || user?.email}
                 </p>
                 <p className="text-[0.65rem] text-text-muted leading-tight">
-                  {roleLabels[user?.role] || user?.role}
+                  {roleLabels[user!.role] || user?.role}
                 </p>
               </div>
               <ChevronDown size={14} className="text-text-muted" />

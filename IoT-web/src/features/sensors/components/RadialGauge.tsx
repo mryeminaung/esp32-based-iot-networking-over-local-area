@@ -5,6 +5,8 @@ import { getMoistureCondition } from "@/lib/moistureUtils";
 type RadialGaugeProps = {
 	value: number; // 0–100
 	size?: number;
+	dryThreshold?: number;
+	optimalThreshold?: number;
 };
 
 const circumference = 2 * Math.PI * 68; // r=68 → ~427.26
@@ -28,7 +30,7 @@ function AnimatedNumber({ value }: { value: number }) {
 	return <>{display}</>;
 }
 
-export default function RadialGauge({ value, size = 200 }: RadialGaugeProps) {
+export default function RadialGauge({ value, size = 200, dryThreshold, optimalThreshold }: RadialGaugeProps) {
 	const fillRef = useRef<SVGCircleElement>(null);
 
 	const gaugeSize =
@@ -39,7 +41,7 @@ export default function RadialGauge({ value, size = 200 }: RadialGaugeProps) {
 	const offset = circumference - (clamped / 100) * circumference;
 
 	/* Colors based on moisture thresholds */
-	const condition = getMoistureCondition(clamped);
+	const condition = getMoistureCondition(clamped, dryThreshold, optimalThreshold);
 	const color = condition.hex;
 
 	/* Animate on change */

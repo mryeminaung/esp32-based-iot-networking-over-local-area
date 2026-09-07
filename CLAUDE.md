@@ -138,7 +138,7 @@ UI Layer (src/features/)
 - Role-filtered sidebar sections: Main, Analytics, Management, Settings
 - Farm Manager: Dashboard, Sensors, Actuators, Analytics, Activity, Users, Automation, Settings
 - Farm Worker: Dashboard, Sensors, Actuators, Activity, Settings
-- Technician: Dashboard, Sensors, Actuators, Device Info, Diagnostics, Settings
+- Technician: Dashboard, Sensors, Actuators, Diagnostics, Settings
 
 ### API Server (IoT-api) — Express + Prisma
 
@@ -273,7 +273,6 @@ Single-file Arduino sketch (`ESP32-Server.ino`) with:
 | Path | Component | Access |
 |------|-----------|--------|
 | `/login` | LoginPage | Public |
-| `/experiments` | ExperimentsPage | Public |
 | `/` | DashboardPage | All authenticated (role-specific view) |
 | `/sensors` | SensorsPage | All authenticated (technician: health only) |
 | `/actuators` | ActuatorsPage | All authenticated |
@@ -281,7 +280,6 @@ Single-file Arduino sketch (`ESP32-Server.ino`) with:
 | `/analytics` | AnalyticsPage | farm_manager |
 | `/automation` | AutomationPage | farm_manager |
 | `/users` | UserManagementPage | farm_manager |
-| `/devices` | DeviceInfoPage | technician |
 | `/diagnostics` | DiagnosticsPage | technician |
 | `/settings` | SettingsLayout | All authenticated |
 | `/settings/profile` | ProfilePage | All authenticated |

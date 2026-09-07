@@ -40,7 +40,7 @@ const upload = multer({
   },
 });
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // ── Profile routes (any authenticated user) ──
 router.patch("/me", authenticate, updateProfileHandler);

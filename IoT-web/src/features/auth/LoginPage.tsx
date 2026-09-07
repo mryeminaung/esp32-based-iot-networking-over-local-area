@@ -1,9 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTheme } from "@/hooks/useTheme";
 import { useAuthStore } from "@/store/use-auth-store";
-import { Eye, EyeOff, Loader2, Tractor, UserCog, Wrench } from "lucide-react";
+import { useDashboardStore } from "@/store/use-dashboard-store";
+import { Eye, EyeOff, Loader2, Monitor, Moon, Sun, Tractor, UserCog, Wrench } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+
+const THEME_ICONS = {
+	light: Sun,
+	dark: Moon,
+	system: Monitor,
+} as const;
 
 const DEMO_USERS = [
 	{
@@ -33,6 +41,10 @@ export default function LoginPage() {
 	const [activeDemo, setActiveDemo] = useState<number | null>(null);
 	const { login, loading, error } = useAuthStore();
 	const navigate = useNavigate();
+	useTheme();
+	const theme = useDashboardStore((s) => s.theme);
+	const toggleTheme = useDashboardStore((s) => s.toggleTheme);
+	const ThemeIcon = THEME_ICONS[theme];
 
 	const handleDemoClick = (index: number) => {
 		const user = DEMO_USERS[index];
@@ -56,6 +68,15 @@ export default function LoginPage() {
 			className="min-h-screen flex items-center justify-center bg-bg-page px-4 bg-cover bg-center bg-no-repeat relative"
 			style={{ backgroundImage: "url('/main_bg.png')" }}>
 			<div className="absolute inset-0 bg-black/20" />
+
+			{/* Theme toggle */}
+			<button
+				onClick={toggleTheme}
+				className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-bg-card/80 backdrop-blur-sm border border-border hover:border-green-400 transition-colors cursor-pointer"
+				title={`Theme: ${theme}`}>
+				<ThemeIcon className="w-5 h-5 text-text-secondary" />
+			</button>
+
 			<div className="w-full max-w-lg relative z-10">
 				{/* Demo Users */}
 				<div className="flex gap-2 mb-3">
@@ -117,7 +138,7 @@ export default function LoginPage() {
 							required
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
-							placeholder="admin@farm.com"
+							placeholder="user@farm.com"
 							className="w-full px-4 rounded-lg border border-border bg-bg-card text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-colors"
 						/>
 					</div>

@@ -59,6 +59,15 @@ int waterLevelValue = 50;
 int lightValue = 500;
 int airQualityValue = 100;
 
+// Configurable thresholds (updated by backend via POST /config)
+int cfgSoilDryThreshold = 30;
+int cfgSoilOptimalThreshold = 50;
+int cfgWaterLowThreshold = 25;
+int cfgWaterCriticalThreshold = 10;
+bool cfgBuzzerEnabled = true;
+bool cfgBuzzerLowWater = true;
+bool cfgBuzzerDrySoil = true;
+
 // Timing
 unsigned long lastSensorRead = 0;
 unsigned long startTime = 0;
@@ -67,6 +76,7 @@ const unsigned long sensorReadInterval = 2000;
 // Function prototypes
 void handleRoot();
 void handleControl();
+void handleConfig();
 void handleSystem();
 void handleSensors();
 void handleAll();
@@ -152,6 +162,8 @@ void setup()
   server.on("/sensors", HTTP_OPTIONS, handleCORSPreflight);
   server.on("/all", HTTP_GET, handleAll);
   server.on("/all", HTTP_OPTIONS, handleCORSPreflight);
+  server.on("/config", HTTP_POST, handleConfig);
+  server.on("/config", HTTP_OPTIONS, handleCORSPreflight);
 
   server.enableCORS(true);
   server.begin();
@@ -185,21 +197,36 @@ void loop()
     lightValue = readLight();
     airQualityValue = readAirQuality();
 
-    // Auto buzzer based on water level
-    if (waterLevelValue < 10 && !buzzerState) {
-      buzzerState = true;
-      digitalWrite(BUZZER_PIN, HIGH);
-      Serial.println("Buzzer ON: Water level critical");
-    } else if (waterLevelValue >= 10 && buzzerState) {
-      buzzerState = false;
-      digitalWrite(BUZZER_PIN, LOW);
-      Serial.println("Buzzer OFF: Water level recovered");
+    // Auto buzzer based on water level (respects config)
+    if (cfgBuzzerEnabled && cfgBuzzerLowWater) {
+      if (waterLevelValue < cfgWaterCriticalThreshold && !buzzerState) {
+        buzzerState = true;
+        digitalWrite(BUZZER_PIN, HIGH);
+        Serial.println("Buzzer ON: Water level critical");
+      } else if (waterLevelValue >= cfgWaterCriticalThreshold && buzzerState) {
+        buzzerState = false;
+        digitalWrite(BUZZER_PIN, LOW);
+        Serial.println("Buzzer OFF: Water level recovered");
+      }
+    }
+
+    // Auto buzzer based on dry soil (respects config)
+    if (cfgBuzzerEnabled && cfgBuzzerDrySoil) {
+      if (soilMoistureValue < cfgSoilDryThreshold && !buzzerState) {
+        buzzerState = true;
+        digitalWrite(BUZZER_PIN, HIGH);
+        Serial.println("Buzzer ON: Soil dry");
+      } else if (soilMoistureValue >= cfgSoilDryThreshold && buzzerState) {
+        buzzerState = false;
+        digitalWrite(BUZZER_PIN, LOW);
+        Serial.println("Buzzer OFF: Soil moisture recovered");
+      }
     }
 
     lastSensorRead = millis();
 
-    // Auto LED based on soil moisture
-    if (soilMoistureValue <= 30)
+    // Auto LED based on soil moisture (uses configurable thresholds)
+    if (soilMoistureValue <= cfgSoilDryThreshold)
     {
       redLightState = true;
       yellowLightState = false;
@@ -208,7 +235,7 @@ void loop()
       setLight(YELLOW_LIGHT_PIN, false);
       setLight(GREEN_LIGHT_PIN, false);
     }
-    else if (soilMoistureValue < 50)
+    else if (soilMoistureValue < cfgSoilOptimalThreshold)
     {
       redLightState = false;
       yellowLightState = true;
@@ -351,6 +378,49 @@ void handleControl()
       }
 
       Serial.printf("Control: device=%s, state=%d, value=%d\n", device, state, value);
+      server.send(200, "application/json", "{\"status\":\"ok\"}");
+    }
+    else
+    {
+      server.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+    }
+  }
+  else
+  {
+    server.send(400, "application/json", "{\"error\":\"No data\"}");
+  }
+}
+
+// Config endpoint - receive threshold updates from backend
+void handleConfig()
+{
+  if (server.hasArg("plain"))
+  {
+    StaticJsonDocument<300> doc;
+    DeserializationError error = deserializeJson(doc, server.arg("plain"));
+
+    if (!error)
+    {
+      if (doc.containsKey("soilDryThreshold"))
+        cfgSoilDryThreshold = doc["soilDryThreshold"];
+      if (doc.containsKey("soilOptimalThreshold"))
+        cfgSoilOptimalThreshold = doc["soilOptimalThreshold"];
+      if (doc.containsKey("waterLowThreshold"))
+        cfgWaterLowThreshold = doc["waterLowThreshold"];
+      if (doc.containsKey("waterCriticalThreshold"))
+        cfgWaterCriticalThreshold = doc["waterCriticalThreshold"];
+      if (doc.containsKey("buzzerEnabled"))
+        cfgBuzzerEnabled = doc["buzzerEnabled"];
+      if (doc.containsKey("buzzerLowWater"))
+        cfgBuzzerLowWater = doc["buzzerLowWater"];
+      if (doc.containsKey("buzzerDrySoil"))
+        cfgBuzzerDrySoil = doc["buzzerDrySoil"];
+
+      Serial.printf("Config updated: soilDry=%d soilOpt=%d waterLow=%d waterCrit=%d buzzer=%d\n",
+        cfgSoilDryThreshold, cfgSoilOptimalThreshold,
+        cfgWaterLowThreshold, cfgWaterCriticalThreshold,
+        cfgBuzzerEnabled ? 1 : 0);
+
       server.send(200, "application/json", "{\"status\":\"ok\"}");
     }
     else

@@ -11,16 +11,14 @@ import AnalyticsPage from "@/features/analytics/AnalyticsPage";
 import LoginPage from "@/features/auth/LoginPage";
 import DashboardPage from "@/features/dashboard/DashboardPage";
 import DeviceSettingsPage from "@/features/device-settings/DeviceSettingsPage";
-import DeviceInfoPage from "@/features/devices/DeviceInfoPage";
 import DiagnosticsPage from "@/features/diagnostics/DiagnosticsPage";
-import ExperimentsPage from "@/features/experiments/ExperimentsPage";
 import SensorsPage from "@/features/sensors/SensorsPage";
 import SettingsLayout from "@/features/settings/SettingsLayout";
 import AccountPage from "@/features/settings/pages/AccountPage";
 import ProfilePage from "@/features/settings/pages/ProfilePage";
+import QRCodePage from "@/features/settings/pages/QRCodePage";
 import SecurityPage from "@/features/settings/pages/SecurityPage";
 import ThemePage from "@/features/settings/pages/ThemePage";
-import QRCodePage from "@/features/settings/pages/QRCodePage";
 import UserManagementPage from "@/features/users/UserManagementPage";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
@@ -33,10 +31,6 @@ export default function App() {
 						<Route
 							path="/login"
 							element={<LoginPage />}
-						/>
-						<Route
-							path="/experiments"
-							element={<ExperimentsPage />}
 						/>
 						<Route element={<ProtectedRoute />}>
 							<Route element={<AppLayout />}>
@@ -78,14 +72,6 @@ export default function App() {
 									<Route
 										index
 										element={<UserManagementPage />}
-									/>
-								</Route>
-								<Route
-									path="devices"
-									element={<RoleRoute allowedRoles={[ROLES.TECHNICIAN]} />}>
-									<Route
-										index
-										element={<DeviceInfoPage />}
 									/>
 								</Route>
 								<Route

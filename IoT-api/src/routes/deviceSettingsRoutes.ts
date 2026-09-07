@@ -7,7 +7,7 @@ import {
   updateSettingsHandler,
 } from "../controllers/deviceSettingsController.js";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 router.use(authenticate);
 

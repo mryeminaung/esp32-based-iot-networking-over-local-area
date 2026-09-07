@@ -31,6 +31,7 @@ export default function DeviceSettingsPage() {
   useHeader("Device Settings");
 
   const moisture = useDashboardStore((s) => s.sensors.soilMoisture);
+  const setDeviceSettings = useDashboardStore((s) => s.setDeviceSettings);
 
   const [settings, setSettings] = useState<DeviceSettings>(INITIAL_SETTINGS);
   const [saved, setSaved] = useState(false);
@@ -63,6 +64,20 @@ export default function DeviceSettingsPage() {
     try {
       const api = await updateDeviceSettings(settingsToApi(settings));
       setSettings(apiToSettings(api));
+      // Sync thresholds to Zustand store so gauge cards update immediately
+      setDeviceSettings({
+        soilDryThreshold: settings.soilMoisture.dryThreshold,
+        soilOptimalThreshold: settings.soilMoisture.optimalThreshold,
+        waterLowThreshold: settings.waterLevel.lowThreshold,
+        waterCriticalThreshold: settings.waterLevel.criticalThreshold,
+        waterWarningEnabled: settings.waterLevel.warningEnabled,
+        buzzerEnabled: settings.buzzer.enabled,
+        buzzerLowWater: settings.buzzer.lowWater,
+        buzzerDrySoil: settings.buzzer.drySoil,
+        buzzerSensorError: settings.buzzer.sensorError,
+        fanEnabled: settings.fan.enabled,
+        fanSpeed: settings.fan.speed,
+      });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {

@@ -7,7 +7,7 @@ import {
   controlDeviceHandler,
 } from "../controllers/deviceController.js";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 router.use(authenticate);
 

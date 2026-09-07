@@ -31,3 +31,30 @@ export async function sendDeviceCommand(device: string, state: number, value = 0
     throw new AppError(502, `ESP32 unreachable: ${(error as Error).message}`);
   }
 }
+
+/**
+ * Push threshold config to ESP32
+ */
+export async function sendConfigToESP32(config: {
+  soilDryThreshold: number;
+  soilOptimalThreshold: number;
+  waterLowThreshold: number;
+  waterCriticalThreshold: number;
+  buzzerEnabled: boolean;
+  buzzerLowWater: boolean;
+  buzzerDrySoil: boolean;
+}) {
+  try {
+    const res = await fetch(`${ESP32_API_URL}/config`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(config),
+    });
+    if (!res.ok) throw new Error(`ESP32 responded ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    // Non-fatal — ESP32 may be offline; settings are still saved in DB
+    console.error("[DeviceService] Failed to push config to ESP32:", (error as Error).message);
+    return null;
+  }
+}

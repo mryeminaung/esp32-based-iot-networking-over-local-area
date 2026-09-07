@@ -12,6 +12,8 @@ import sensorRoutes from "./src/routes/sensorRoutes.js";
 import deviceRoutes from "./src/routes/deviceRoutes.js";
 import deviceSettingsRoutes from "./src/routes/deviceSettingsRoutes.js";
 import { startCollector } from "./src/services/collectorService.js";
+import { getSettings } from "./src/services/deviceSettingsService.js";
+import { sendConfigToESP32 } from "./src/services/deviceService.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -44,9 +46,26 @@ const PORT = process.env.PORT || 5000;
 const start = async () => {
 	await connectDB();
 
-	app.listen(PORT, () => {
+	app.listen(PORT, async () => {
 		console.log(`Smart Agriculture API is running on http://localhost:${PORT}`);
 		startCollector();
+
+		// Push current thresholds to ESP32 on startup
+		try {
+			const settings = await getSettings();
+			await sendConfigToESP32({
+				soilDryThreshold: settings.soilDryThreshold,
+				soilOptimalThreshold: settings.soilOptimalThreshold,
+				waterLowThreshold: settings.waterLowThreshold,
+				waterCriticalThreshold: settings.waterCriticalThreshold,
+				buzzerEnabled: settings.buzzerEnabled,
+				buzzerLowWater: settings.buzzerLowWater,
+				buzzerDrySoil: settings.buzzerDrySoil,
+			});
+			console.log("[Startup] Config pushed to ESP32");
+		} catch {
+			console.log("[Startup] Could not push config to ESP32 (may be offline)");
+		}
 	});
 };
 

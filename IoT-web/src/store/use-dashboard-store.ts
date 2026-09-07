@@ -27,9 +27,23 @@ export type SysInfo = {
 	uptime: string;
 };
 
-export type Theme = "light" | "dark";
+export type Theme = "light" | "dark" | "system";
 
 export type DeviceKeys = Record<DeviceKey, boolean | number>;
+
+export type DeviceSettingsState = {
+	soilDryThreshold: number;
+	soilOptimalThreshold: number;
+	waterLowThreshold: number;
+	waterCriticalThreshold: number;
+	waterWarningEnabled: boolean;
+	buzzerEnabled: boolean;
+	buzzerLowWater: boolean;
+	buzzerDrySoil: boolean;
+	buzzerSensorError: boolean;
+	fanEnabled: boolean;
+	fanSpeed: number;
+};
 
 export type SensorReadings = {
 	soilMoisture: number;
@@ -50,6 +64,7 @@ export type DashboardState = {
 	lastSeen: Date | null;
 	logs: LogEntry[];
 	theme: Theme;
+	deviceSettings: DeviceSettingsState;
 };
 
 export type DashboardActions = {
@@ -70,6 +85,7 @@ export type DashboardActions = {
 	clearLogs: () => void;
 	toggleTheme: () => void;
 	setTheme: (t: Theme) => void;
+	setDeviceSettings: (settings: Partial<DeviceSettingsState>) => void;
 };
 
 const initialSysInfo: SysInfo = {
@@ -111,6 +127,19 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 		lastSeen: null,
 		logs: [],
 		theme: (localStorage.getItem("theme") as Theme) || "light",
+		deviceSettings: {
+			soilDryThreshold: 30,
+			soilOptimalThreshold: 50,
+			waterLowThreshold: 25,
+			waterCriticalThreshold: 10,
+			waterWarningEnabled: true,
+			buzzerEnabled: true,
+			buzzerLowWater: true,
+			buzzerDrySoil: true,
+			buzzerSensorError: false,
+			fanEnabled: true,
+			fanSpeed: 65,
+		},
 
 		// ── Actions ──
 		setConnected: (connected) => set({ connected }),
@@ -155,7 +184,8 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 
 		toggleTheme: () =>
 			set((s) => {
-				const next = s.theme === "light" ? "dark" : "light";
+				const order: Theme[] = ["light", "dark", "system"];
+				const next = order[(order.indexOf(s.theme) + 1) % order.length];
 				localStorage.setItem("theme", next);
 				return { theme: next };
 			}),
@@ -164,5 +194,10 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 			localStorage.setItem("theme", theme);
 			set({ theme });
 		},
+
+		setDeviceSettings: (settings) =>
+			set((s) => ({
+				deviceSettings: { ...s.deviceSettings, ...settings },
+			})),
 	}),
 );

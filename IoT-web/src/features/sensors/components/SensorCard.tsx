@@ -3,8 +3,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import RadialGauge from "./RadialGauge";
 import { Droplets } from "lucide-react";
 
-export default function SensorCard() {
-	const moisture = useDashboardStore((s) => s.moisture);
+type SensorCardProps = {
+	dryThreshold?: number;
+	optimalThreshold?: number;
+};
+
+export default function SensorCard({ dryThreshold, optimalThreshold }: SensorCardProps) {
+	const moisture = useDashboardStore((s) => s.sensors.soilMoisture);
 
 	return (
 		<Card className="text-center h-full">
@@ -17,7 +22,11 @@ export default function SensorCard() {
 				</div>
 			</CardHeader>
 			<CardContent className="pt-0">
-				<RadialGauge value={moisture} />
+				<RadialGauge
+					value={moisture}
+					dryThreshold={dryThreshold}
+					optimalThreshold={optimalThreshold}
+				/>
 			</CardContent>
 		</Card>
 	);

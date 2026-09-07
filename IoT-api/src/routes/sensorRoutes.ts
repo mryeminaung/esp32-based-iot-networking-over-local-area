@@ -7,7 +7,7 @@ import {
   getLatestReadingHandler,
 } from "../controllers/sensorController.js";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 router.use(authenticate);
 

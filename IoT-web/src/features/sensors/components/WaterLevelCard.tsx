@@ -3,39 +3,43 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ThresholdRadialGauge from "./ThresholdRadialGauge";
 import { Waves } from "lucide-react";
 
-const waterLevelThresholds = [
-	{
-		max: 20,
-		label: "LOW",
-		hex: "#ef4444",
-		bgClass: "bg-danger/10",
-		textClass: "text-danger",
-	},
-	{
-		max: 60,
-		label: "MID",
-		hex: "#f59e0b",
-		bgClass: "bg-warning/10",
-		textClass: "text-warning",
-	},
-	{
-		max: 100,
-		label: "FULL",
-		hex: "#10b981",
-		bgClass: "bg-success/10",
-		textClass: "text-success",
-	},
-];
-
-const scaleMarkers = [
-	{ position: 0, label: "0%" },
-	{ position: 20, label: "20%" },
-	{ position: 60, label: "60%" },
-	{ position: 100, label: "100%" },
-];
-
 export default function WaterLevelCard() {
 	const waterLevel = useDashboardStore((s) => s.sensors.waterLevel);
+	const waterLowThreshold = useDashboardStore((s) => s.deviceSettings.waterLowThreshold);
+
+	// Derive bands from store thresholds
+	const midMax = Math.round((waterLowThreshold + 100) / 2);
+
+	const waterLevelThresholds = [
+		{
+			max: waterLowThreshold,
+			label: "LOW",
+			hex: "#ef4444",
+			bgClass: "bg-danger/10",
+			textClass: "text-danger",
+		},
+		{
+			max: midMax,
+			label: "MID",
+			hex: "#f59e0b",
+			bgClass: "bg-warning/10",
+			textClass: "text-warning",
+		},
+		{
+			max: 100,
+			label: "FULL",
+			hex: "#10b981",
+			bgClass: "bg-success/10",
+			textClass: "text-success",
+		},
+	];
+
+	const scaleMarkers = [
+		{ position: 0, label: "0%" },
+		{ position: waterLowThreshold, label: `${waterLowThreshold}%` },
+		{ position: midMax, label: `${midMax}%` },
+		{ position: 100, label: "100%" },
+	];
 
 	return (
 		<Card className="text-center h-full">

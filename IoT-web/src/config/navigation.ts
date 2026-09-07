@@ -2,7 +2,6 @@ import {
   LayoutDashboard,
   Activity,
   Users,
-  Server,
   Thermometer,
   Power,
   BarChart3,
@@ -26,87 +25,81 @@ export type NavSection = {
 }
 
 export const navigation: NavSection[] = [
-  {
-    // Main section - no title
-    items: [
-      {
-        path: "/",
-        label: "Dashboard",
-        icon: LayoutDashboard,
-        roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
-      },
-      {
-        path: "/sensors",
-        label: "Sensors",
-        icon: Thermometer,
-        roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
-      },
-      {
-        path: "/actuators",
-        label: "Actuators",
-        icon: Power,
-        roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
-      },
-    ],
-  },
-  {
-    title: "Analytics",
-    items: [
-      {
-        path: "/analytics",
-        label: "Analytics",
-        icon: BarChart3,
-        roles: [ROLES.FARM_MANAGER],
-      },
-      {
-        path: "/activity",
-        label: "Activity Logs",
-        icon: Activity,
-        roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER],
-      },
-    ],
-  },
-  {
-    title: "Management",
-    items: [
-      {
-        path: "/users",
-        label: "Users",
-        icon: Users,
-        roles: [ROLES.FARM_MANAGER],
-      },
-      {
-        path: "/devices",
-        label: "Device Info",
-        icon: Server,
-        roles: [ROLES.TECHNICIAN],
-      },
-      {
-        path: "/device-settings",
-        label: "Device Settings",
-        icon: SlidersHorizontal,
-        roles: [ROLES.FARM_MANAGER],
-      },
-      {
-        path: "/diagnostics",
-        label: "Diagnostics",
-        icon: Stethoscope,
-        roles: [ROLES.TECHNICIAN],
-      },
-    ],
-  },
-  {
-    // Settings - separated at bottom
-    items: [
-      {
-        path: "/settings",
-        label: "Settings",
-        icon: Settings,
-        roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
-      },
-    ],
-  },
-]
+	{
+		title: "Overview",
+		items: [
+			{
+				path: "/",
+				label: "Dashboard",
+				icon: LayoutDashboard,
+				roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
+			},
+			{
+				path: "/sensors",
+				label: "Sensors",
+				icon: Thermometer,
+				roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
+			},
+			{
+				path: "/actuators",
+				label: "Actuators",
+				icon: Power,
+				roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
+			},
+		],
+	},
+	{
+		title: "Management",
+		items: [
+			{
+				path: "/users",
+				label: "Users",
+				icon: Users,
+				roles: [ROLES.FARM_MANAGER],
+			},
+			{
+				path: "/device-settings",
+				label: "Device Settings",
+				icon: SlidersHorizontal,
+				roles: [ROLES.FARM_MANAGER],
+			},
+			{
+				path: "/diagnostics",
+				label: "Diagnostics",
+				icon: Stethoscope,
+				roles: [ROLES.TECHNICIAN],
+			},
+		],
+	},
+	{
+		title: "Analytics",
+		items: [
+			{
+				path: "/analytics",
+				label: "Analytics",
+				icon: BarChart3,
+				roles: [ROLES.FARM_MANAGER],
+			},
+			{
+				path: "/activity",
+				label: "Activity Logs",
+				icon: Activity,
+				roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER],
+			},
+		],
+	},
+	{
+		// Settings - separated at bottom
+		items: [
+			{
+				path: "/settings",
+				label: "Settings",
+				icon: Settings,
+				roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
+			},
+		],
+	},
+];
 
 // Filter navigation sections by role
 export function getNavSections(role: string | undefined): NavSection[] {
