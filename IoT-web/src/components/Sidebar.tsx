@@ -67,8 +67,8 @@ export default memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
 							<div className="space-y-1">
 								{section.items.map((item) => {
 									const isActive =
-										item.path === "/"
-											? location.pathname === "/"
+										item.path === "/dashboard"
+											? location.pathname === "/dashboard"
 											: location.pathname.startsWith(item.path);
 
 									return (

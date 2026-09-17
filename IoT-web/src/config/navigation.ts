@@ -29,7 +29,7 @@ export const navigation: NavSection[] = [
 		title: "Overview",
 		items: [
 			{
-				path: "/",
+				path: "/dashboard",
 				label: "Dashboard",
 				icon: LayoutDashboard,
 				roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],

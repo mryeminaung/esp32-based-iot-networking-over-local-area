@@ -12,6 +12,7 @@ import LoginPage from "@/features/auth/LoginPage";
 import DashboardPage from "@/features/dashboard/DashboardPage";
 import DeviceSettingsPage from "@/features/device-settings/DeviceSettingsPage";
 import DiagnosticsPage from "@/features/diagnostics/DiagnosticsPage";
+import LandingPage from "@/features/landing/LandingPage";
 import SensorsPage from "@/features/sensors/SensorsPage";
 import SettingsLayout from "@/features/settings/SettingsLayout";
 import AccountPage from "@/features/settings/pages/AccountPage";
@@ -29,13 +30,17 @@ export default function App() {
 				<AuthInitializer>
 					<Routes>
 						<Route
+							path="/"
+							element={<LandingPage />}
+						/>
+						<Route
 							path="/login"
 							element={<LoginPage />}
 						/>
 						<Route element={<ProtectedRoute />}>
 							<Route element={<AppLayout />}>
 								<Route
-									index
+									path="/dashboard"
 									element={<DashboardPage />}
 								/>
 								<Route

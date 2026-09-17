@@ -10,7 +10,7 @@ export default function RoleRoute({ allowedRoles }: RoleRouteProps) {
   const { user } = useAuthStore()
 
   if (!user || !allowedRoles.includes(user.role as Role)) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/dashboard" replace />
   }
 
   return <Outlet />
