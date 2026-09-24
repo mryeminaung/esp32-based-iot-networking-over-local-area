@@ -5,7 +5,6 @@ const DEVICES = [
   "yellow_light",
   "green_light",
   "white_light",
-  "fan",
   "relay",
   "water_pump",
   "buzzer",

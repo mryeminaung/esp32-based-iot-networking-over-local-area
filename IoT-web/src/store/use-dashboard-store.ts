@@ -41,8 +41,6 @@ export type DeviceSettingsState = {
 	buzzerLowWater: boolean;
 	buzzerDrySoil: boolean;
 	buzzerSensorError: boolean;
-	fanEnabled: boolean;
-	fanSpeed: number;
 };
 
 export type SensorReadings = {
@@ -137,8 +135,6 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 			buzzerLowWater: true,
 			buzzerDrySoil: true,
 			buzzerSensorError: false,
-			fanEnabled: true,
-			fanSpeed: 65,
 		},
 
 		// ── Actions ──

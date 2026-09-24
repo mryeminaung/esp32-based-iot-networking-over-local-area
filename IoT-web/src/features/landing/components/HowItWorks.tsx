@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Cpu, BarChart3, Zap } from "lucide-react";
+import { BarChart3, Cpu, Zap } from "lucide-react";
 
 const STEPS = [
 	{
@@ -7,7 +7,7 @@ const STEPS = [
 		step: "01",
 		title: "Connect Sensors",
 		description:
-			"ESP32 reads DHT22, capacitive soil sensor, BH1750, MQ-135, and water level sensor every second.",
+			"ESP32 reads DHT22, Resistive soil sensor, BH1750, and water level sensor every second.",
 		iconBg: "bg-green-500/15",
 		iconColor: "text-green-400",
 		dotColor: "bg-green-500",
@@ -27,7 +27,7 @@ const STEPS = [
 		step: "03",
 		title: "Automate & Act",
 		description:
-			"Threshold-based automation rules trigger irrigation pumps, grow lights, and fans — with manual override support.",
+			"Threshold-based automation rules trigger irrigation pumps and grow lights — with manual override support.",
 		iconBg: "bg-amber-500/15",
 		iconColor: "text-amber-400",
 		dotColor: "bg-amber-500",
@@ -46,8 +46,7 @@ export default function HowItWorks() {
 					transition={{ duration: 0.6 }}
 					className="text-center mb-16">
 					<h2 className="text-3xl sm:text-4xl font-bold text-text-primary">
-						How It{" "}
-						<span className="text-green-600">Works</span>
+						How It <span className="text-green-600">Works</span>
 					</h2>
 					<p className="mt-4 text-text-muted max-w-xl mx-auto">
 						From sensor to screen in three simple steps — fully automated, fully

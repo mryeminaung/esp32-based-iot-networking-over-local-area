@@ -11,7 +11,6 @@ import {
 } from "@/api/deviceSettings";
 import SoilMoistureCard from "./components/SoilMoistureCard";
 import WaterLevelCard from "./components/WaterLevelCard";
-import FanConfigCard from "./components/FanConfigCard";
 import BuzzerConfigCard from "./components/BuzzerConfigCard";
 import {
   apiToSettings,
@@ -23,7 +22,6 @@ import type { DeviceSettings } from "./types";
 const INITIAL_SETTINGS: DeviceSettings = {
   soilMoisture: { dryThreshold: 30, optimalThreshold: 50 },
   waterLevel: { lowThreshold: 25, criticalThreshold: 10, warningEnabled: true },
-  fan: { enabled: true, speed: 65 },
   buzzer: { enabled: true, lowWater: true, drySoil: true, sensorError: false },
 };
 
@@ -75,8 +73,6 @@ export default function DeviceSettingsPage() {
         buzzerLowWater: settings.buzzer.lowWater,
         buzzerDrySoil: settings.buzzer.drySoil,
         buzzerSensorError: settings.buzzer.sensorError,
-        fanEnabled: settings.fan.enabled,
-        fanSpeed: settings.fan.speed,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -133,13 +129,6 @@ export default function DeviceSettingsPage() {
             update("waterLevel", field, value)
           }
           onWarningToggle={(val) => update("waterLevel", "warningEnabled", val)}
-        />
-
-        <FanConfigCard
-          enabled={settings.fan.enabled}
-          speed={settings.fan.speed}
-          onEnabledChange={(val) => update("fan", "enabled", val)}
-          onSpeedChange={(val) => update("fan", "speed", val)}
         />
 
         <BuzzerConfigCard

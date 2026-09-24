@@ -1,14 +1,13 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-	Thermometer,
 	Droplets,
-	Sun,
-	Wind,
-	Waves,
 	Sprout,
+	Sun,
+	Thermometer,
+	Waves,
 	type LucideIcon,
 } from "lucide-react";
+import { useState } from "react";
 
 type Sensor = {
 	icon: LucideIcon;
@@ -29,7 +28,8 @@ const SENSORS: Sensor[] = [
 		iconBg: "bg-red-500/15",
 		what: "Measures ambient air temperature using a DHT22 digital sensor with ±0.5°C accuracy.",
 		why: "Temperature directly affects crop growth rate, flowering, and fruit development. Monitoring prevents heat stress and frost damage.",
-		where: "Mounted above the crop canopy inside the greenhouse or open field monitoring station.",
+		where:
+			"Mounted above the crop canopy inside the greenhouse or open field monitoring station.",
 		features: [
 			"DHT22 digital sensor",
 			"Range: -40°C to 80°C",
@@ -44,7 +44,8 @@ const SENSORS: Sensor[] = [
 		iconBg: "bg-blue-500/15",
 		what: "Tracks relative humidity in the air using the DHT22 sensor paired with temperature measurement.",
 		why: "High humidity promotes fungal diseases; low humidity causes wilting. Maintaining 40–70% RH is critical for most crops.",
-		where: "Co-located with the temperature sensor, positioned at canopy level for accurate readings.",
+		where:
+			"Co-located with the temperature sensor, positioned at canopy level for accurate readings.",
 		features: [
 			"DHT22 combined sensor",
 			"Range: 0–100% RH",
@@ -59,7 +60,8 @@ const SENSORS: Sensor[] = [
 		iconBg: "bg-green-500/15",
 		what: "Capacitive soil moisture sensor measures volumetric water content in the root zone without corroding.",
 		why: "Over-watering wastes water and causes root rot; under-watering stunts growth. Precise monitoring enables data-driven irrigation.",
-		where: "Buried 5–10 cm deep in the soil near the root zone of primary crops.",
+		where:
+			"Buried 5–10 cm deep in the soil near the root zone of primary crops.",
 		features: [
 			"Capacitive (no corrosion)",
 			"Analog output on GPIO 34",
@@ -74,27 +76,13 @@ const SENSORS: Sensor[] = [
 		iconBg: "bg-yellow-500/15",
 		what: "BH1750 digital lux sensor measures ambient light intensity in lux for photosynthesis optimization.",
 		why: "Insufficient light reduces yield; excessive light can scorch leaves. Light data drives grow-light and shading automation.",
-		where: "Mounted at the top of the monitoring station, facing upward with an unobstructed view.",
+		where:
+			"Mounted at the top of the monitoring station, facing upward with an unobstructed view.",
 		features: [
 			"BH1750 I²C digital sensor",
 			"Range: 1 – 65535 lux",
 			"High resolution: 1 lux",
 			"Drives LED grow-light control",
-		],
-	},
-	{
-		icon: Wind,
-		title: "Air Quality",
-		color: "text-purple-400",
-		iconBg: "bg-purple-500/15",
-		what: "MQ-135 analog gas sensor detects NH₃, NOₓ, CO₂, benzene, and smoke for environmental safety.",
-		why: "Poor air quality from pesticides, exhaust, or buildup of gases harms both crops and farm workers. Alerts enable timely ventilation.",
-		where: "Placed inside enclosed greenhouse areas or near pesticide storage zones.",
-		features: [
-			"MQ-135 gas sensor",
-			"Detects NH₃, NOₓ, CO₂, benzene",
-			"Analog + digital output",
-			"Triggers fan ventilation",
 		],
 	},
 	{
@@ -104,7 +92,8 @@ const SENSORS: Sensor[] = [
 		iconBg: "bg-cyan-500/15",
 		what: "Ultrasonic distance sensor measures water level in tanks and reservoirs for supply management.",
 		why: "Running dry mid-irrigation damages pumps and stresses crops. Continuous monitoring prevents water shortages.",
-		where: "Mounted at the top of water tanks, facing downward toward the water surface.",
+		where:
+			"Mounted at the top of water tanks, facing downward toward the water surface.",
 		features: [
 			"Ultrasonic distance measurement",
 			"Non-contact (no corrosion)",
@@ -130,8 +119,7 @@ export default function FeaturesSection() {
 					transition={{ duration: 0.6 }}
 					className="text-center mb-16">
 					<h2 className="text-3xl sm:text-4xl font-bold text-text-primary">
-						Six Sensors,{" "}
-						<span className="text-green-600">One Dashboard</span>
+						Six Sensors, <span className="text-green-600">One Dashboard</span>
 					</h2>
 					<p className="mt-4 text-text-muted max-w-xl mx-auto">
 						Every critical environmental metric from your farm, collected every
@@ -178,7 +166,7 @@ export default function FeaturesSection() {
 					</div>
 
 					{/* Right: detail panel */}
-					<div className="bg-bg-card border border-border rounded-2xl p-6 sm:p-8 min-h-[380px]">
+					<div className="bg-bg-card border border-border rounded-2xl p-6 sm:p-8z">
 						<AnimatePresence mode="wait">
 							<motion.div
 								key={active}

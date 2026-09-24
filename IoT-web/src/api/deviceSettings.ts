@@ -7,8 +7,6 @@ export type DeviceSettings = {
   waterLowThreshold: number;
   waterCriticalThreshold: number;
   waterWarningEnabled: boolean;
-  fanEnabled: boolean;
-  fanSpeed: number;
   buzzerEnabled: boolean;
   buzzerLowWater: boolean;
   buzzerDrySoil: boolean;

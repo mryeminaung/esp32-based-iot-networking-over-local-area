@@ -35,8 +35,6 @@ export default function AuthInitializer({
           buzzerLowWater: s.buzzer.lowWater,
           buzzerDrySoil: s.buzzer.drySoil,
           buzzerSensorError: s.buzzer.sensorError,
-          fanEnabled: s.fan.enabled,
-          fanSpeed: s.fan.speed,
         })
       })
       .catch(() => {

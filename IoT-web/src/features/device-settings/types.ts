@@ -12,10 +12,6 @@ export type DeviceSettings = {
     criticalThreshold: number;
     warningEnabled: boolean;
   };
-  fan: {
-    enabled: boolean;
-    speed: number;
-  };
   buzzer: {
     enabled: boolean;
     lowWater: boolean;
@@ -36,10 +32,6 @@ export function apiToSettings(api: ApiDeviceSettings): DeviceSettings {
       criticalThreshold: api.waterCriticalThreshold,
       warningEnabled: api.waterWarningEnabled,
     },
-    fan: {
-      enabled: api.fanEnabled,
-      speed: api.fanSpeed,
-    },
     buzzer: {
       enabled: api.buzzerEnabled,
       lowWater: api.buzzerLowWater,
@@ -57,8 +49,6 @@ export function settingsToApi(settings: DeviceSettings): Partial<ApiDeviceSettin
     waterLowThreshold: settings.waterLevel.lowThreshold,
     waterCriticalThreshold: settings.waterLevel.criticalThreshold,
     waterWarningEnabled: settings.waterLevel.warningEnabled,
-    fanEnabled: settings.fan.enabled,
-    fanSpeed: settings.fan.speed,
     buzzerEnabled: settings.buzzer.enabled,
     buzzerLowWater: settings.buzzer.lowWater,
     buzzerDrySoil: settings.buzzer.drySoil,

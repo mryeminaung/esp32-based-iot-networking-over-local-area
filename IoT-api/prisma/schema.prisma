@@ -74,8 +74,6 @@ model DeviceSettings {
   waterLowThreshold      Float    @default(25)
   waterCriticalThreshold Float    @default(10)
   waterWarningEnabled    Boolean  @default(true)
-  fanEnabled             Boolean  @default(true)
-  fanSpeed               Int      @default(65)
   buzzerEnabled          Boolean  @default(true)
   buzzerLowWater         Boolean  @default(true)
   buzzerDrySoil          Boolean  @default(true)

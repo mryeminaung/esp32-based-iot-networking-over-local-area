@@ -73,9 +73,9 @@ export default function HeroSection() {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.7, delay: 0.3 }}
 					className="mt-6 text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-					Monitor soil moisture, temperature, humidity, light, and air quality
-					in real-time. Automate irrigation and lighting with intelligent
-					threshold-based controls.
+					Monitor soil moisture, temperature, humidity and light in real-time.
+					Automate irrigation and lighting with intelligent threshold-based
+					controls.
 				</motion.p>
 
 				{/* CTA Buttons */}

@@ -184,122 +184,126 @@ export default function ManagerDashboard() {
 						))}
 					</div>
 
-					{/* Device overview */}
-					<motion.div
-						custom={4}
-						variants={fadeInUp}
-						initial="hidden"
-						animate="visible">
-						<Card>
-							<CardContent className="space-y-4">
-								<h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-									<Server
-										size={15}
-										className="text-text-muted"
-									/>
-									Device Status
-								</h2>
+					{/* Device Status + Quick Actions side-by-side */}
+					<div className="grid gap-4 lg:grid-cols-2">
+						{/* Device Status (left) */}
+						<motion.div
+							custom={4}
+							variants={fadeInUp}
+							initial="hidden"
+							animate="visible">
+							<Card className="h-full">
+								<CardContent className="space-y-4 h-full flex flex-col">
+									<h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+										<Server
+											size={15}
+											className="text-text-muted"
+										/>
+										Device Status
+									</h2>
 
-								<div className="grid gap-3 sm:grid-cols-2">
-									{DEVICE_GROUPS.map((group) => {
-										const activeCount = group.items.filter(
-											(d) => devices[d.key as keyof typeof devices],
-										).length;
-										return (
-											<div
-												key={group.label}
-												className="flex items-center gap-3 p-3 rounded-xl bg-bg-muted">
-												<div className="w-9 h-9 rounded-lg bg-bg-card border border-border flex items-center justify-center shrink-0">
-													<group.icon className="w-4 h-4 text-text-muted" />
-												</div>
-												<div className="flex-1 min-w-0">
-													<p className="text-sm font-medium text-text-primary">
-														{group.label}
-													</p>
-													<div className="flex gap-1.5 mt-1.5">
-														{group.items.map((d) => (
-															<span
-																key={d.key}
-																title={d.name}
-																className={`w-2 h-2 rounded-full transition-all duration-300 ${
-																	devices[d.key as keyof typeof devices]
-																		? d.dot
-																		: "bg-border"
-																}`}
-															/>
-														))}
+									<div className="grid gap-3 sm:grid-cols-2 flex-1">
+										{DEVICE_GROUPS.map((group) => {
+											const activeCount = group.items.filter(
+												(d) => devices[d.key as keyof typeof devices],
+											).length;
+											return (
+												<div
+													key={group.label}
+													className="flex items-center gap-3 p-3 rounded-xl bg-bg-muted">
+													<div className="w-9 h-9 rounded-lg bg-bg-card border border-border flex items-center justify-center shrink-0">
+														<group.icon className="w-4 h-4 text-text-muted" />
 													</div>
+													<div className="flex-1 min-w-0">
+														<p className="text-sm font-medium text-text-primary">
+															{group.label}
+														</p>
+														<div className="flex gap-1.5 mt-1.5">
+															{group.items.map((d) => (
+																<span
+																	key={d.key}
+																	title={d.name}
+																	className={`w-2 h-2 rounded-full transition-all duration-300 ${
+																		devices[d.key as keyof typeof devices]
+																			? d.dot
+																			: "bg-border"
+																	}`}
+																/>
+															))}
+														</div>
+													</div>
+													<span
+														className={`text-xs font-semibold tabular-nums ${
+															activeCount > 0 ? "text-success" : "text-text-muted"
+														}`}>
+														{activeCount}/{group.items.length}
+													</span>
 												</div>
-												<span
-													className={`text-xs font-semibold tabular-nums ${
-														activeCount > 0 ? "text-success" : "text-text-muted"
-													}`}>
-													{activeCount}/{group.items.length}
+											);
+										})}
+									</div>
+
+									{/* Soil moisture bar */}
+									<div className="p-3 rounded-xl bg-bg-muted">
+										<div className="flex items-center justify-between mb-2">
+											<div className="flex items-center gap-2">
+												<Droplets
+													size={14}
+													className="text-water"
+												/>
+												<span className="text-xs font-medium text-text-primary">
+													Soil Moisture
 												</span>
 											</div>
-										);
-									})}
-								</div>
-
-								{/* Soil moisture bar */}
-								<div className="p-3 rounded-xl bg-bg-muted">
-									<div className="flex items-center justify-between mb-2">
-										<div className="flex items-center gap-2">
-											<Droplets
-												size={14}
-												className="text-water"
-											/>
-											<span className="text-xs font-medium text-text-primary">
-												Soil Moisture
+											<span className="text-xs font-bold text-text-primary">
+												{moisture}%
 											</span>
 										</div>
-										<span className="text-xs font-bold text-text-primary">
-											{moisture}%
-										</span>
+										<div className="w-full h-1.5 rounded-full bg-border overflow-hidden">
+											<div
+												className="h-full rounded-full bg-gradient-to-r from-water to-blue-400 transition-all duration-500"
+												style={{ width: `${moisture}%` }}
+											/>
+										</div>
 									</div>
-									<div className="w-full h-1.5 rounded-full bg-border overflow-hidden">
-										<div
-											className="h-full rounded-full bg-gradient-to-r from-water to-blue-400 transition-all duration-500"
-											style={{ width: `${moisture}%` }}
-										/>
-									</div>
-								</div>
-							</CardContent>
-						</Card>
-					</motion.div>
+								</CardContent>
+							</Card>
+						</motion.div>
 
-					{/* Quick actions */}
-					<motion.div
-						custom={5}
-						variants={fadeInUp}
-						initial="hidden"
-						animate="visible">
-						<h2 className="text-sm font-semibold text-text-primary mb-3">
-							Quick Actions
-						</h2>
-						<div className="grid gap-3 sm:grid-cols-3">
-							{QUICK_ACTIONS.map((action) => {
-								const Icon = action.icon;
-								return (
-									<button
-										key={action.label}
-										onClick={() => navigate(action.path)}
-										className="flex items-center gap-3 p-4 rounded-xl bg-bg-card border border-border hover:border-green/30 transition-all group text-left">
-										<div
-											className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${action.color}`}>
-											<Icon className="w-5 h-5" />
-										</div>
-										<div className="flex-1 min-w-0">
-											<p className="text-sm font-medium text-text-primary">
-												{action.label}
-											</p>
-										</div>
-										<ArrowRight className="w-4 h-4 text-text-muted group-hover:text-green transition-colors" />
-									</button>
-								);
-							})}
-						</div>
-					</motion.div>
+						{/* Quick Actions (right) */}
+						<motion.div
+							custom={5}
+							variants={fadeInUp}
+							initial="hidden"
+							animate="visible"
+							className="flex flex-col">
+							<h2 className="text-sm font-semibold text-text-primary mb-3">
+								Quick Actions
+							</h2>
+							<div className="grid gap-3 flex-1">
+								{QUICK_ACTIONS.map((action) => {
+									const Icon = action.icon;
+									return (
+										<button
+											key={action.label}
+											onClick={() => navigate(action.path)}
+											className="flex items-center gap-3 p-4 rounded-xl bg-bg-card border border-border hover:border-green/30 transition-all group text-left">
+											<div
+												className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${action.color}`}>
+												<Icon className="w-5 h-5" />
+											</div>
+											<div className="flex-1 min-w-0">
+												<p className="text-sm font-medium text-text-primary">
+													{action.label}
+												</p>
+											</div>
+											<ArrowRight className="w-4 h-4 text-text-muted group-hover:text-green transition-colors" />
+										</button>
+									);
+								})}
+							</div>
+						</motion.div>
+					</div>
 				</>
 			)}
 		</>
