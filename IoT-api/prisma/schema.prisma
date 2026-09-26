@@ -78,6 +78,7 @@ model DeviceSettings {
   buzzerLowWater         Boolean  @default(true)
   buzzerDrySoil          Boolean  @default(true)
   buzzerSensorError      Boolean  @default(false)
+  lightLowThreshold      Int      @default(30)
   createdAt              DateTime @default(now()) @map("created_at")
   updatedAt              DateTime @updatedAt @map("updated_at")
 

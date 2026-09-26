@@ -41,6 +41,7 @@ export type DeviceSettingsState = {
 	buzzerLowWater: boolean;
 	buzzerDrySoil: boolean;
 	buzzerSensorError: boolean;
+	lightLowThreshold: number;
 };
 
 export type SensorReadings = {
@@ -135,6 +136,7 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 			buzzerLowWater: true,
 			buzzerDrySoil: true,
 			buzzerSensorError: false,
+			lightLowThreshold: 30,
 		},
 
 		// ── Actions ──

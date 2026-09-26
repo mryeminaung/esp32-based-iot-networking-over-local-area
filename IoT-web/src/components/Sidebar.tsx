@@ -1,31 +1,32 @@
-import { getNavSections } from "@/config/navigation"
-import { useAuthStore } from "@/store/use-auth-store"
-import { memo } from "react"
-import { NavLink, useLocation } from "react-router"
+import { getNavSections } from "@/config/navigation";
+import { useAuthStore } from "@/store/use-auth-store";
+import { memo } from "react";
+import { NavLink, useLocation } from "react-router";
 
 type SidebarProps = {
-  collapsed: boolean
-  onToggle: () => void
-}
+	collapsed: boolean;
+	onToggle: () => void;
+};
 
 export default memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
-  const user = useAuthStore((s) => s.user)
-  const location = useLocation()
-  const sections = getNavSections(user?.role)
+	const user = useAuthStore((s) => s.user);
+	const location = useLocation();
+	const sections = getNavSections(user?.role);
 
-  return (
+	return (
 		<aside
-			onClick={(e) => {
+			onClick={() => {
 				// Only close on mobile — desktop sidebar doesn't close on background click
-				if (window.innerWidth < 768) onToggle()
+				if (window.innerWidth < 768) onToggle();
 			}}
 			className={`fixed left-0 top-0 h-full z-40 flex flex-col transition-[width] duration-300 max-md:w-screen max-md:bg-transparent ${
 				collapsed ? "w-[72px]" : "w-56"
 			}`}>
 			{/* Inner card — fixed width, has background */}
-			<div className={`h-full flex flex-col bg-bg-card border-r border-border ${
-				collapsed ? "w-[72px]" : "w-56"
-			}`}>
+			<div
+				className={`h-full flex flex-col bg-bg-card border-r border-border ${
+					collapsed ? "w-[72px]" : "w-56"
+				}`}>
 				{/* Brand */}
 				<div className="flex items-center gap-2.5 px-4 h-16 border-b border-border shrink-0">
 					<img
@@ -38,7 +39,9 @@ export default memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
 							<h1 className="text-[12px]  font-bold text-text-primary truncate">
 								Smart Agriculture
 							</h1>
-							<span className="text-[0.65rem] text-text-muted">IoT Monitoring System</span>
+							<span className="text-[0.65rem] text-text-muted">
+								IoT Monitoring System
+							</span>
 						</div>
 					)}
 				</div>
@@ -93,4 +96,4 @@ export default memo(function Sidebar({ collapsed, onToggle }: SidebarProps) {
 			</div>
 		</aside>
 	);
-})
+});

@@ -31,6 +31,7 @@ export async function updateSettings(data: Record<string, unknown>) {
     buzzerEnabled: settings.buzzerEnabled,
     buzzerLowWater: settings.buzzerLowWater,
     buzzerDrySoil: settings.buzzerDrySoil,
+    lightLowThreshold: settings.lightLowThreshold,
   }).catch(() => {
     /* already logged inside sendConfigToESP32 */
   });

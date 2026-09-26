@@ -1,30 +1,29 @@
-import { getSensorReadings, type SensorReading } from "@/api/sensors";
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useHeader } from "@/hooks/useHeader";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useDashboardStore } from "@/store/use-dashboard-store";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import {
+	AreaChart,
+	Area,
+	XAxis,
+	YAxis,
+	Tooltip,
+	ResponsiveContainer,
+	CartesianGrid,
+} from "recharts";
 import {
 	AlertTriangle,
 	Bell,
 	Droplets,
 	Power,
-	RefreshCw,
 	Sun,
 	Thermometer,
 	Waves,
 	Wind,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import {
-	Area,
-	AreaChart,
-	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis,
-} from "recharts";
 import RadialGauge from "./components/RadialGauge";
 import SensorHealthCard from "./components/SensorHealthCard";
 import ThresholdRadialGauge from "./components/ThresholdRadialGauge";
@@ -36,23 +35,24 @@ const HIGH_COLOR = "#10b981";
 
 // ── Threshold configs per sensor ──
 
+// ESP32 outputs 0-100 for light (mapped from raw analog 0-4095)
 const lightThresholds = [
 	{
-		max: 200,
+		max: 30,
 		label: "LOW",
 		hex: LOW_COLOR,
 		bgClass: "bg-red-100 dark:bg-red-900/30",
 		textClass: "text-red-600",
 	},
 	{
-		max: 600,
+		max: 70,
 		label: "MED",
 		hex: MED_COLOR,
 		bgClass: "bg-amber-100 dark:bg-amber-900/30",
 		textClass: "text-amber-600",
 	},
 	{
-		max: 1024,
+		max: 100,
 		label: "HIGH",
 		hex: HIGH_COLOR,
 		bgClass: "bg-green-100 dark:bg-green-900/30",
@@ -60,23 +60,25 @@ const lightThresholds = [
 	},
 ];
 
+// ESP32 outputs 0-100 for air quality (mapped from raw analog 0-4095)
+// Lower = better air, Higher = worse air
 const airQualityThresholds = [
 	{
-		max: 150,
+		max: 30,
 		label: "LOW",
 		hex: HIGH_COLOR,
 		bgClass: "bg-green-100 dark:bg-green-900/30",
 		textClass: "text-green-600",
 	},
 	{
-		max: 300,
+		max: 70,
 		label: "MED",
 		hex: MED_COLOR,
 		bgClass: "bg-amber-100 dark:bg-amber-900/30",
 		textClass: "text-amber-600",
 	},
 	{
-		max: 500,
+		max: 100,
 		label: "HIGH",
 		hex: LOW_COLOR,
 		bgClass: "bg-red-100 dark:bg-red-900/30",
@@ -151,160 +153,103 @@ const deviceList = [
 	},
 ];
 
-// ── Chart sensor card (area chart with recent readings) ──
-function ChartSensorCard({
+// ── Live chart card — subscribes to store, shows rolling buffer ──
+const MAX_POINTS = 30;
+
+function LiveChartCard({
 	icon: Icon,
 	iconColor,
 	title,
-	currentValue,
 	unit,
+	color,
 	sensorKey,
-	chartColor,
 }: {
 	icon: React.ComponentType<{ size?: number; className?: string }>;
 	iconColor: string;
 	title: string;
-	currentValue: number;
 	unit: string;
-	sensorKey: keyof Pick<SensorReading, "temperature" | "humidity">;
-	chartColor: string;
+	color: string;
+	sensorKey: "temperature" | "humidity";
 }) {
-	const [readings, setReadings] = useState<
-		{ time: string; value: number | null }[]
-	>([]);
-	const [loading, setLoading] = useState(true);
-
-	const fetchData = async () => {
-		try {
-			const { readings: data } = await getSensorReadings({ limit: 20 });
-			const chartData = data
-				.map((r) => ({
-					time: new Date(r.createdAt).toLocaleTimeString([], {
-						hour: "2-digit",
-						minute: "2-digit",
-					}),
-					value: r[sensorKey],
-				}))
-				.filter((d): d is { time: string; value: number } => d.value !== null);
-			setReadings(chartData);
-		} catch {
-			// ignore fetch errors
-		} finally {
-			setLoading(false);
-		}
-	};
+	const value = useDashboardStore((s) => s.sensors[sensorKey]);
+	const [data, setData] = useState<{ time: string; value: number }[]>([]);
+	const lastRef = useRef<number | null>(null);
 
 	useEffect(() => {
-		fetchData();
-	}, []);
+		if (value === lastRef.current) return;
+		lastRef.current = value;
+		const now = new Date();
+		const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+		setData((prev) => {
+			const next = [...prev, { time, value }];
+			return next.length > MAX_POINTS ? next.slice(-MAX_POINTS) : next;
+		});
+	}, [value]);
 
 	return (
 		<Card className="h-full">
 			<CardHeader className="pb-1">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2">
-						<Icon
-							size={16}
-							className={iconColor}
-						/>
+						<Icon size={16} className={iconColor} />
 						<h2 className="text-sm font-semibold text-text-primary">{title}</h2>
 					</div>
-					<div className="flex items-center gap-2">
-						<span className="text-lg font-bold text-text-primary">
-							{currentValue}
-							<span className="text-xs font-normal text-text-muted ml-0.5">
-								{unit}
-							</span>
-						</span>
-						<button
-							onClick={fetchData}
-							className="p-1 rounded-md hover:bg-muted transition-colors cursor-pointer"
-							title="Refresh">
-							<RefreshCw
-								size={14}
-								className="text-text-muted"
-							/>
-						</button>
-					</div>
+					<span className="text-lg font-bold text-text-primary">
+						{value}
+						<span className="text-xs font-normal text-text-muted ml-0.5">{unit}</span>
+					</span>
 				</div>
 			</CardHeader>
 			<CardContent className="pt-0">
-				{/* Chart */}
-				<div className="h-[120px] w-full">
-					{loading ? (
-						<div className="h-full flex items-center justify-center text-text-muted text-xs">
-							Loading...
-						</div>
-					) : readings.length > 0 ? (
-						<ResponsiveContainer
-							width="100%"
-							height="100%">
-							<AreaChart
-								data={readings}
-								margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+				<div className="h-[140px] w-full">
+					{data.length > 1 ? (
+						<ResponsiveContainer width="100%" height="100%">
+							<AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
 								<defs>
-									<linearGradient
-										id={`gradient-${sensorKey}`}
-										x1="0"
-										y1="0"
-										x2="0"
-										y2="1">
-										<stop
-											offset="0%"
-											stopColor={chartColor}
-											stopOpacity={0.3}
-										/>
-										<stop
-											offset="100%"
-											stopColor={chartColor}
-											stopOpacity={0.05}
-										/>
+									<linearGradient id={`live-${sensorKey}`} x1="0" y1="0" x2="0" y2="1">
+										<stop offset="5%" stopColor={color} stopOpacity={0.3} />
+										<stop offset="95%" stopColor={color} stopOpacity={0} />
 									</linearGradient>
 								</defs>
+								<CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
 								<XAxis
 									dataKey="time"
-									tick={{
-										fontSize: 10,
-										fill: "var(--color-text-muted, #94a3b8)",
-									}}
+									tick={{ fontSize: 10, fill: "var(--text-muted)" }}
 									axisLine={false}
 									tickLine={false}
 									interval="preserveStartEnd"
 								/>
 								<YAxis
-									domain={[0, 100]}
-									tick={{
-										fontSize: 10,
-										fill: "var(--color-text-muted, #94a3b8)",
-									}}
+									domain={[0, "auto"]}
+									tick={{ fontSize: 10, fill: "var(--text-muted)" }}
 									axisLine={false}
 									tickLine={false}
-									width={30}
-									ticks={[0, 25, 50, 75, 100]}
+									width={35}
 								/>
 								<Tooltip
 									contentStyle={{
-										backgroundColor: "var(--color-bg-card, #fff)",
-										border: "1px solid var(--color-border, #e2e8f0)",
+										background: "var(--bg-card)",
+										border: "1px solid var(--border)",
 										borderRadius: "8px",
 										fontSize: "12px",
+										boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
 									}}
-									formatter={(value: number) => [`${value}${unit}`, title]}
+									formatter={(val: number) => [`${val}${unit}`, title]}
 								/>
 								<Area
 									type="monotone"
 									dataKey="value"
-									stroke={chartColor}
+									stroke={color}
 									strokeWidth={2}
-									fill={`url(#gradient-${sensorKey})`}
+									fill={`url(#live-${sensorKey})`}
 									dot={false}
-									activeDot={{ r: 4, fill: chartColor }}
+									activeDot={{ r: 4, strokeWidth: 0 }}
 								/>
 							</AreaChart>
 						</ResponsiveContainer>
 					) : (
 						<div className="h-full flex items-center justify-center text-text-muted text-xs">
-							No data yet
+							Collecting data...
 						</div>
 					)}
 				</div>
@@ -316,7 +261,6 @@ function ChartSensorCard({
 // ── Stat card (for light, air quality) ──
 function StatSensorCard({
 	icon: Icon,
-	iconColor,
 	title,
 	value,
 	unit,
@@ -446,7 +390,7 @@ export default function SensorsPage() {
 						</h2>
 					</CardHeader>
 					<CardContent className="space-y-4">
-						<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+						<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
 							{deviceList.map((device, i) => {
 								const isOn = !!devices[device.key];
 								const Icon = device.icon;
@@ -539,21 +483,20 @@ export default function SensorsPage() {
 				</motion.div>
 			</div>
 
-			{/* Row 3: Temperature + Humidity — area charts */}
+			{/* Row 3: Temperature + Humidity — live charts */}
 			<div className="grid gap-5 grid-cols-1 md:grid-cols-2">
 				<motion.div
 					custom={0}
 					variants={fadeInUp}
 					initial="hidden"
 					animate="visible">
-					<ChartSensorCard
+					<LiveChartCard
 						icon={Thermometer}
 						iconColor="text-cyan-500"
 						title="Temperature"
-						currentValue={sensors.temperature}
 						unit="°C"
+						color="#06b6d4"
 						sensorKey="temperature"
-						chartColor="#06b6d4"
 					/>
 				</motion.div>
 				<motion.div
@@ -561,14 +504,13 @@ export default function SensorsPage() {
 					variants={fadeInUp}
 					initial="hidden"
 					animate="visible">
-					<ChartSensorCard
+					<LiveChartCard
 						icon={Droplets}
 						iconColor="text-blue-500"
 						title="Humidity"
-						currentValue={sensors.humidity}
 						unit="%"
+						color="#3b82f6"
 						sensorKey="humidity"
-						chartColor="#3b82f6"
 					/>
 				</motion.div>
 			</div>
@@ -599,13 +541,14 @@ function SensorCardInline() {
 					</h2>
 				</div>
 			</CardHeader>
-			<CardContent className="pt-0">
-				<RadialGauge
-					value={moisture}
-					size={120}
-					dryThreshold={dryThreshold}
-					optimalThreshold={optimalThreshold}
-				/>
+			<CardContent className="pt-0 flex justify-center">
+				<div className="w-[180px]">
+					<RadialGauge
+						value={moisture}
+						dryThreshold={dryThreshold}
+						optimalThreshold={optimalThreshold}
+					/>
+				</div>
 			</CardContent>
 		</Card>
 	);
@@ -662,14 +605,15 @@ function WaterLevelRadialInline() {
 					</h2>
 				</div>
 			</CardHeader>
-			<CardContent className="pt-0">
-				<ThresholdRadialGauge
-					value={waterLevel}
-					size={120}
-					max={100}
-					thresholds={waterLevelThresholds}
-					scaleMarkers={scaleMarkers}
-				/>
+			<CardContent className="pt-0 flex justify-center">
+				<div className="w-[180px]">
+					<ThresholdRadialGauge
+						value={waterLevel}
+						max={100}
+						thresholds={waterLevelThresholds}
+						scaleMarkers={scaleMarkers}
+					/>
+				</div>
 			</CardContent>
 		</Card>
 	);

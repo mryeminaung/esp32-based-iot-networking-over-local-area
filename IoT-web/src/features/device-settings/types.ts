@@ -18,6 +18,9 @@ export type DeviceSettings = {
     drySoil: boolean;
     sensorError: boolean;
   };
+  growLight: {
+    lowThreshold: number;
+  };
 };
 
 /** Convert flat API response to nested component state */
@@ -38,6 +41,9 @@ export function apiToSettings(api: ApiDeviceSettings): DeviceSettings {
       drySoil: api.buzzerDrySoil,
       sensorError: api.buzzerSensorError,
     },
+    growLight: {
+      lowThreshold: api.lightLowThreshold,
+    },
   };
 }
 
@@ -53,6 +59,7 @@ export function settingsToApi(settings: DeviceSettings): Partial<ApiDeviceSettin
     buzzerLowWater: settings.buzzer.lowWater,
     buzzerDrySoil: settings.buzzer.drySoil,
     buzzerSensorError: settings.buzzer.sensorError,
+    lightLowThreshold: settings.growLight.lowThreshold,
   };
 }
 

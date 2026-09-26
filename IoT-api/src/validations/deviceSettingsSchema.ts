@@ -10,4 +10,5 @@ export const updateDeviceSettingsSchema = z.object({
   buzzerLowWater: z.boolean().optional(),
   buzzerDrySoil: z.boolean().optional(),
   buzzerSensorError: z.boolean().optional(),
+  lightLowThreshold: z.number().int().min(0).max(100).optional(),
 });

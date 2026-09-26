@@ -12,6 +12,7 @@ import {
 import SoilMoistureCard from "./components/SoilMoistureCard";
 import WaterLevelCard from "./components/WaterLevelCard";
 import BuzzerConfigCard from "./components/BuzzerConfigCard";
+import GrowLightCard from "./components/GrowLightCard";
 import {
   apiToSettings,
   settingsToApi,
@@ -23,12 +24,14 @@ const INITIAL_SETTINGS: DeviceSettings = {
   soilMoisture: { dryThreshold: 30, optimalThreshold: 50 },
   waterLevel: { lowThreshold: 25, criticalThreshold: 10, warningEnabled: true },
   buzzer: { enabled: true, lowWater: true, drySoil: true, sensorError: false },
+  growLight: { lowThreshold: 30 },
 };
 
 export default function DeviceSettingsPage() {
   useHeader("Device Settings");
 
   const moisture = useDashboardStore((s) => s.sensors.soilMoisture);
+  const currentLight = useDashboardStore((s) => s.sensors.light);
   const setDeviceSettings = useDashboardStore((s) => s.setDeviceSettings);
 
   const [settings, setSettings] = useState<DeviceSettings>(INITIAL_SETTINGS);
@@ -73,6 +76,7 @@ export default function DeviceSettingsPage() {
         buzzerLowWater: settings.buzzer.lowWater,
         buzzerDrySoil: settings.buzzer.drySoil,
         buzzerSensorError: settings.buzzer.sensorError,
+        lightLowThreshold: settings.growLight.lowThreshold,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -138,6 +142,14 @@ export default function DeviceSettingsPage() {
           sensorError={settings.buzzer.sensorError}
           onEnabledChange={(val) => update("buzzer", "enabled", val)}
           onConditionChange={(field, val) => update("buzzer", field, val)}
+        />
+
+        <GrowLightCard
+          currentLight={currentLight}
+          lowThreshold={settings.growLight.lowThreshold}
+          onThresholdChange={(field, value) =>
+            update("growLight", field, value)
+          }
         />
       </div>
 

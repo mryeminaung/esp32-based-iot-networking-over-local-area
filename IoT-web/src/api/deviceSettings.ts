@@ -11,6 +11,7 @@ export type DeviceSettings = {
   buzzerLowWater: boolean;
   buzzerDrySoil: boolean;
   buzzerSensorError: boolean;
+  lightLowThreshold: number;
   createdAt: string;
   updatedAt: string;
 };

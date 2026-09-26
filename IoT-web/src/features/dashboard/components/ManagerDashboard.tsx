@@ -194,25 +194,44 @@ export default function ManagerDashboard() {
 							animate="visible">
 							<Card className="h-full">
 								<CardContent className="space-y-4 h-full flex flex-col">
-									<h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-										<Server
-											size={15}
-											className="text-text-muted"
-										/>
-										Device Status
-									</h2>
+									{/* Header with summary */}
+									<div className="flex items-center justify-between">
+										<h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+											<Server size={15} className="text-text-muted" />
+											Device Status
+										</h2>
+										<span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+											activeDevices > 0
+												? "bg-success/10 text-success"
+												: "bg-bg-muted text-text-muted"
+										}`}>
+											{activeDevices}/{totalDevices} active
+										</span>
+									</div>
 
-									<div className="grid gap-3 sm:grid-cols-2 flex-1">
+									{/* Device groups */}
+									<div className="grid gap-2.5 flex-1">
 										{DEVICE_GROUPS.map((group) => {
 											const activeCount = group.items.filter(
 												(d) => devices[d.key as keyof typeof devices],
 											).length;
+											const allActive = activeCount === group.items.length;
 											return (
 												<div
 													key={group.label}
-													className="flex items-center gap-3 p-3 rounded-xl bg-bg-muted">
-													<div className="w-9 h-9 rounded-lg bg-bg-card border border-border flex items-center justify-center shrink-0">
-														<group.icon className="w-4 h-4 text-text-muted" />
+													className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${
+														allActive
+															? "bg-success/5 border border-success/20"
+															: "bg-bg-muted"
+													}`}>
+													<div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+														allActive
+															? "bg-success/10"
+															: "bg-bg-card border border-border"
+													}`}>
+														<group.icon className={`w-4 h-4 ${
+															allActive ? "text-success" : "text-text-muted"
+														}`} />
 													</div>
 													<div className="flex-1 min-w-0">
 														<p className="text-sm font-medium text-text-primary">
@@ -232,10 +251,11 @@ export default function ManagerDashboard() {
 															))}
 														</div>
 													</div>
-													<span
-														className={`text-xs font-semibold tabular-nums ${
-															activeCount > 0 ? "text-success" : "text-text-muted"
-														}`}>
+													<span className={`text-xs font-bold tabular-nums px-2 py-0.5 rounded-full ${
+														activeCount > 0
+															? "bg-success/10 text-success"
+															: "bg-bg-muted text-text-muted"
+													}`}>
 														{activeCount}/{group.items.length}
 													</span>
 												</div>
@@ -247,10 +267,7 @@ export default function ManagerDashboard() {
 									<div className="p-3 rounded-xl bg-bg-muted">
 										<div className="flex items-center justify-between mb-2">
 											<div className="flex items-center gap-2">
-												<Droplets
-													size={14}
-													className="text-water"
-												/>
+												<Droplets size={14} className="text-water" />
 												<span className="text-xs font-medium text-text-primary">
 													Soil Moisture
 												</span>
@@ -261,10 +278,23 @@ export default function ManagerDashboard() {
 										</div>
 										<div className="w-full h-1.5 rounded-full bg-border overflow-hidden">
 											<div
-												className="h-full rounded-full bg-gradient-to-r from-water to-blue-400 transition-all duration-500"
+												className={`h-full rounded-full transition-all duration-500 ${
+													condition.label === "DRY"
+														? "bg-danger"
+														: condition.label === "MOIST"
+															? "bg-warning"
+															: "bg-success"
+												}`}
 												style={{ width: `${moisture}%` }}
 											/>
 										</div>
+										<p className="text-[0.65rem] text-text-muted mt-1.5">
+											{condition.label === "DRY"
+												? "Soil is dry — irrigation needed"
+												: condition.label === "MOIST"
+													? "Soil is moist — monitor closely"
+													: "Soil moisture is optimal"}
+										</p>
 									</div>
 								</CardContent>
 							</Card>

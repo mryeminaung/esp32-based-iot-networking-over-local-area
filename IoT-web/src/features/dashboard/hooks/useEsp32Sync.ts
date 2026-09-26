@@ -130,10 +130,11 @@ export default function useEsp32Sync() {
 				// Log moisture changes
 				if (previousMoisture !== -1 && data.soilMoisture !== previousMoisture) {
 					const now = new Date().toLocaleTimeString();
+					const { deviceSettings } = useDashboardStore.getState();
 					const condition =
-						data.soilMoisture <= 30
+						data.soilMoisture < deviceSettings.soilDryThreshold
 							? "DRY"
-							: data.soilMoisture < 50
+							: data.soilMoisture < deviceSettings.soilOptimalThreshold
 								? "MOIST"
 								: "OPTIMAL";
 					addLog({

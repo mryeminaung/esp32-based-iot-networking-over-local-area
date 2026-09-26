@@ -43,6 +43,7 @@ export async function sendConfigToESP32(config: {
   buzzerEnabled: boolean;
   buzzerLowWater: boolean;
   buzzerDrySoil: boolean;
+  lightLowThreshold: number;
 }) {
   try {
     const res = await fetch(`${ESP32_API_URL}/config`, {

@@ -6,16 +6,22 @@
  * - Red Light: GPIO 2
  * - Yellow Light: GPIO 4
  * - Green Light: GPIO 5
- * - White Light: GPIO 18
+ * - White Light (Grow): GPIO 18
  * - Relay: GPIO 21
  * - Water Pump: GPIO 22
  * - Soil Moisture Sensor: GPIO 34 (analog)
+ * - Water Level Sensor: GPIO 35 (analog)
+ * - Light Sensor (LDR): GPIO 36 (analog)
+ * - Air Quality (MQ-135): GPIO 39 (analog)
+ * - DHT22 (Temp/Humidity): GPIO 13
+ * - Buzzer: GPIO 25
  */
 
 #include <WiFi.h>
 #include <WebServer.h>
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
+#include <DHT.h>
 
 // WiFi Configuration
 const char *ssid = "MIIT-WIFI";
@@ -37,6 +43,11 @@ WebServer server(80);
 #define LIGHT_PIN 36
 #define AIR_QUALITY_PIN 39
 #define BUZZER_PIN 25
+#define DHT_PIN 13
+#define DHT_TYPE DHT22
+
+// DHT sensor instance
+DHT dht(DHT_PIN, DHT_TYPE);
 
 // Device States
 bool redLightState = false;
@@ -51,13 +62,12 @@ bool buzzerState = false;
 // Sensor Values
 int soilMoistureValue = 0;
 
-// Additional sensor values (placeholder — update when hardware is wired)
-// DHT22: GPIO 13, Water Level: GPIO 35, LDR: GPIO 36, MQ-135: GPIO 39
-float temperatureValue = 25.0;
-float humidityValue = 60.0;
-int waterLevelValue = 50;
-int lightValue = 500;
-int airQualityValue = 100;
+// Additional sensor values
+float temperatureValue = 0.0;
+float humidityValue = 0.0;
+int waterLevelValue = 0;
+int lightValue = 0;
+int airQualityValue = 0;
 
 // Configurable thresholds (updated by backend via POST /config)
 int cfgSoilDryThreshold = 30;
@@ -67,6 +77,7 @@ int cfgWaterCriticalThreshold = 10;
 bool cfgBuzzerEnabled = true;
 bool cfgBuzzerLowWater = true;
 bool cfgBuzzerDrySoil = true;
+int cfgLightLowThreshold = 30; // grow light turns ON when light < this (0-100)
 
 // Timing
 unsigned long lastSensorRead = 0;
@@ -102,6 +113,9 @@ void setup()
   pinMode(LIGHT_PIN, INPUT);
   pinMode(AIR_QUALITY_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
+
+  // Initialize DHT22 sensor
+  dht.begin();
 
   // Initial state - all off
   digitalWrite(RED_LIGHT_PIN, LOW);
@@ -189,13 +203,19 @@ void loop()
     }
   }
 
-  // Read sensors and auto-control R/Y/G LEDs
+  // Read sensors and auto-control LEDs
   if (millis() - lastSensorRead > sensorReadInterval)
   {
     soilMoistureValue = readSoilMoisture();
     waterLevelValue = readWaterLevel();
     lightValue = readLight();
     airQualityValue = readAirQuality();
+
+    // Read DHT22 (temperature & humidity)
+    float t = dht.readTemperature();
+    float h = dht.readHumidity();
+    if (!isnan(t)) temperatureValue = t;
+    if (!isnan(h)) humidityValue = h;
 
     // Auto buzzer based on water level (respects config)
     if (cfgBuzzerEnabled && cfgBuzzerLowWater) {
@@ -252,6 +272,26 @@ void loop()
       setLight(RED_LIGHT_PIN, false);
       setLight(YELLOW_LIGHT_PIN, false);
       setLight(GREEN_LIGHT_PIN, true);
+    }
+
+    // Auto grow light (white) based on light sensor
+    if (lightValue < cfgLightLowThreshold)
+    {
+      if (!whiteLightState)
+      {
+        whiteLightState = true;
+        setLight(WHITE_LIGHT_PIN, true);
+        Serial.println("Grow light ON: Low light detected");
+      }
+    }
+    else
+    {
+      if (whiteLightState)
+      {
+        whiteLightState = false;
+        setLight(WHITE_LIGHT_PIN, false);
+        Serial.println("Grow light OFF: Sufficient light");
+      }
     }
   }
 }
@@ -415,10 +455,13 @@ void handleConfig()
         cfgBuzzerLowWater = doc["buzzerLowWater"];
       if (doc.containsKey("buzzerDrySoil"))
         cfgBuzzerDrySoil = doc["buzzerDrySoil"];
+      if (doc.containsKey("lightLowThreshold"))
+        cfgLightLowThreshold = doc["lightLowThreshold"];
 
-      Serial.printf("Config updated: soilDry=%d soilOpt=%d waterLow=%d waterCrit=%d buzzer=%d\n",
+      Serial.printf("Config updated: soilDry=%d soilOpt=%d waterLow=%d waterCrit=%d lightLow=%d buzzer=%d\n",
         cfgSoilDryThreshold, cfgSoilOptimalThreshold,
         cfgWaterLowThreshold, cfgWaterCriticalThreshold,
+        cfgLightLowThreshold,
         cfgBuzzerEnabled ? 1 : 0);
 
       server.send(200, "application/json", "{\"status\":\"ok\"}");
@@ -563,7 +606,9 @@ int readWaterLevel()
 
 int readAirQuality()
 {
-  return analogRead(AIR_QUALITY_PIN); // raw 0-4095, higher = worse air
+  int rawValue = analogRead(AIR_QUALITY_PIN);
+  int aqi = map(rawValue, 0, 4095, 0, 100); // scale to 0-100, higher = worse air
+  return constrain(aqi, 0, 100);
 }
 
 int readLight()
