@@ -78,13 +78,17 @@ export default function EditUserModal({
 	if (!user) return null
 
 	return (
-		<Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
+		<Dialog
+			open={open}
+			onOpenChange={(v) => !v && handleClose()}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Edit User</DialogTitle>
 				</DialogHeader>
 
-				<form onSubmit={handleSubmit} className="space-y-4">
+				<form
+					onSubmit={handleSubmit}
+					className="space-y-4">
 					<div>
 						<label className="block text-sm font-medium text-text-secondary mb-1.5">
 							Name
@@ -118,13 +122,21 @@ export default function EditUserModal({
 								<label className="block text-sm font-medium text-text-secondary mb-1.5">
 									Role <span className="text-red-500">*</span>
 								</label>
-								<Select value={editRole} onValueChange={(v) => v && setEditRole(v)}>
+								<Select
+									value={editRole}
+									onValueChange={(v) => v && setEditRole(v)}>
 									<SelectTrigger className="w-full h-10">
-										<SelectValue placeholder="Select role">{roleLabels[editRole] || "Select role"}</SelectValue>
+										<SelectValue placeholder="Select role">
+											{roleLabels[editRole] || "Select role"}
+										</SelectValue>
 									</SelectTrigger>
 									<SelectContent alignItemWithTrigger={false}>
 										{ROLES.map((r) => (
-											<SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+											<SelectItem
+												key={r.value}
+												value={r.value}>
+												{r.label}
+											</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
@@ -144,8 +156,8 @@ export default function EditUserModal({
 											minLength={newPassword ? 8 : undefined}
 											className="w-full px-4 rounded-lg border border-border bg-bg-card text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent text-sm pr-10"
 										/>
-										{newPassword && (
-											showNewPassword ? (
+										{newPassword &&
+											(showNewPassword ? (
 												<EyeOff
 													onClick={() => setShowNewPassword(false)}
 													className="size-4 absolute right-3 top-3 text-text-muted hover:text-text-primary cursor-pointer"
@@ -155,14 +167,16 @@ export default function EditUserModal({
 													onClick={() => setShowNewPassword(true)}
 													className="size-4 absolute right-3 top-3 text-text-muted hover:text-text-primary cursor-pointer"
 												/>
-											)
-										)}
+											))}
 									</div>
 									<Button
 										type="button"
 										variant="outline"
-										onClick={() => { setNewPassword(generatePassword()); setShowNewPassword(true); }}
-										className="shrink-0"
+										onClick={() => {
+											setNewPassword(generatePassword());
+											setShowNewPassword(true);
+										}}
+										className="shrink-0 py-4.5"
 										title="Generate random password">
 										<RefreshCw size={14} />
 										Generate
@@ -170,7 +184,10 @@ export default function EditUserModal({
 								</div>
 								{showNewPassword && newPassword && (
 									<p className="mt-1.5 text-xs text-gray-400">
-										Password: <span className="font-mono text-text-secondary">{newPassword}</span>
+										Password:{" "}
+										<span className="font-mono text-text-secondary">
+											{newPassword}
+										</span>
 									</p>
 								)}
 							</div>
@@ -178,13 +195,23 @@ export default function EditUserModal({
 					)}
 
 					<div className="flex gap-3 pt-2">
-						<Button type="button" variant="outline" onClick={handleClose} className="flex-1 flex items-center justify-center gap-2 px-4 rounded-lg border border-border text-text-secondary text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={handleClose}
+							className="flex-1 flex items-center justify-center gap-2 px-4 py-4.5 rounded-2xl border border-border text-text-secondary text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer">
 							Cancel
 						</Button>
-						<Button type="submit" disabled={submitting} className="flex-1 flex items-center justify-center gap-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white text-sm font-medium transition-colors cursor-pointer disabled:cursor-not-allowed">
+						<Button
+							type="submit"
+							disabled={submitting}
+							className="flex-1 flex items-center justify-center gap-2 px-4 py-4.5 rounded-2xl bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white text-sm font-medium transition-colors cursor-pointer disabled:cursor-not-allowed">
 							{submitting ? (
 								<>
-									<Loader2 size={14} className="animate-spin" />
+									<Loader2
+										size={14}
+										className="animate-spin"
+									/>
 									Saving...
 								</>
 							) : (

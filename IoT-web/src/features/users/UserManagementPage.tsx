@@ -1,19 +1,19 @@
 import { backendClient } from "@/api/auth";
-import { useToastManager } from "@/components/ui/toast";
-import { Plus, Search, Users, RefreshCw } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useHeader } from "@/hooks/useHeader";
+import EmptyState from "@/components/EmptyState";
+import ErrorState from "@/components/ErrorState";
+import LoadingState from "@/components/LoadingState";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import { useToastManager } from "@/components/ui/toast";
+import { useHeader } from "@/hooks/useHeader";
+import { Plus, RefreshCw, Search, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import CreateUserModal from "./components/CreateUserModal";
 import DeleteUserDialog from "./components/DeleteUserDialog";
 import EditUserModal from "./components/EditUserModal";
-import type { User } from "./types";
 import UserTable, { type ViewMode } from "./components/UserTable";
 import UserToolbar from "./components/UserToolbar";
-import LoadingState from "@/components/LoadingState";
-import EmptyState from "@/components/EmptyState";
-import ErrorState from "@/components/ErrorState";
+import type { User } from "./types";
 
 export default function UserManagementPage() {
 	useHeader("Farm User Management");
@@ -26,7 +26,7 @@ export default function UserManagementPage() {
 	const [search, setSearch] = useState("");
 	const [roleFilter, setRoleFilter] = useState<string | null>(null);
 	const [viewMode, setViewMode] = useState<ViewMode>(
-		() => (localStorage.getItem("users-view") as ViewMode) ?? "grid"
+		() => (localStorage.getItem("users-view") as ViewMode) ?? "grid",
 	);
 
 	const handleViewChange = (v: ViewMode) => {
@@ -87,7 +87,10 @@ export default function UserManagementPage() {
 		if (!deletingUser) return;
 		try {
 			await backendClient.delete(`/users/${deletingUser.id}`);
-			toastManager.add({ title: `User "${deletingUser.email}" deleted`, type: "success" });
+			toastManager.add({
+				title: `User "${deletingUser.email}" deleted`,
+				type: "success",
+			});
 			setDeletingUser(null);
 			fetchUsers();
 		} catch (err: unknown) {
@@ -104,9 +107,11 @@ export default function UserManagementPage() {
 			{/* Header */}
 			<PageHeader
 				title="Farm User Management"
-				description="Manage farm users and roles"
-			>
-				<Button size="lg" onClick={() => setShowCreateModal(true)}>
+				description="Manage farm users and roles">
+				<Button
+					size="lg"
+					className="rounded-2xl"
+					onClick={() => setShowCreateModal(true)}>
 					<Plus size={16} />
 					Add User
 				</Button>
@@ -119,7 +124,9 @@ export default function UserManagementPage() {
 				<ErrorState
 					message={error}
 					action={
-						<button onClick={fetchUsers} className="mt-2 inline-flex items-center gap-1.5 text-sm text-green hover:text-green/80">
+						<button
+							onClick={fetchUsers}
+							className="mt-2 inline-flex items-center gap-1.5 text-sm text-green hover:text-green/80">
 							<RefreshCw className="w-3.5 h-3.5" /> Retry
 						</button>
 					}

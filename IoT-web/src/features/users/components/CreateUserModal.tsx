@@ -149,7 +149,7 @@ export default function CreateUserModal({
 									setPassword(generatePassword());
 									setShowPassword(true);
 								}}
-								className="shrink-0"
+								className="shrink-0 py-4.5"
 								title="Generate random password">
 								<RefreshCw size={14} />
 								Generate

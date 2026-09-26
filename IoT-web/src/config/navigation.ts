@@ -1,14 +1,14 @@
 import {
-  LayoutDashboard,
-  Activity,
-  Users,
-  Thermometer,
-  Power,
-  BarChart3,
-  Stethoscope,
-  Settings,
-  SlidersHorizontal,
-  type LucideIcon,
+	Activity,
+	BarChart3,
+	LayoutDashboard,
+	Power,
+	Settings,
+	SlidersHorizontal,
+	Stethoscope,
+	Thermometer,
+	Users,
+	type LucideIcon,
 } from "lucide-react"
 import { ROLES, type Role } from "./roles"
 
@@ -89,6 +89,7 @@ export const navigation: NavSection[] = [
 		],
 	},
 	{
+		title: "Control",
 		// Settings - separated at bottom
 		items: [
 			{

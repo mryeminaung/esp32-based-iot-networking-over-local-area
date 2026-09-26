@@ -34,7 +34,7 @@ export default function RadialGauge({ value, size = 200, dryThreshold, optimalTh
 	const fillRef = useRef<SVGCircleElement>(null);
 
 	const gaugeSize =
-		size > 120 ? "w-[180px] h-[180px] sm:w-[220px] sm:h-[220px]" : "w-full";
+		size > 120 ? "w-[110px] h-[110px] sm:w-[220px] sm:h-[220px]" : "w-full";
 
 	/* Clamp & compute offset */
 	const clamped = Math.max(0, Math.min(100, value));
