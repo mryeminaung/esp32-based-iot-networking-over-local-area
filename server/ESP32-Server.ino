@@ -217,30 +217,20 @@ void loop()
     if (!isnan(t)) temperatureValue = t;
     if (!isnan(h)) humidityValue = h;
 
-    // Auto buzzer based on water level (respects config)
-    if (cfgBuzzerEnabled && cfgBuzzerLowWater) {
-      if (waterLevelValue < cfgWaterCriticalThreshold && !buzzerState) {
-        buzzerState = true;
-        digitalWrite(BUZZER_PIN, HIGH);
-        Serial.println("Buzzer ON: Water level critical");
-      } else if (waterLevelValue >= cfgWaterCriticalThreshold && buzzerState) {
-        buzzerState = false;
-        digitalWrite(BUZZER_PIN, LOW);
-        Serial.println("Buzzer OFF: Water level recovered");
-      }
-    }
+    // Auto buzzer — evaluate all conditions independently, then apply combined result
+    bool buzzerForWater = cfgBuzzerEnabled && cfgBuzzerLowWater && (waterLevelValue < cfgWaterCriticalThreshold);
+    bool buzzerForSoil  = cfgBuzzerEnabled && cfgBuzzerDrySoil  && (soilMoistureValue < cfgSoilDryThreshold);
+    bool shouldBuzz = buzzerForWater || buzzerForSoil;
 
-    // Auto buzzer based on dry soil (respects config)
-    if (cfgBuzzerEnabled && cfgBuzzerDrySoil) {
-      if (soilMoistureValue < cfgSoilDryThreshold && !buzzerState) {
-        buzzerState = true;
-        digitalWrite(BUZZER_PIN, HIGH);
-        Serial.println("Buzzer ON: Soil dry");
-      } else if (soilMoistureValue >= cfgSoilDryThreshold && buzzerState) {
-        buzzerState = false;
-        digitalWrite(BUZZER_PIN, LOW);
-        Serial.println("Buzzer OFF: Soil moisture recovered");
-      }
+    if (shouldBuzz && !buzzerState) {
+      buzzerState = true;
+      digitalWrite(BUZZER_PIN, HIGH);
+      if (buzzerForWater) Serial.println("Buzzer ON: Water level critical");
+      if (buzzerForSoil)  Serial.println("Buzzer ON: Soil dry");
+    } else if (!shouldBuzz && buzzerState) {
+      buzzerState = false;
+      digitalWrite(BUZZER_PIN, LOW);
+      Serial.println("Buzzer OFF: All conditions recovered");
     }
 
     lastSensorRead = millis();
