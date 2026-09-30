@@ -4,7 +4,9 @@ import "dotenv/config";
 import express, { type Request, type Response } from "express";
 import path from "path";
 import { fileURLToPath } from "url";
+import swaggerUi from "swagger-ui-express";
 import connectDB from "./src/config/db.js";
+import { swaggerSpec } from "./src/config/swagger.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import activityRoutes from "./src/routes/activityRoutes.js";
@@ -25,6 +27,12 @@ app.use(cookieParser());
 
 // Serve uploaded files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Swagger API docs
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: ".swagger-ui .topbar { display: none }",
+  customSiteTitle: "Smart Agriculture API Docs",
+}));
 
 // Routes
 app.use("/api/auth", authRoutes);
