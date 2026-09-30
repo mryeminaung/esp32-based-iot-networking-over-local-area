@@ -4,12 +4,14 @@ Arduino-based firmware for the ESP32 DevKit V1 that powers the IoT Networking La
 
 ## Features
 
-- **REST API** — 5 endpoints for device control, sensor reading, and system info
+- **REST API** — 6 endpoints for device control, sensor reading, system info, and config
 - **Auto LED feedback** — Red/Yellow/Green LEDs indicate soil moisture level (dry / moist / wet)
-- **PWM fan control** — 0–100% duty cycle via `ledc`
+- **Auto grow light** — White LED turns on when light level drops below threshold
+- **Auto buzzer** — Alerts on critical water level or dry soil
 - **mDNS discovery** — reachable at `http://esp32-server.local`
 - **CORS enabled** — works with cross-origin web dashboards
 - **WiFi reconnect guard** — auto-reconnects on link loss
+- **Configurable thresholds** — Backend can push threshold updates via POST `/config`
 
 ## Quick Start
 
@@ -30,26 +32,57 @@ curl http://esp32-server.local/all
 
 ## Pin Mapping
 
-| Component           | GPIO |
-| ------------------- | ---- |
-| Red Light           | 2    |
-| Yellow Light        | 4    |
-| Green Light         | 5    |
-| White Light         | 18   |
-| Fan (PWM)           | 19   |
-| Relay               | 21   |
-| Water Pump          | 22   |
-| Soil Moisture (ADC) | 34   |
+### Output Devices (Actuators)
+
+| Device       | GPIO | Type        |
+| ------------ | ---- | ----------- |
+| Red Light    | 2    | Digital OUT |
+| Yellow Light | 4    | Digital OUT |
+| Green Light  | 5    | Digital OUT |
+| White Light  | 18   | Digital OUT |
+| Relay        | 21   | Digital OUT |
+| Water Pump   | 22   | Digital OUT |
+| Buzzer       | 25   | Digital OUT |
+
+### Input Devices (Sensors)
+
+| Device              | GPIO | Type        |
+| ------------------- | ---- | ----------- |
+| Soil Moisture       | 34   | Analog IN   |
+| Water Level         | 35   | Analog IN   |
+| Light (LDR)         | 36   | Analog IN   |
+| Air Quality (MQ-135)| 39   | Analog IN   |
+| DHT22 (Temp/Humid)  | 13   | Digital IN  |
 
 ## API Endpoints
 
-| Method | Path       | Description             |
-| ------ | ---------- | ----------------------- |
-| GET    | `/`        | Health check            |
-| POST   | `/control` | Control a device        |
-| GET    | `/system`  | Device/system info      |
-| GET    | `/sensors` | Sensor + device states  |
-| GET    | `/all`     | Combined system+sensors |
+| Method | Path        | Description                                |
+| ------ | ----------- | ------------------------------------------ |
+| GET    | `/`         | API documentation landing page             |
+| GET    | `/all`      | Combined system info + sensor data         |
+| GET    | `/system`   | System info (IP, MAC, uptime, free heap)   |
+| GET    | `/sensors`  | Sensor readings + device states            |
+| POST   | `/control`  | Control device (lights, pump, relay, buzzer)|
+| POST   | `/config`   | Update thresholds and buzzer settings      |
+
+### Control Devices
+
+```bash
+curl -X POST http://esp32-server.local/control \
+  -H "Content-Type: application/json" \
+  -d '{"device": "water_pump", "state": 1}'
+
+# Devices: red_light, yellow_light, green_light, white_light, relay, water_pump, buzzer
+# States: 1 = ON, 0 = OFF
+```
+
+### Update Config
+
+```bash
+curl -X POST http://esp32-server.local/config \
+  -H "Content-Type: application/json" \
+  -d '{"soilDryThreshold": 30, "buzzerEnabled": true}'
+```
 
 ## Documentation
 
