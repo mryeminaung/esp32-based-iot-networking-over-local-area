@@ -14,7 +14,7 @@ router.use(authenticate);
 router.get("/", getSettingsHandler);
 router.put(
   "/",
-  authorize("devices:control"),
+  authorize("system:configure"),
   validate(updateDeviceSettingsSchema),
   updateSettingsHandler,
 );

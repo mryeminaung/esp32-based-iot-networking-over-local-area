@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authenticate } from "../middleware/authMiddleware.js";
+import { authenticate, authorize } from "../middleware/authMiddleware.js";
 import {
   recordReadingHandler,
   getReadingsHandler,
@@ -13,7 +13,7 @@ router.use(authenticate);
 
 router.post("/readings", recordReadingHandler);
 router.get("/readings", getReadingsHandler);
-router.get("/analytics", getAnalyticsHandler);
+router.get("/analytics", authorize("sensors:read"), getAnalyticsHandler);
 router.get("/latest", getLatestReadingHandler);
 
 export default router;

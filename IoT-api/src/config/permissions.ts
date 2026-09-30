@@ -16,6 +16,7 @@ export const P = {
   NETWORK_READ: "network:read",
   DIAGNOSTICS_READ: "diagnostics:read",
   SYSTEM_CONFIGURE: "system:configure",
+  ACTIVITY_WRITE: "activity:write",
 };
 
 // Role → permissions mapping
@@ -31,6 +32,7 @@ export const PERMISSIONS = {
     P.NETWORK_READ,
     P.DIAGNOSTICS_READ,
     P.SYSTEM_CONFIGURE,
+    P.ACTIVITY_WRITE,
   ],
   [ROLES.FARM_WORKER]: [
     P.SENSORS_READ,
@@ -38,6 +40,7 @@ export const PERMISSIONS = {
     P.DEVICES_CONTROL,
     P.LOGS_READ,
     P.ACTIVITY_READ,
+    P.ACTIVITY_WRITE,
   ],
   [ROLES.TECHNICIAN]: [
     P.SENSORS_READ,
@@ -45,6 +48,7 @@ export const PERMISSIONS = {
     P.DEVICES_CONTROL,
     P.NETWORK_READ,
     P.DIAGNOSTICS_READ,
+    P.ACTIVITY_WRITE,
   ],
 };
 

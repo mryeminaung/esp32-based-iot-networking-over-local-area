@@ -23,6 +23,8 @@ model User {
   activityLogs  ActivityLog[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now())
+
+  @@map("users")
 }
 
 model RefreshToken {
@@ -35,6 +37,7 @@ model RefreshToken {
 
   @@index([userId])
   @@index([expiresAt])
+  @@map("refresh_tokens")
 }
 
 model ActivityLog {
@@ -69,16 +72,16 @@ model SensorReading {
 
 model DeviceSettings {
   id                     Int      @id @default(autoincrement())
-  soilDryThreshold       Float    @default(30)
-  soilOptimalThreshold   Float    @default(50)
-  waterLowThreshold      Float    @default(25)
-  waterCriticalThreshold Float    @default(10)
-  waterWarningEnabled    Boolean  @default(true)
-  buzzerEnabled          Boolean  @default(true)
-  buzzerLowWater         Boolean  @default(true)
-  buzzerDrySoil          Boolean  @default(true)
-  buzzerSensorError      Boolean  @default(false)
-  lightLowThreshold      Int      @default(30)
+  soilDryThreshold       Float    @default(30) @map("soil_dry_threshold")
+  soilOptimalThreshold   Float    @default(50) @map("soil_optimal_threshold")
+  waterLowThreshold      Float    @default(25) @map("water_low_threshold")
+  waterCriticalThreshold Float    @default(10) @map("water_critical_threshold")
+  waterWarningEnabled    Boolean  @default(true) @map("water_warning_enabled")
+  buzzerEnabled          Boolean  @default(true) @map("buzzer_enabled")
+  buzzerLowWater         Boolean  @default(true) @map("buzzer_low_water")
+  buzzerDrySoil          Boolean  @default(true) @map("buzzer_dry_soil")
+  buzzerSensorError      Boolean  @default(false) @map("buzzer_sensor_error")
+  lightLowThreshold      Int      @default(30) @map("light_low_threshold")
   createdAt              DateTime @default(now()) @map("created_at")
   updatedAt              DateTime @updatedAt @map("updated_at")
 
