@@ -46,13 +46,17 @@ curl http://esp32-server.local/all
 
 ### Input Devices (Sensors)
 
-| Device              | GPIO | Type        |
-| ------------------- | ---- | ----------- |
-| Soil Moisture       | 34   | Analog IN   |
-| Water Level         | 35   | Analog IN   |
-| Light (LDR)         | 36   | Analog IN   |
-| Air Quality (MQ-135)| 39   | Analog IN   |
-| DHT22 (Temp/Humid)  | 13   | Digital IN  |
+| Device              | GPIO       | Type        |
+| ------------------- | ---------- | ----------- |
+| Soil Moisture       | 34         | Analog IN   |
+| Water Level         | 35         | Analog IN   |
+| Air Quality (MQ-135)| 39         | Analog IN   |
+| DHT22 (Temp/Humid)  | 13         | Digital IN  |
+| BH1750 Light (I2C)  | 26 (SDA)   | I2C IN      |
+| BH1750 Light (I2C)  | 27 (SCL)   | I2C IN      |
+
+**Note:** GPIO 21/22 are reserved for relay + pump, so BH1750 I2C uses GPIO 26/27 (not the ESP32 default 21/22).
+Light is reported as 0–100% (BH1750 lux mapped: 0–1000 lx → 0–100%).
 
 ## API Endpoints
 

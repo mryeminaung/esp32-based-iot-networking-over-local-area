@@ -69,6 +69,7 @@ const start = async () => {
 				buzzerEnabled: settings.buzzerEnabled,
 				buzzerLowWater: settings.buzzerLowWater,
 				buzzerDrySoil: settings.buzzerDrySoil,
+				lightLowThreshold: settings.lightLowThreshold,
 			});
 			console.log("[Startup] Config pushed to ESP32");
 		} catch {

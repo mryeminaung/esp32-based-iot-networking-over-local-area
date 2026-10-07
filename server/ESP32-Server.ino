@@ -7,14 +7,18 @@
  * - Yellow Light: GPIO 4
  * - Green Light: GPIO 5
  * - White Light (Grow): GPIO 18
- * - Relay: GPIO 21
+ * - Relay: GPIO 21 (active-LOW: LOW = ON, HIGH = OFF)
  * - Water Pump: GPIO 22
  * - Soil Moisture Sensor: GPIO 34 (analog)
  * - Water Level Sensor: GPIO 35 (analog)
- * - Light Sensor (LDR): GPIO 36 (analog)
  * - Air Quality (MQ-135): GPIO 39 (analog)
  * - DHT22 (Temp/Humidity): GPIO 13
  * - Buzzer: GPIO 25
+ * - BH1750 Light Sensor (I2C): SDA GPIO 26, SCL GPIO 27
+ *   (GPIO 21/22 reserved for relay + pump, so I2C uses 26/27)
+ *
+ * Light scale: BH1750 reports lux; firmware maps 0–1000 lx → 0–100%
+ * so JSON field "light" and cfgLightLowThreshold stay on the 0–100 scale.
  */
 
 #include <WiFi.h>
@@ -22,6 +26,8 @@
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
 #include <DHT.h>
+#include <Wire.h>
+#include <BH1750.h>
 
 // WiFi Configuration
 const char *ssid = "MIIT-WIFI";
@@ -40,14 +46,24 @@ WebServer server(80);
 #define PUMP_PIN 22
 #define SOIL_MOISTURE_PIN 34
 #define WATER_LEVEL_PIN 35
-#define LIGHT_PIN 36
 #define AIR_QUALITY_PIN 39
 #define BUZZER_PIN 25
 #define DHT_PIN 13
 #define DHT_TYPE DHT22
 
+// BH1750 I2C pins (GPIO 21/22 are taken by relay + pump)
+#define BH1750_SDA_PIN 26
+#define BH1750_SCL_PIN 27
+
+// Lux → 0-100% brightness mapping
+const float luxToPercentMax = 1000.0; // 1000 lx ≈ 100%
+
 // DHT sensor instance
 DHT dht(DHT_PIN, DHT_TYPE);
+
+// BH1750 light sensor instance (address 0x23 default)
+BH1750 lightMeter;
+bool bh1750Ok = false;
 
 // Device States
 bool redLightState = false;
@@ -110,19 +126,26 @@ void setup()
   pinMode(PUMP_PIN, OUTPUT);
   pinMode(SOIL_MOISTURE_PIN, INPUT);
   pinMode(WATER_LEVEL_PIN, INPUT);
-  pinMode(LIGHT_PIN, INPUT);
   pinMode(AIR_QUALITY_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
 
   // Initialize DHT22 sensor
   dht.begin();
 
+  // Initialize BH1750 light sensor over I2C
+  Wire.begin(BH1750_SDA_PIN, BH1750_SCL_PIN);
+  bh1750Ok = lightMeter.begin();
+  if (bh1750Ok)
+    Serial.println("BH1750 light sensor ready (I2C 0x23)");
+  else
+    Serial.println("BH1750 not found! Check I2C wiring (SDA 26 / SCL 27)");
+
   // Initial state - all off
   digitalWrite(RED_LIGHT_PIN, LOW);
   digitalWrite(YELLOW_LIGHT_PIN, LOW);
   digitalWrite(GREEN_LIGHT_PIN, LOW);
   digitalWrite(WHITE_LIGHT_PIN, LOW);
-  digitalWrite(RELAY_PIN, LOW);
+  digitalWrite(RELAY_PIN, HIGH); // active-LOW: HIGH = OFF at boot
   digitalWrite(PUMP_PIN, LOW);
   digitalWrite(BUZZER_PIN, LOW);
 
@@ -394,7 +417,8 @@ void handleControl()
       else if (deviceStr == "relay")
       {
         relayState = state;
-        digitalWrite(RELAY_PIN, state ? HIGH : LOW);
+        // active-LOW module: LOW = ON, HIGH = OFF
+        digitalWrite(RELAY_PIN, state ? LOW : HIGH);
       }
       else if (deviceStr == "water_pump")
       {
@@ -603,7 +627,14 @@ int readAirQuality()
 
 int readLight()
 {
-  int rawValue = analogRead(LIGHT_PIN);
-  int luxApprox = map(rawValue, 0, 4095, 0, 100); // 0-100% brightness
-  return constrain(luxApprox, 0, 100);
+  if (!bh1750Ok)
+    return 0;
+
+  float lux = lightMeter.readLightLevel();
+  if (lux < 0)
+    return 0; // I2C read error
+
+  // BH1750 reports lux; map to 0-100% so downstream (API/web/mobile) scale stays unchanged
+  int percent = (int)((lux / luxToPercentMax) * 100.0f);
+  return constrain(percent, 0, 100);
 }
