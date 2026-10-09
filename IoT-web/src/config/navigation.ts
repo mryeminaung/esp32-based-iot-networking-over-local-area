@@ -44,7 +44,7 @@ export const navigation: NavSection[] = [
 				path: "/actuators",
 				label: "Actuators",
 				icon: Power,
-				roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER, ROLES.TECHNICIAN],
+				roles: [ROLES.FARM_MANAGER, ROLES.FARM_WORKER],
 			},
 		],
 	},

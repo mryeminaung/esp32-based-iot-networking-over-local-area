@@ -38,6 +38,10 @@ export default function DateRangePicker({
 	);
 }
 
+export function getPresetLabel(preset: string): string {
+	return PRESETS.find((pr) => pr.value === preset)?.fullLabel ?? "Selected period";
+}
+
 export function getDateRange(preset: string): { from: string; to: string } {
 	const now = new Date();
 	const to = now.toISOString().split("T")[0];

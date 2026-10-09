@@ -4,34 +4,38 @@ import ErrorState from "@/components/ErrorState";
 import LoadingState from "@/components/LoadingState";
 import PageHeader from "@/components/PageHeader";
 import { useHeader } from "@/hooks/useHeader";
-import { BarChart3, RefreshCw } from "lucide-react";
+import { BarChart3, FileSpreadsheet, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AnalyticsSummary from "./components/AnalyticsSummary";
-import DateRangePicker, { getDateRange } from "./components/DateRangePicker";
+import DateRangePicker, {
+	getDateRange,
+	getPresetLabel,
+} from "./components/DateRangePicker";
 import SensorChart from "./components/SensorChart";
+import { exportAnalyticsExcel } from "./exportAnalytics";
 
 const CHART_SENSORS = [
 	{
 		key: "temperature" as const,
-		title: "Temperature (24h trend)",
+		title: "Temperature",
 		color: "#f97316",
 		unit: "°C",
 	},
 	{
 		key: "humidity" as const,
-		title: "Humidity (24h trend)",
+		title: "Humidity",
 		color: "#3b82f6",
 		unit: "%",
 	},
 	{
 		key: "soilMoisture" as const,
-		title: "Soil Moisture (24h trend)",
+		title: "Soil Moisture",
 		color: "#16a34a",
 		unit: "%",
 	},
 	{
 		key: "light" as const,
-		title: "Light Intensity (24h trend)",
+		title: "Light Intensity",
 		color: "#eab308",
 		unit: " lux",
 	},
@@ -87,6 +91,7 @@ export default function AnalyticsPage() {
 	const [analytics, setAnalytics] = useState<SensorAnalytics[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [exporting, setExporting] = useState(false);
 
 	const fetchAnalytics = async () => {
 		setLoading(true);
@@ -111,16 +116,35 @@ export default function AnalyticsPage() {
 		[analytics],
 	);
 
+	const handleExport = () => {
+		if (exporting || analytics.length === 0) return;
+		setExporting(true);
+		try {
+			exportAnalyticsExcel(analytics, preset, getPresetLabel(preset));
+		} finally {
+			setExporting(false);
+		}
+	};
+
 	return (
 		<div className="max-w-[1100px] mx-auto space-y-5">
 			{/* Header */}
 			<PageHeader
 				title="Sensor Analytics"
 				description="Historical sensor data and trends">
-				<DateRangePicker
-					preset={preset}
-					onChange={setPreset}
-				/>
+				<div className="flex items-center gap-2 flex-wrap justify-end">
+					<DateRangePicker
+						preset={preset}
+						onChange={setPreset}
+					/>
+					<button
+						onClick={handleExport}
+						disabled={exporting || loading || analytics.length === 0}
+						className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl bg-white text-green-700 hover:bg-green-50 text-sm font-semibold shadow-md shadow-green-900/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border-2 border-white hover:cursor-pointer">
+							<FileSpreadsheet className="w-4 h-4" />
+							{exporting ? "Exporting..." : "Export Excel"}
+						</button>
+					</div>
 			</PageHeader>
 
 			{error && (
@@ -154,7 +178,7 @@ export default function AnalyticsPage() {
 						{CHART_SENSORS.map((sensor) => (
 							<SensorChart
 								key={sensor.key}
-								title={sensor.title}
+								title={`${sensor.title} (${getPresetLabel(preset)} trend)`}
 								data={analytics}
 								dataKey={sensor.key}
 								color={sensor.color}

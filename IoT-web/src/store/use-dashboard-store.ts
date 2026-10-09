@@ -136,7 +136,7 @@ export const useDashboardStore = create<DashboardState & DashboardActions>(
 			buzzerLowWater: true,
 			buzzerDrySoil: true,
 			buzzerSensorError: false,
-			lightLowThreshold: 30,
+			lightLowThreshold: 50,
 		},
 
 		// ── Actions ──

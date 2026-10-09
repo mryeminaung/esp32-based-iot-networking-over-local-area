@@ -49,8 +49,16 @@ export default function App() {
 								/>
 								<Route
 									path="actuators"
-									element={<ActuatorsPage />}
-								/>
+									element={
+										<RoleRoute
+											allowedRoles={[ROLES.FARM_MANAGER, ROLES.FARM_WORKER]}
+										/>
+									}>
+									<Route
+										index
+										element={<ActuatorsPage />}
+									/>
+								</Route>
 								<Route
 									path="activity"
 									element={

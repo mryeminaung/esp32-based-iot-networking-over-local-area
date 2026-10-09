@@ -62,7 +62,7 @@ export const components = {
         buzzerLowWater: { type: "boolean", example: true },
         buzzerDrySoil: { type: "boolean", example: true },
         buzzerSensorError: { type: "boolean", example: false },
-        lightLowThreshold: { type: "integer", example: 30 },
+        lightLowThreshold: { type: "integer", example: 50 },
         createdAt: { type: "string", format: "date-time" },
         updatedAt: { type: "string", format: "date-time" },
       },

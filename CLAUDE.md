@@ -275,7 +275,7 @@ Single-file Arduino sketch (`ESP32-Server.ino`) with:
 | `/login` | LoginPage | Public |
 | `/` | DashboardPage | All authenticated (role-specific view) |
 | `/sensors` | SensorsPage | All authenticated (technician: health only) |
-| `/actuators` | ActuatorsPage | All authenticated |
+| `/actuators` | ActuatorsPage | farm_manager, farm_worker |
 | `/activity` | ActivityLogPage | farm_manager, farm_worker |
 | `/analytics` | AnalyticsPage | farm_manager |
 | `/automation` | AutomationPage | farm_manager |

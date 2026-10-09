@@ -93,7 +93,7 @@ int cfgWaterCriticalThreshold = 10;
 bool cfgBuzzerEnabled = true;
 bool cfgBuzzerLowWater = true;
 bool cfgBuzzerDrySoil = true;
-int cfgLightLowThreshold = 30; // grow light turns ON when light < this (0-100)
+int cfgLightLowThreshold = 50; // grow light turns ON when light < this (0-100)
 
 // Timing
 unsigned long lastSensorRead = 0;

@@ -1,4 +1,4 @@
-import { memo } from "react"
+import { memo, useState } from "react"
 import { motion } from "framer-motion"
 import {
   Card,
@@ -17,9 +17,12 @@ import {
   Zap,
   Loader2,
 } from "lucide-react"
-import { DEVICE_LABELS, LED_DEVICES, DIGITAL_DEVICES } from "../types"
+import { DEVICE_LABELS, LED_DEVICES } from "../types"
 import { cn } from "@/lib/utils"
-import { useDashboardStore } from "@/store/use-dashboard-store"
+import {
+  useDashboardStore,
+  type DeviceKey,
+} from "@/store/use-dashboard-store"
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 16 },
@@ -35,13 +38,13 @@ type ActuatorTestCardProps = {
 }
 
 type TestButtonProps = {
-  device: string
+  device: DeviceKey
   label: string
   icon: React.ElementType
   isOn: boolean
   delay: number
   connected: boolean
-  onToggle: (device: string, state: boolean) => Promise<void>
+  onToggle: (device: DeviceKey, state: boolean) => Promise<void>
 }
 
 function TestButton({
@@ -101,10 +104,9 @@ export default memo(function ActuatorTestCard({
   const toast = useToastManager()
   const devices = useDashboardStore((s) => s.devices)
   const toggleDevice = useDashboardStore((s) => s.toggleDevice)
-  const setSlider = useDashboardStore((s) => s.setSlider)
   const addLog = useDashboardStore((s) => s.addLog)
 
-  const handleDigitalToggle = async (device: string, state: boolean) => {
+  const handleDigitalToggle = async (device: DeviceKey, state: boolean) => {
     const prev = devices[device as keyof typeof devices]
 
     // Optimistic update
@@ -190,7 +192,7 @@ export default memo(function ActuatorTestCard({
                   device="water_pump"
                   label={DEVICE_LABELS.water_pump}
                   icon={Droplets}
-                  isOn={devices.water_pump}
+                  isOn={Boolean(devices.water_pump)}
                   delay={5}
                   connected={connected}
                   onToggle={handleDigitalToggle}
@@ -199,7 +201,7 @@ export default memo(function ActuatorTestCard({
                   device="relay"
                   label={DEVICE_LABELS.relay}
                   icon={Power}
-                  isOn={devices.relay}
+                  isOn={Boolean(devices.relay)}
                   delay={6}
                   connected={connected}
                   onToggle={handleDigitalToggle}

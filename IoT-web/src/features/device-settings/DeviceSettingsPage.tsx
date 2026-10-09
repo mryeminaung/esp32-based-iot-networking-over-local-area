@@ -24,7 +24,7 @@ const INITIAL_SETTINGS: DeviceSettings = {
   soilMoisture: { dryThreshold: 30, optimalThreshold: 50 },
   waterLevel: { lowThreshold: 25, criticalThreshold: 10, warningEnabled: true },
   buzzer: { enabled: true, lowWater: true, drySoil: true, sensorError: false },
-  growLight: { lowThreshold: 30 },
+  growLight: { lowThreshold: 50 },
 };
 
 export default function DeviceSettingsPage() {

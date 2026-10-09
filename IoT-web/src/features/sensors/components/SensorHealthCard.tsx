@@ -97,7 +97,7 @@ const deviceFields = [
 export default function SensorHealthCard() {
 	const connected = useDashboardStore((s) => s.connected);
 	const sysInfo = useDashboardStore((s) => s.sysInfo);
-	const moisture = useDashboardStore((s) => s.moisture);
+	const sensors = useDashboardStore((s) => s.sensors);
 	const devices = useDashboardStore((s) => s.devices);
 
 	return (
@@ -113,7 +113,7 @@ export default function SensorHealthCard() {
 					<div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
 						{sensorFields.map((sensor) => {
 							const Icon = sensor.icon;
-							const value = sensor.key === "soilMoisture" ? moisture : null;
+							const value = sensors[sensor.key as keyof typeof sensors];
 							const isOnline =
 								connected && value !== null && value !== undefined;
 
