@@ -1,6 +1,6 @@
-# ESP32 Based Smart Agriculture IoT Monitoring System Over Local Area Network
+# ESP32 Based Smart Agriculture IoT Monitoring and Controlling System Over Local Area Network
 
-A capstone project for **ESP32 Based Smart Agriculture IoT Monitoring System Over Local Area Network** — a smart agriculture IoT platform with real-time sensor monitoring, device control, and automation.
+A capstone project for **ESP32 Based Smart Agriculture IoT Monitoring and Controlling System Over Local Area Network** — a smart agriculture IoT platform with real-time sensor monitoring, device control, and automation.
 
 ## Project Structure
 
